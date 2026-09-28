@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-tertiary-fixed-variant": "#93000b", "secondary-fixed-dim": "#bec6e0", "on-secondary": "#ffffff", "on-error": "#ffffff", "outline-variant": "#bcc9c6", "tertiary-container": "#e02928", "surface-variant": "#d3e4fe", "on-surface": "#0b1c30", "on-surface-variant": "#3d4947", "inverse-surface": "#213145", "on-tertiary-fixed": "#410002", "on-primary-fixed-variant": "#005049", "surface-dim": "#cbdbf5", "primary-container": "#008378", "surface-container-lowest": "#ffffff", "inverse-on-surface": "#eaf1ff", "surface-container-highest": "#d3e4fe", "surface-container-high": "#dce9ff", "on-tertiary": "#ffffff", "surface-container": "#e5eeff", "error": "#ba1a1a", "background": "#f8f9ff", "error-container": "#ffdad6", "surface-container-low": "#eff4ff", "on-primary-fixed": "#00201d", "on-primary": "#ffffff", "primary": "#00685f", "tertiary-fixed-dim": "#ffb4ab", "on-secondary-container": "#5c647a", "surface": "#f8f9ff", "secondary": "#565e74", "primary-fixed": "#89f5e7", "inverse-primary": "#6bd8cb", "on-primary-container": "#f4fffc", "primary-fixed-dim": "#6bd8cb", "on-secondary-fixed-variant": "#3f465c", "on-background": "#0b1c30", "on-error-container": "#93000a", "on-secondary-fixed": "#131b2e", "on-tertiary-container": "#fffbff", "secondary-fixed": "#dae2fd", "secondary-container": "#dae2fd", "surface-bright": "#f8f9ff", "tertiary-fixed": "#ffdad6", "outline": "#6d7a77", "surface-tint": "#006a61", "tertiary": "#bb0112" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "gutter": "1rem", "space-lg": "1rem", "space-sm": "0.5rem", "space-xl": "1.5rem", "margin": "1rem", "space-xs": "0.25rem", "space-md": "0.75rem" }, fontFamily: { "data-time": ["Inter"], "body-lg": ["Inter"], "headline-md": ["Inter"], "label-sm": ["Inter"], "label-lg": ["Inter"], "headline-sm": ["Inter"], "body-md": ["Inter"], "body-sm": ["Inter"], "headline-lg": ["Inter"], "display-lg": ["Inter"], "data-metric": ["Inter"], "label-md": ["Inter"], "title-md": ["Inter"] }, fontSize: { "data-time": ["15px", { "lineHeight": "20px", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "headline-md": ["20px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "600" }], "label-lg": ["14px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "600" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "headline-lg": ["24px", { "lineHeight": "30px", "letterSpacing": "-0.015em", "fontWeight": "700" }], "display-lg": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "data-metric": ["22px", { "lineHeight": "26px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }], "title-md": ["16px", { "lineHeight": "22px", "fontWeight": "600" }] } } } };</script><style>@layer base { html, body { width: 100%; min-height: 100%; margin: 0; padding: 0; } body { overscroll-behavior-y: none; } .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); } .pt-safe { padding-top: env(safe-area-inset-top, 0px); } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style></head><body class="bg-background font-body-md text-body-md text-on-surface flex flex-col antialiased"><header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl pt-safe"><div class="h-6 px-margin flex items-center justify-between text-on-surface select-none"><span class="font-label-sm text-label-sm font-semibold tracking-tight">10:42</span><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-[14px]">signal_cellular_alt</span><span class="font-label-sm text-label-sm font-bold">5G</span><span class="material-symbols-outlined text-[14px]">wifi</span><span class="material-symbols-outlined text-[16px]">battery_full</span></div></div><div class="h-14 px-margin flex items-center justify-between"><div class="flex items-center gap-space-sm"><div class="w-9 h-9 rounded-lg bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[20px]">hub</span></div><div class="flex flex-col"><div class="flex items-center gap-space-xs"><h1 class="font-title-md text-title-md text-on-surface uppercase tracking-tight">Compare</h1><span class="bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm px-1.5 py-0.5 rounded-full">PUNE</span></div></div></div><div class="flex items-center gap-space-sm"><button class="w-11 h-11 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors active:scale-95"><span class="material-symbols-outlined text-[22px]">tune</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-none"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 w-full bg-background pt-20 pb-24 px-margin"><div class="flex flex-col w-full gap-space-lg">
+<!-- Header Context & Waypoint Bar -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<h2 class="font-headline-md text-headline-md text-on-surface tracking-tight">Route Trade-off Matrix</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Compare 5 options by travel duration versus fare</p>
+</div>
+<span class="bg-primary/10 text-primary px-2 py-1 rounded-full font-label-sm text-label-sm">LIVE FARES</span>
+</div>
+<!-- Active Route Pill Ribbon -->
+<div class="bg-surface-container-low rounded-xl p-space-sm flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="flex flex-col items-center gap-0.5">
+<span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
+<span class="w-0.5 h-3 bg-outline-variant"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary"></span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1 truncate">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Origin</span>
+<span class="font-title-md text-title-md text-on-surface truncate">FC Road (Deccan)</span>
+</div>
+<div class="flex items-center gap-1 truncate">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Dest</span>
+<span class="font-title-md text-title-md text-on-surface truncate">Hinjewadi Phase 1</span>
+</div>
+</div>
+</div>
+<button aria-label="Change route endpoints" class="bg-surface-container-highest text-on-surface-variant p-2 rounded-lg flex items-center justify-center active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[18px]">swap_vert</span>
+</button>
+</div>
+</div>
+<!-- 2D Scatter Plot Visualisation Canvas -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-md flex flex-col gap-space-sm relative overflow-hidden">
+<!-- Matrix Zone Badges Header -->
+<div class="flex items-center justify-between text-on-surface-variant">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-primary">insights</span>
+<span class="font-label-sm text-label-sm font-semibold tracking-wider uppercase">Pareto Frontier</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Optimal Envelope</span>
+</div>
+</div>
+<!-- 2D SVG Cartesian Coordinate Grid -->
+<div class="relative w-full aspect-[4/3.4] select-none">
+<svg aria-label="Scatter plot showing travel time vs cost" class="w-full h-full overflow-visible" role="img" viewbox="0 0 360 270">
+<defs>
+<!-- Quadrant Gradients -->
+<lineargradient id="sweetSpotGrad" x1="0" x2="1" y1="1" y2="0">
+<stop offset="0%" stop-color="#00685f" stop-opacity="0.12"></stop>
+<stop offset="100%" stop-color="#00685f" stop-opacity="0.01"></stop>
+</lineargradient>
+<lineargradient id="speedGrad" x1="0" x2="1" y1="0" y2="1">
+<stop offset="0%" stop-color="#e02928" stop-opacity="0.08"></stop>
+<stop offset="100%" stop-color="#e02928" stop-opacity="0.0"></stop>
+</lineargradient>
+<filter height="200%" id="softGlow" width="200%" x="-50%" y="-50%">
+<fegaussianblur result="blur" stddeviation="3"></fegaussianblur>
+<fecomposite in="SourceGraphic" in2="blur" operator="over"></fecomposite>
+</filter>
+</defs>
+<!-- Quadrant Background Highlights -->
+<!-- Sweet Spot Zone: X (30m to 48m), Y (0 to 100) -->
+<rect fill="url(#sweetSpotGrad)" height="94" rx="8" width="138" x="52" y="146"></rect>
+<!-- Premium Speed Zone: X (30m to 42m), Y (150 to 350) -->
+<rect fill="url(#speedGrad)" height="110" rx="8" width="92" x="52" y="20"></rect>
+<!-- Quadrant Watermark Labels -->
+<text class="font-label-sm text-[9px] font-bold fill-tertiary-container tracking-wider uppercase opacity-80" x="58" y="32">Premium Speed</text>
+<text class="font-label-sm text-[9px] font-bold fill-primary tracking-wider uppercase" x="58" y="234">Sweet Spot (Fast &amp; Cheap)</text>
+<text class="font-label-sm text-[9px] font-bold fill-secondary tracking-wider uppercase opacity-80" x="210" y="234">Budget Saver</text>
+<!-- Subtle Grid Lines -->
+<!-- Horizontal Y Lines (Cost: ₹350, ₹200, ₹100, ₹50, ₹0) -->
+<!-- Bottom baseline is y=240 (₹0). Top baseline is y=30 (₹350) -->
+<line opacity="0.4" stroke="#bcc9c6" stroke-dasharray="2 2" stroke-width="0.8" x1="48" x2="345" y1="30" y2="30"></line>
+<text class="font-label-sm text-[10px] fill-on-surface-variant" text-anchor="end" x="42" y="34">₹350</text>
+<line opacity="0.4" stroke="#bcc9c6" stroke-dasharray="2 2" stroke-width="0.8" x1="48" x2="345" y1="90" y2="90"></line>
+<text class="font-label-sm text-[10px] fill-on-surface-variant" text-anchor="end" x="42" y="94">₹200</text>
+<line opacity="0.4" stroke="#bcc9c6" stroke-dasharray="2 2" stroke-width="0.8" x1="48" x2="345" y1="150" y2="150"></line>
+<text class="font-label-sm text-[10px] fill-on-surface-variant" text-anchor="end" x="42" y="154">₹100</text>
+<line opacity="0.4" stroke="#bcc9c6" stroke-dasharray="2 2" stroke-width="0.8" x1="48" x2="345" y1="195" y2="195"></line>
+<text class="font-label-sm text-[10px] fill-on-surface-variant" text-anchor="end" x="42" y="199">₹50</text>
+<line stroke="#6d7a77" stroke-width="1.2" x1="48" x2="345" y1="240" y2="240"></line>
+<text class="font-label-sm text-[10px] font-semibold fill-on-surface" text-anchor="end" x="42" y="244">₹0</text>
+<!-- Vertical X Lines (Time: 30m, 40m, 50m, 60m) -->
+<!-- X range: 30m (x=60) to 60m (x=330). Step=90px per 10 mins -->
+<line stroke="#6d7a77" stroke-width="1.2" x1="60" x2="60" y1="25" y2="240"></line>
+<text class="font-label-sm text-[10px] font-semibold fill-on-surface" text-anchor="middle" x="60" y="255">30m</text>
+<line opacity="0.4" stroke="#bcc9c6" stroke-dasharray="2 2" stroke-width="0.8" x1="150" x2="150" y1="25" y2="240"></line>
+<text class="font-label-sm text-[10px] fill-on-surface-variant" text-anchor="middle" x="150" y="255">40m</text>
+<line opacity="0.4" stroke="#bcc9c6" stroke-dasharray="2 2" stroke-width="0.8" x1="240" x2="240" y1="25" y2="240"></line>
+<text class="font-label-sm text-[10px] fill-on-surface-variant" text-anchor="middle" x="240" y="255">50m</text>
+<line opacity="0.4" stroke="#bcc9c6" stroke-dasharray="2 2" stroke-width="0.8" x1="330" x2="330" y1="25" y2="240"></line>
+<text class="font-label-sm text-[10px] fill-on-surface-variant" text-anchor="middle" x="330" y="255">60m</text>
+<!-- Axis Titles -->
+<text class="font-label-sm text-[9px] font-bold fill-on-surface-variant tracking-wider uppercase" text-anchor="middle" x="195" y="267">Commute Duration (Minutes)</text>
+<!-- Pareto Trend Curve (Hypothetical efficiency envelope) -->
+<path d="M 96 123 Q 120 185 168 214 T 276 225" fill="none" opacity="0.65" stroke="#00685f" stroke-dasharray="4 3" stroke-width="1.8"></path>
+<!-- ================= DATA POINTS ================= -->
+<!-- POINT 2: Direct Cab (38m, ₹320) -->
+<!-- X: 30 + 8m = 60 + 72 = 132 | Y: 240 - (320/350)*210 = 240 - 192 = 48 -->
+<g class="cursor-pointer group" onclick="selectPoint(2)">
+<circle cx="132" cy="48" fill="#e02928" r="6"></circle>
+<circle cx="132" cy="48" fill="none" opacity="0.4" r="9" stroke="#e02928" stroke-width="1"></circle>
+<!-- Tag Label -->
+<rect fill="#eff4ff" height="20" rx="4" width="118" x="142" y="38"></rect>
+<text class="font-label-sm text-[10px] font-bold fill-on-surface" x="146" y="52">Uber Cab (38m, ₹320)</text>
+</g>
+<!-- POINT 3: Auto + Metro (34m, ₹145) - Fastest -->
+<!-- X: 30 + 4m = 60 + 36 = 96 | Y: 240 - (145/350)*210 = 240 - 87 = 153 -->
+<g class="cursor-pointer group" onclick="selectPoint(3)">
+<circle cx="96" cy="153" fill="#565e74" r="7"></circle>
+<!-- Badge Pill -->
+<rect fill="#dae2fd" height="22" rx="4" width="128" x="22" y="116"></rect>
+<text class="font-label-sm text-[10px] font-bold fill-on-secondary-fixed" x="26" y="131">Auto+Metro (34m, ₹145) ⚡</text>
+<!-- Pointer tick line -->
+<line stroke="#565e74" stroke-width="1.2" x1="96" x2="96" y1="138" y2="146"></line>
+</g>
+<!-- POINT 4: Metro + Feeder (46m, ₹40) -->
+<!-- X: 30 + 16m = 60 + 144 = 204 | Y: 240 - (40/350)*210 = 240 - 24 = 216 -->
+<g class="cursor-pointer group" onclick="selectPoint(4)">
+<circle cx="204" cy="216" fill="#008378" r="6"></circle>
+<rect fill="#d3e4fe" height="20" rx="4" width="118" x="180" y="184"></rect>
+<text class="font-label-sm text-[10px] font-semibold fill-on-surface" x="184" y="198">Metro+Feeder (46m, ₹40)</text>
+<line stroke="#008378" stroke-width="1" x1="204" x2="204" y1="204" y2="210"></line>
+</g>
+<!-- POINT 5: Bus 115X (54m, ₹25) - Cheapest -->
+<!-- X: 30 + 24m = 60 + 216 = 276 | Y: 240 - (25/350)*210 = 240 - 15 = 225 -->
+<g class="cursor-pointer group" onclick="selectPoint(5)">
+<circle cx="276" cy="225" fill="#bb0112" r="7"></circle>
+<rect fill="#ffdad6" height="20" rx="4" width="118" x="236" y="242"></rect>
+<text class="font-label-sm text-[10px] font-bold fill-on-tertiary-fixed-variant" x="240" y="256">Bus 115X (54m, ₹25) 🏷️</text>
+</g>
+<!-- POINT 1: RECOMMENDED [Metro + Bus] (42m, ₹35) -->
+<!-- X: 30 + 12m = 60 + 108 = 168 | Y: 240 - (35/350)*210 = 240 - 21 = 219 -->
+<g class="cursor-pointer group" onclick="selectPoint(1)">
+<!-- Pulsating Outer Halo -->
+<circle cx="168" cy="219" fill="#00685f" opacity="0.2" r="16">
+<animate attributename="r" dur="2.4s" repeatcount="indefinite" values="12;18;12"></animate>
+<animate attributename="opacity" dur="2.4s" repeatcount="indefinite" values="0.3;0.08;0.3"></animate>
+</circle>
+<circle cx="168" cy="219" fill="#00685f" filter="url(#softGlow)" r="10" stroke="#ffffff" stroke-width="2.5"></circle>
+<circle cx="168" cy="219" fill="#ffffff" r="4"></circle>
+<!-- Recommendation Floating Tag -->
+<g transform="translate(108, 142)">
+<rect fill="#00685f" height="28" rx="6" width="128" x="0" y="0"></rect>
+<polygon fill="#00685f" points="60,28 66,35 72,28"></polygon>
+<text class="font-label-sm text-[9px] font-bold fill-primary-fixed uppercase tracking-wider" x="6" y="13">★ Best Value Match</text>
+<text class="font-label-sm text-[11px] font-bold fill-on-primary" x="6" y="23">Metro+Bus (42m, ₹35)</text>
+</g>
+</g>
+</svg>
+</div>
+<!-- Quick Mode Legend Chips -->
+<div class="flex items-center justify-between pt-space-xs overflow-x-auto gap-space-xs no-scrollbar">
+<div class="flex items-center gap-1 bg-surface-container px-2 py-1 rounded-full shrink-0">
+<span class="w-2.5 h-2.5 rounded-full bg-primary ring-2 ring-primary/20"></span>
+<span class="font-label-sm text-label-sm text-on-surface">Recommended</span>
+</div>
+<div class="flex items-center gap-1 bg-surface-container px-2 py-1 rounded-full shrink-0">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-label-sm text-label-sm text-on-surface">Auto Hybrid</span>
+</div>
+<div class="flex items-center gap-1 bg-surface-container px-2 py-1 rounded-full shrink-0">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span class="font-label-sm text-label-sm text-on-surface">Direct Cab</span>
+</div>
+<div class="flex items-center gap-1 bg-surface-container px-2 py-1 rounded-full shrink-0">
+<span class="w-2 h-2 rounded-full bg-tertiary-container"></span>
+<span class="font-label-sm text-label-sm text-on-surface">PMPML Bus</span>
+</div>
+</div>
+</div>
+<!-- Trade-off Analysis Human Narrative Card -->
+<div class="bg-surface-container-low rounded-xl p-space-lg shadow-sm flex flex-col gap-space-sm relative overflow-hidden">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[18px]">balance</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-primary uppercase font-bold tracking-wider">Commuter Intelligence</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">The 8-Minute Trade-off</h3>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+      The <strong class="text-on-surface font-semibold">Recommended route (Metro + Bus)</strong> takes only <span class="font-semibold text-primary">8 minutes longer</span> than an auto/metro combo (<span class="font-semibold text-on-surface">42 min</span> vs <span class="font-semibold text-on-surface">34 min</span>), but slashes your one-way fare by <span class="font-bold text-primary">76%</span> (saving ₹110 vs auto and ₹285 vs direct cab).
+    </p>
+<!-- Monthly Savings Callout Box -->
+<div class="bg-surface-container rounded-lg p-space-md flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[22px]">savings</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Daily Office Commute (22 Days)</span>
+<span class="font-title-md text-title-md text-on-surface font-bold">Save ~₹3,200 / month</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm bg-primary/10 text-primary font-bold px-2 py-1 rounded">ROI 9.1x</span>
+</div>
+</div>
+<!-- Route Comparison Matrix Quick Cards -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<h3 class="font-title-md text-title-md text-on-surface">Compare All 5 Options</h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Tap to inspect</span>
+</div>
+<!-- Option 1: RECOMMENDED [Metro + Bus] -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-md flex flex-col gap-space-sm transition-all duration-200" id="route-card-1">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="bg-primary text-on-primary font-label-sm text-label-sm px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">★ Recommended</span>
+<span class="bg-surface-container text-on-surface-variant font-label-sm text-label-sm px-1.5 py-0.5 rounded">Aqua Metro + Bus 100</span>
+</div>
+<div class="flex items-baseline gap-0.5">
+<span class="font-data-metric text-data-metric text-on-surface">₹35</span>
+</div>
+</div>
+<!-- Progression ribbon -->
+<div class="flex items-center gap-1.5 text-on-surface-variant text-label-sm">
+<span class="bg-surface-container px-2 py-0.5 rounded flex items-center gap-1 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[13px]">directions_walk</span> 3m
+        </span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+<span class="bg-primary-container text-on-primary font-label-sm text-label-sm px-2 py-0.5 rounded flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">subway</span> 21m
+        </span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+<span class="bg-surface-container px-2 py-0.5 rounded flex items-center gap-1 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[13px]">directions_bus</span> 18m
+        </span>
+</div>
+<!-- Stat Badges -->
+<div class="grid grid-cols-4 gap-2 pt-1">
+<div class="flex flex-col bg-surface-container-low p-1.5 rounded text-center">
+<span class="font-label-sm text-[10px] text-on-surface-variant">DURATION</span>
+<span class="font-data-time text-data-time text-primary">42 min</span>
+</div>
+<div class="flex flex-col bg-surface-container-low p-1.5 rounded text-center">
+<span class="font-label-sm text-[10px] text-on-surface-variant">COMFORT</span>
+<span class="font-data-time text-data-time text-on-surface">8.4/10</span>
+</div>
+<div class="flex flex-col bg-surface-container-low p-1.5 rounded text-center">
+<span class="font-label-sm text-[10px] text-on-surface-variant">RELIABILITY</span>
+<span class="font-data-time text-data-time text-primary">94%</span>
+</div>
+<div class="flex flex-col bg-surface-container-low p-1.5 rounded text-center">
+<span class="font-label-sm text-[10px] text-on-surface-variant">CO₂ EMITTED</span>
+<span class="font-data-time text-data-time text-on-surface">0.4 kg</span>
+</div>
+</div>
+</div>
+<!-- Option 2: Fastest Hybrid (Auto + Metro) -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col gap-space-sm transition-all duration-200" id="route-card-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="bg-secondary text-on-secondary font-label-sm text-label-sm px-2 py-0.5 rounded uppercase font-bold">Fastest</span>
+<span class="font-title-md text-title-md text-on-surface font-semibold">Auto ➔ Metro Aqua</span>
+</div>
+<div class="flex items-baseline gap-0.5">
+<span class="font-data-metric text-data-metric text-on-surface">₹145</span>
+</div>
+</div>
+<!-- Progression ribbon -->
+<div class="flex items-center gap-1.5 text-on-surface-variant text-label-sm">
+<span class="bg-secondary-container text-on-secondary-fixed font-label-sm text-label-sm px-2 py-0.5 rounded flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">local_taxi</span> 11m
+        </span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+<span class="bg-primary-container text-on-primary font-label-sm text-label-sm px-2 py-0.5 rounded flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">subway</span> 23m
+        </span>
+</div>
+<!-- Stat Badges -->
+<div class="grid grid-cols-4 gap-2 pt-1">
+<div class="flex flex-col bg-surface-container-low p-1.5 rounded text-center">
+<span class="font-label-sm text-[10px] text-on-surface-variant">DURATION</span>
+<span class="font-data-time text-data-time text-on-surface font-bold">34 min</span>
+</div>
+<div class="flex flex-col bg-surface-container-low p-1.5 rounded text-center">
+<span class="font-label-sm text-[10px] text-on-surface-variant">COMFORT</span>
+<span class="font-data-time text-data-time text-on-surface">7.8/10</span>
+</div>
+<div class="flex flex-col bg-surface-container-low p-1.5 rounded text-center">
+<span class="font-label-sm text-[10px] text-on-surface-variant">RELIABILITY</span>
+<span class="font-data-time text-data-time text-on-surface">89%</span>
+</div>
+<div class="flex flex-col bg-surface-container-low p-1.5 rounded text-center">
+<span class="font-label-sm text-[10px] text-on-surface-variant">CO₂ EMITTED</span>
+<span class="font-data-time text-data-time text-on-surface">1.2 kg</span>
+</div>
+</div>
+</div>
+<!-- Option 3: Cheapest (Direct PMPML Bus 115X) -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col gap-space-sm transition-all duration-200" id="route-card-5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-sm text-label-sm px-2 py-0.5 rounded uppercase font-bold">Cheapest</span>
+<span class="font-title-md text-title-md text-on-surface font-semibold">Direct Bus 115X</span>
+</div>
+<div class="flex items-baseline gap-0.5">
+<span class="font-data-metric text-data-metric text-primary">₹25</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant text-label-sm">
+<span class="bg-surface-container px-2 py-0.5 rounded flex items-center gap-1 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[13px]">directions_walk</span> 5m
+        </span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+<span class="bg-error-container text-on-error-container font-label-sm text-label-sm px-2 py-0.5 rounded flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">directions_bus</span> 49m
+        </span>
+</div>
+<div class="grid grid-cols-4 gap-2 pt-1">
+<div class="flex flex-col bg-surface-container-low p-1.5 rounded text-center">
+<span class="font-label-sm text-[10px] text-on-surface-variant">DURATION</span>
+<span class="font-data-time text-data-time text-on-surface">54 min</span>
+</div>
+<div class="flex flex-col bg-surface-container-low p-1.5 rounded text-center">
+<span class="font-label-sm text-[10px] text-on-surface-variant">COMFORT</span>
+<span class="font-data-time text-data-time text-on-surface">5.2/10</span>
+</div>
+<div class="flex flex-col bg-surface-container-low p-1.5 rounded text-center">
+<span class="font-label-sm text-[10px] text-on-surface-variant">RELIABILITY</span>
+<span class="font-data-time text-data-time text-error font-semibold">72%</span>
+</div>
+<div class="flex flex-col bg-surface-container-low p-1.5 rounded text-center">
+<span class="font-label-sm text-[10px] text-on-surface-variant">CO₂ EMITTED</span>
+<span class="font-data-time text-data-time text-on-surface">0.6 kg</span>
+</div>
+</div>
+</div>
+<!-- Option 4: Direct Cab (Uber/Ola) -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col gap-space-sm opacity-90 transition-all duration-200" id="route-card-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="bg-surface-container-highest text-on-surface-variant font-label-sm text-label-sm px-2 py-0.5 rounded uppercase font-semibold">Cab Direct</span>
+<span class="font-title-md text-title-md text-on-surface">Uber Auto/Cab</span>
+</div>
+<div class="flex items-baseline gap-0.5">
+<span class="font-data-metric text-data-metric text-tertiary">₹320</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant text-label-sm">
+<span class="bg-surface-container-high text-on-surface font-label-sm text-label-sm px-2 py-0.5 rounded flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">local_taxi</span> 38 min door-to-door
+        </span>
+<span class="font-label-sm text-label-sm text-error flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[12px]">traffic</span> University flyover delay
+        </span>
+</div>
+<div class="grid grid-cols-4 gap-2 pt-1">
+<div class="flex flex-col bg-surface-container-low p-1.5 rounded text-center">
+<span class="font-label-sm text-[10px] text-on-surface-variant">DURATION</span>
+<span class="font-data-time text-data-time text-on-surface">38 min</span>
+</div>
+<div class="flex flex-col bg-surface-container-low p-1.5 rounded text-center">
+<span class="font-label-sm text-[10px] text-on-surface-variant">COMFORT</span>
+<span class="font-data-time text-data-time text-on-surface font-semibold">9.0/10</span>
+</div>
+<div class="flex flex-col bg-surface-container-low p-1.5 rounded text-center">
+<span class="font-label-sm text-[10px] text-on-surface-variant">RELIABILITY</span>
+<span class="font-data-time text-data-time text-on-surface">81%</span>
+</div>
+<div class="flex flex-col bg-surface-container-low p-1.5 rounded text-center">
+<span class="font-label-sm text-[10px] text-on-surface-variant">CO₂ EMITTED</span>
+<span class="font-data-time text-data-time text-error font-semibold">4.8 kg</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Primary Floating CTA to Commit Selection -->
+<div class="pt-space-xs pb-space-sm flex flex-col gap-space-xs">
+<button class="w-full h-12 bg-primary text-on-primary rounded-xl font-label-lg text-label-lg flex items-center justify-center gap-space-xs shadow-md active:bg-primary-container transition-colors" onclick="confirmRouteSelection()">
+<span>Select Recommended Commute (Metro + Bus)</span>
+<span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+<p class="text-center font-label-sm text-label-sm text-on-surface-variant">
+      Integrates seamless ticketing via MahaMetro UPI &amp; PMPML Pass
+    </p>
+</div>
+</div>
+<script>
+  function selectPoint(pointId) {
+    const cardMap = {
+      1: 'route-card-1',
+      2: 'route-card-2',
+      3: 'route-card-3',
+      4: 'route-card-1',
+      5: 'route-card-5'
+    };
+    const targetId = cardMap[pointId];
+    if (targetId) {
+      const el = document.getElementById(targetId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        el.classList.add('bg-surface-variant');
+        setTimeout(() => {
+          el.classList.remove('bg-surface-variant');
+        }, 1200);
+      }
+    }
+  }
+
+  function confirmRouteSelection() {
+    const btn = event.currentTarget;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">check_circle</span> Plan Saved to Today\'s Commute';
+    btn.classList.replace('bg-primary', 'bg-primary-container');
+    setTimeout(() => {
+      btn.innerHTML = originalText;
+      btn.classList.replace('bg-primary-container', 'bg-primary');
+    }, 2500);
+  }
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/95 backdrop-blur-xl shadow-[0_-4px_16px_rgba(11,28,48,0.06)]" data-active-classes="text-primary font-bold"><div class="h-16 px-space-sm flex items-center justify-around"><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-0.5 text-on-surface-variant hover:text-on-surface transition-colors" data-path="search" href="#"><span class="material-symbols-outlined text-[24px]">search</span><span class="font-label-sm text-label-sm tracking-normal">Search</span></a><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-0.5 text-on-surface-variant hover:text-on-surface transition-colors" data-path="routes" href="#"><span class="material-symbols-outlined text-[24px]">alt_route</span><span class="font-label-sm text-label-sm tracking-normal">Routes</span></a><a aria-current="page" class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-0.5 transition-colors text-primary font-bold" data-path="compare" href="#"><span class="material-symbols-outlined text-[24px]">compare_arrows</span><span class="font-label-sm text-label-sm tracking-normal">Compare</span></a><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-0.5 text-on-surface-variant hover:text-on-surface transition-colors" data-path="alerts" href="#"><span class="material-symbols-outlined text-[24px]">notifications_none</span><span class="font-label-sm text-label-sm tracking-normal">Alerts</span></a></div></nav></body></html>

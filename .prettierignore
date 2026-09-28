@@ -1,0 +1,6 @@
+design/
+node_modules/
+.expo/
+dist/
+ios/
+android/

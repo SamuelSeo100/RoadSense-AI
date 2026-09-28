@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-tertiary-fixed-variant": "#93000b", "secondary-fixed-dim": "#bec6e0", "on-secondary": "#ffffff", "on-error": "#ffffff", "outline-variant": "#bcc9c6", "tertiary-container": "#e02928", "surface-variant": "#d3e4fe", "on-surface": "#0b1c30", "on-surface-variant": "#3d4947", "inverse-surface": "#213145", "on-tertiary-fixed": "#410002", "on-primary-fixed-variant": "#005049", "surface-dim": "#cbdbf5", "primary-container": "#008378", "surface-container-lowest": "#ffffff", "inverse-on-surface": "#eaf1ff", "surface-container-highest": "#d3e4fe", "surface-container-high": "#dce9ff", "on-tertiary": "#ffffff", "surface-container": "#e5eeff", "error": "#ba1a1a", "background": "#f8f9ff", "error-container": "#ffdad6", "surface-container-low": "#eff4ff", "on-primary-fixed": "#00201d", "on-primary": "#ffffff", "primary": "#00685f", "tertiary-fixed-dim": "#ffb4ab", "on-secondary-container": "#5c647a", "surface": "#f8f9ff", "secondary": "#565e74", "primary-fixed": "#89f5e7", "inverse-primary": "#6bd8cb", "on-primary-container": "#f4fffc", "primary-fixed-dim": "#6bd8cb", "on-secondary-fixed-variant": "#3f465c", "on-background": "#0b1c30", "on-error-container": "#93000a", "on-secondary-fixed": "#131b2e", "on-tertiary-container": "#fffbff", "secondary-fixed": "#dae2fd", "secondary-container": "#dae2fd", "surface-bright": "#f8f9ff", "tertiary-fixed": "#ffdad6", "outline": "#6d7a77", "surface-tint": "#006a61", "tertiary": "#bb0112" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "gutter": "1rem", "space-lg": "1rem", "space-sm": "0.5rem", "space-xl": "1.5rem", "margin": "1rem", "space-xs": "0.25rem", "space-md": "0.75rem" }, fontFamily: { "data-time": ["Inter"], "body-lg": ["Inter"], "headline-md": ["Inter"], "label-sm": ["Inter"], "label-lg": ["Inter"], "headline-sm": ["Inter"], "body-md": ["Inter"], "body-sm": ["Inter"], "headline-lg": ["Inter"], "display-lg": ["Inter"], "data-metric": ["Inter"], "label-md": ["Inter"], "title-md": ["Inter"] }, fontSize: { "data-time": ["15px", { "lineHeight": "20px", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "headline-md": ["20px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.03em", "fontWeight": "600" }], "label-lg": ["14px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "600" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "headline-lg": ["24px", { "lineHeight": "30px", "letterSpacing": "-0.015em", "fontWeight": "700" }], "display-lg": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "data-metric": ["22px", { "lineHeight": "26px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }], "title-md": ["16px", { "lineHeight": "22px", "fontWeight": "600" }] } } } };</script><style>@layer base { html, body { width: 100%; min-height: 100%; margin: 0; padding: 0; } body { overscroll-behavior-y: none; } .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); } .pt-safe { padding-top: env(safe-area-inset-top, 0px); } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style></head><body class="bg-background font-body-md text-body-md text-on-surface flex flex-col antialiased"><header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl pt-safe"><div class="h-6 px-margin flex items-center justify-between text-on-surface select-none"><span class="font-label-sm text-label-sm font-semibold tracking-tight">10:42</span><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-[14px]">signal_cellular_alt</span><span class="font-label-sm text-label-sm font-bold">5G</span><span class="material-symbols-outlined text-[14px]">wifi</span><span class="material-symbols-outlined text-[16px]">battery_full</span></div></div><div class="h-14 px-margin flex items-center justify-between"><div class="flex items-center gap-space-sm"><button class="w-11 h-11 -ml-2 flex items-center justify-center text-on-surface hover:text-primary transition-colors active:scale-95" onclick="history.back()"><span class="material-symbols-outlined text-[24px]">arrow_back</span></button><h1 class="font-title-md text-title-md text-on-surface tracking-tight truncate max-w-[200px]">Journey Detail</h1></div><div class="flex items-center gap-space-sm"><button class="w-11 h-11 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors active:scale-95"><span class="material-symbols-outlined text-[22px]">share</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-none"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 w-full bg-background pt-20 pb-safe px-margin"><div class="flex flex-col w-full pb-28">
+<!-- Map Visualizer Card -->
+<section class="relative w-full h-80 rounded-xl overflow-hidden bg-surface-container-high shadow-md">
+<!-- Map Background / River / Grid Canvas -->
+<div class="absolute inset-0 w-full h-full bg-cover bg-center" data-location="Shivajinagar to Hinjewadi, Pune" style="">
+<!-- Simulated Vector Transit Overlay for crisp readability -->
+<svg class="w-full h-full object-cover" fill="none" viewbox="0 0 400 320" xmlns="http://www.w3.org/2000/svg">
+<!-- River Mula-Mutha subtle ribbon -->
+<path d="M-10 170 C90 190, 160 140, 240 165 C320 190, 370 160, 420 175" opacity="0.6" stroke="#cbdbf5" stroke-linecap="round" stroke-width="22"></path>
+<path d="M-10 170 C90 190, 160 140, 240 165 C320 190, 370 160, 420 175" stroke="#dce9ff" stroke-linecap="round" stroke-width="12"></path>
+<!-- Urban Arterials -->
+<path d="M40 290 L110 200 L180 185 L360 80" opacity="0.4" stroke="#bcc9c6" stroke-linecap="round" stroke-width="4"></path>
+<path d="M110 200 L210 240 L380 230" opacity="0.3" stroke="#bcc9c6" stroke-width="2.5"></path>
+<path d="M170 30 L180 185 L190 310" opacity="0.3" stroke="#bcc9c6" stroke-width="3"></path>
+<!-- ROUTE SEGMENT 1: Walk (300m) -->
+<path d="M50 260 L80 235" stroke="#565e74" stroke-dasharray="4 4" stroke-linecap="round" stroke-width="3.5"></path>
+<!-- ROUTE SEGMENT 2: Pune Metro Aqua Line -->
+<path d="M80 235 L175 180" stroke="#008378" stroke-linecap="round" stroke-width="6"></path>
+<path d="M80 235 L175 180" stroke="#89f5e7" stroke-linecap="round" stroke-width="2"></path>
+<!-- ROUTE SEGMENT 3: PMPML Bus Express via Bypass -->
+<path d="M175 180 C230 160, 270 120, 330 95" stroke="#bb0112" stroke-linecap="round" stroke-width="5"></path>
+<!-- ROUTE SEGMENT 4: Final Walk to Destination -->
+<path d="M330 95 L360 80" stroke="#565e74" stroke-dasharray="4 4" stroke-linecap="round" stroke-width="3.5"></path>
+<!-- Real-time Metro Transit Pulse indicator -->
+<circle class="animate-ping" cx="130" cy="206" fill="#008378" opacity="0.75" r="5"></circle>
+<circle cx="130" cy="206" fill="#00685f" r="4"></circle>
+<!-- Real-time Bus marker -->
+<circle class="animate-ping" cx="260" cy="138" fill="#bb0112" opacity="0.75" r="5"></circle>
+<circle cx="260" cy="138" fill="#e02928" r="4"></circle>
+<!-- Map Stop Markers -->
+<!-- Origin / Shivajinagar -->
+<g transform="translate(42, 252)">
+<circle cx="8" cy="8" fill="#0b1c30" r="7"></circle>
+<circle cx="8" cy="8" fill="#ffffff" r="3.5"></circle>
+</g>
+<!-- Metro Station Boarding -->
+<g transform="translate(72, 227)">
+<rect fill="#00685f" height="16" rx="8" width="16" x="0" y="0"></rect>
+<circle cx="8" cy="8" fill="#ffffff" r="3.5"></circle>
+</g>
+<!-- Garware Interchange Node -->
+<g transform="translate(167, 172)">
+<rect fill="#565e74" height="16" rx="8" width="16" x="0" y="0"></rect>
+<circle cx="8" cy="8" fill="#ffffff" r="4"></circle>
+</g>
+<!-- Hinjewadi Ph 1 End Bus Stop -->
+<g transform="translate(322, 87)">
+<rect fill="#bb0112" height="16" rx="8" width="16" x="0" y="0"></rect>
+<circle cx="8" cy="8" fill="#ffffff" r="3.5"></circle>
+</g>
+<!-- Final Destination Pin -->
+<g transform="translate(354, 62)">
+<path d="M6 0 C2.7 0 0 2.7 0 6 C0 10.5 6 16 6 16 C6 16 12 10.5 12 6 C12 2.7 9.3 0 6 0 Z" fill="#0b1c30"></path>
+<circle cx="6" cy="6" fill="#ffffff" r="2.5"></circle>
+</g>
+</svg>
+</div>
+<!-- Live Traffic & Status Badge (Top-Left of map) -->
+<div class="absolute top-3 left-3 flex items-center gap-space-xs bg-surface-container-lowest/95 backdrop-blur-sm px-space-sm py-1 rounded-full shadow-sm">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-on-surface uppercase tracking-wide">Live Corridors • University Flyover Congested (+18m)</span>
+</div>
+<!-- Floating Map Controls (Top-Right) -->
+<div class="absolute top-3 right-3 flex flex-col gap-1.5">
+<button aria-label="Toggle Live Congestion" class="w-9 h-9 rounded-lg bg-surface-container-lowest text-on-surface flex items-center justify-center shadow-sm active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[20px] text-tertiary">traffic</span>
+</button>
+<button aria-label="Recenter Map" class="w-9 h-9 rounded-lg bg-surface-container-lowest text-on-surface flex items-center justify-center shadow-sm active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[20px] text-primary">my_location</span>
+</button>
+<button aria-label="Zoom In" class="w-9 h-9 rounded-lg bg-surface-container-lowest text-on-surface flex items-center justify-center shadow-sm active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+</div>
+<!-- Quick Location Chips (Bottom overlay within map) -->
+<div class="absolute bottom-2 inset-x-2 flex items-center justify-between gap-space-xs overflow-x-auto select-none">
+<div class="flex items-center gap-1 bg-surface-container-lowest/95 backdrop-blur-sm px-2.5 py-1 rounded-md shadow-sm shrink-0">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Shivajinagar</span>
+</div>
+<span class="material-symbols-outlined text-secondary text-[14px]">arrow_forward</span>
+<div class="flex items-center gap-1 bg-surface-container-lowest/95 backdrop-blur-sm px-2.5 py-1 rounded-md shadow-sm shrink-0">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Garware College</span>
+</div>
+<span class="material-symbols-outlined text-secondary text-[14px]">arrow_forward</span>
+<div class="flex items-center gap-1 bg-surface-container-lowest/95 backdrop-blur-sm px-2.5 py-1 rounded-md shadow-sm shrink-0">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Wipro Cir. Ph 1</span>
+</div>
+</div>
+</section>
+<!-- Route Summary Banner -->
+<section class="mt-space-md p-space-md rounded-xl bg-surface-container-lowest shadow-sm flex items-center justify-between">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-md text-headline-md text-on-surface">42 min</span>
+<span class="px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm font-bold">Fastest</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Arrive by 11:24 AM • 16.4 km</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-data-metric text-data-metric text-primary">₹35</span>
+<span class="font-label-sm text-label-sm text-secondary">Single Combined QR</span>
+</div>
+</section>
+<!-- Vertical Timeline: Step-by-Step Multi-Modal Legs -->
+<section class="mt-space-md flex flex-col gap-0 relative">
+<!-- LEG 1: Walk to Shivajinagar Metro -->
+<div class="flex gap-space-md">
+<!-- Spine & Icon Column -->
+<div class="flex flex-col items-center">
+<div class="w-9 h-9 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[20px]">directions_walk</span>
+</div>
+<div class="w-0.5 grow bg-secondary-fixed-dim my-1"></div>
+</div>
+<!-- Step Content -->
+<div class="grow pb-4 pt-1">
+<div class="flex items-center justify-between">
+<h2 class="font-title-md text-title-md text-on-surface">Walk to Shivajinagar Metro</h2>
+<span class="font-data-time text-data-time text-on-surface-variant">4 min</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">300 m • Follow FC Road pedestrian pathway to Gate 2</p>
+<div class="mt-2 inline-flex items-center gap-1.5 px-2 py-1 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px] text-secondary">stairs</span>
+<span>Access via Gate 2 • Escalator active</span>
+</div>
+</div>
+</div>
+<!-- TRANSFER 1 CONNECTOR -->
+<div class="flex gap-space-md">
+<div class="flex flex-col items-center">
+<div class="w-0.5 h-full bg-secondary-fixed-dim"></div>
+</div>
+<div class="grow py-1.5 pl-0.5">
+<div class="flex items-center gap-2 p-2 rounded-lg bg-surface-container-low text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-primary">schedule</span>
+<span class="font-label-md text-label-md font-semibold text-on-surface">3 min transfer wait</span>
+<span class="text-outline-variant">•</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Clear platform signage</span>
+</div>
+</div>
+</div>
+<!-- LEG 2: Pune Metro Aqua Line -->
+<div class="flex gap-space-md">
+<!-- Spine & Icon Column -->
+<div class="flex flex-col items-center">
+<div class="w-0.5 h-2 bg-secondary-fixed-dim"></div>
+<div class="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[20px]">subway</span>
+</div>
+<div class="w-0.5 grow bg-primary-container my-1"></div>
+</div>
+<!-- Step Content Card -->
+<div class="grow pb-4 pt-1">
+<div class="p-space-md rounded-xl bg-surface-container-lowest shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 rounded bg-primary-container text-on-primary-container font-label-sm text-label-sm font-bold">Aqua Line</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Line 2</span>
+</div>
+<span class="font-data-time text-data-time text-on-surface">11 min</span>
+</div>
+<p class="font-title-md text-title-md text-on-surface mt-1.5">Towards Vanaz / Ruby Hall Link</p>
+<div class="mt-2 space-y-1 font-body-sm text-body-sm">
+<div class="flex items-center gap-2 text-on-surface">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="font-semibold">Board:</span> Shivajinagar Metro (Platform 1)
+            </div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-outline-variant"></span>
+<span class="font-semibold">Alight:</span> Garware College Station
+            </div>
+</div>
+<!-- Stops Collapsible Pill -->
+<div class="mt-3 pt-2.5 flex items-center justify-between bg-surface-container-low px-2.5 py-1.5 rounded-lg text-on-surface-variant">
+<div class="flex items-center gap-1.5 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">linear_scale</span>
+<span>4 intermediate stations (Civil Court, PMC...)</span>
+</div>
+<span class="font-data-time text-data-time text-primary">₹15</span>
+</div>
+</div>
+</div>
+</div>
+<!-- TRANSFER 2 CONNECTOR -->
+<div class="flex gap-space-md">
+<div class="flex flex-col items-center">
+<div class="w-0.5 h-full bg-primary-container"></div>
+</div>
+<div class="grow py-1.5 pl-0.5">
+<div class="flex items-center gap-2 p-2 rounded-lg bg-surface-container-low text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-tertiary">departure_board</span>
+<span class="font-label-md text-label-md font-semibold text-on-surface">4 min wait</span>
+<span class="text-outline-variant">•</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Exit Gate 1 for Dedicated Bus Bay 3</span>
+</div>
+</div>
+</div>
+<!-- LEG 3: PMPML Express Bus -->
+<div class="flex gap-space-md">
+<!-- Spine & Icon Column -->
+<div class="flex flex-col items-center">
+<div class="w-0.5 h-2 bg-primary-container"></div>
+<div class="w-9 h-9 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[20px]">directions_bus</span>
+</div>
+<div class="w-0.5 grow bg-secondary-fixed-dim my-1"></div>
+</div>
+<!-- Step Content Card -->
+<div class="grow pb-4 pt-1">
+<div class="p-space-md rounded-xl bg-surface-container-lowest shadow-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="px-2 py-0.5 rounded bg-tertiary-container text-on-tertiary-container font-label-sm text-label-sm font-bold">BUS 100</span>
+<span class="font-label-sm text-label-sm text-tertiary font-semibold flex items-center gap-0.5">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span> Fast Express
+              </span>
+</div>
+<span class="font-data-time text-data-time text-on-surface">18 min</span>
+</div>
+<p class="font-title-md text-title-md text-on-surface mt-1.5">Garware Bay to Hinjewadi Phase 1</p>
+<div class="mt-2 space-y-1 font-body-sm text-body-sm">
+<div class="flex items-center gap-2 text-on-surface">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span class="font-semibold">Board:</span> Garware College Bus Bay Stand
+            </div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-outline-variant"></span>
+<span class="font-semibold">Alight:</span> Hinjewadi Ph 1 (Wipro Circle)
+            </div>
+</div>
+<!-- Feature Badges -->
+<div class="mt-3 flex flex-wrap items-center gap-1.5">
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Electric e-Bus</span>
+<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">AC Seated</span>
+<span class="px-2 py-0.5 rounded bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-label-sm font-bold">On Time</span>
+<span class="ml-auto font-data-time text-data-time text-on-surface">₹20</span>
+</div>
+</div>
+</div>
+</div>
+<!-- LEG 4: Final Walk -->
+<div class="flex gap-space-md">
+<!-- Spine & Icon Column -->
+<div class="flex flex-col items-center">
+<div class="w-0.5 h-2 bg-secondary-fixed-dim"></div>
+<div class="w-9 h-9 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[20px]">pin_drop</span>
+</div>
+</div>
+<!-- Step Content -->
+<div class="grow pt-1 pb-2">
+<div class="flex items-center justify-between">
+<h2 class="font-title-md text-title-md text-on-surface">Walk to Destination (Quadron Park)</h2>
+<span class="font-data-time text-data-time text-on-surface-variant">2 min</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">150 m • Enter via Main IT Park Gate 1</p>
+</div>
+</div>
+</section>
+<!-- Collapsible Section: Why this route? -->
+<section class="mt-space-md bg-surface-container-lowest rounded-xl p-space-md shadow-sm">
+<button class="w-full flex items-center justify-between text-left focus:outline-none select-none" id="whyToggleBtn">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">insights</span>
+<h3 class="font-title-md text-title-md text-on-surface font-semibold">Why this route?</h3>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant transition-transform duration-200" id="whyChevron">expand_less</span>
+</button>
+<!-- Collapsible body -->
+<div class="mt-3 pt-3 flex flex-col gap-2.5" id="whyContent">
+<!-- Bullet 1 -->
+<div class="flex items-start gap-2.5">
+<div class="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[17px] text-primary">traffic</span>
+</div>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface font-semibold">Bypasses University Road Bottleneck</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Underground Metro leg glides through peak morning flyover demolition jam, saving 19 mins.</p>
+</div>
+</div>
+<!-- Bullet 2 -->
+<div class="flex items-start gap-2.5">
+<div class="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[17px] text-primary">savings</span>
+</div>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface font-semibold">Saves ₹140 vs Direct Cab</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Cab fare surges to ₹175 at this hour with an estimated transit time of 54 mins due to Baner signals.</p>
+</div>
+</div>
+<!-- Bullet 3 -->
+<div class="flex items-start gap-2.5">
+<div class="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[17px] text-primary">verified</span>
+</div>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface font-semibold">High Frequency PMPML 100 Connector</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Electric buses leave Garware Bay every 6 minutes with 92% on-time arrival index today.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Route Alternatives Drawer Teaser -->
+<section class="mt-space-md p-space-md rounded-xl bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-surface-container-highest flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">alt_route</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface font-semibold">Explore 2 other combinations</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Via Direct PMPML 115 (55 min) • Metro + Auto</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary text-[20px]">chevron_right</span>
+</section>
+<!-- Sticky Bottom Navigation CTA Bar -->
+<div class="fixed bottom-0 inset-x-0 z-40 bg-surface-container-lowest shadow-[0_-4px_16px_rgba(15,23,42,0.08)] px-margin py-3 pb-safe">
+<div class="max-w-md mx-auto flex items-center justify-between gap-space-md">
+<!-- Fare & Time brief -->
+<div class="flex flex-col">
+<div class="flex items-baseline gap-1">
+<span class="font-data-metric text-data-metric text-on-surface">₹35</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">• 42 min</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary">450m total walking</span>
+</div>
+<!-- Action Buttons -->
+<div class="flex items-center gap-2">
+<button aria-label="Save or Bookmark Route" class="w-12 h-12 rounded-xl bg-surface-container text-on-surface flex items-center justify-center active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[22px]">bookmark_border</span>
+</button>
+<button class="h-12 px-space-lg rounded-xl bg-primary text-on-primary font-label-lg text-label-lg flex items-center justify-center gap-2 active:bg-on-primary-fixed-variant transition-colors shadow-sm active:scale-98" id="startNavBtn">
+<span class="material-symbols-outlined text-[20px]">navigation</span>
+<span>Start Navigation</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Collapsible toggle logic for 'Why this route' card
+  const whyToggleBtn = document.getElementById('whyToggleBtn');
+  const whyContent = document.getElementById('whyContent');
+  const whyChevron = document.getElementById('whyChevron');
+
+  if (whyToggleBtn && whyContent && whyChevron) {
+    whyToggleBtn.addEventListener('click', () => {
+      const isHidden = whyContent.classList.contains('hidden');
+      if (isHidden) {
+        whyContent.classList.remove('hidden');
+        whyChevron.textContent = 'expand_less';
+      } else {
+        whyContent.classList.add('hidden');
+        whyChevron.textContent = 'expand_more';
+      }
+    });
+  }
+
+  // Micro interaction for Start Navigation button
+  const startNavBtn = document.getElementById('startNavBtn');
+  if (startNavBtn) {
+    startNavBtn.addEventListener('click', () => {
+      const originalText = startNavBtn.innerHTML;
+      startNavBtn.innerHTML = '<span class="material-symbols-outlined text-[20px] animate-spin">sync</span><span>Starting...</span>';
+      setTimeout(() => {
+        startNavBtn.innerHTML = '<span class="material-symbols-outlined text-[20px]">check_circle</span><span>Navigating Live</span>';
+        startNavBtn.classList.remove('bg-primary');
+        startNavBtn.classList.add('bg-primary-container');
+      }, 700);
+    });
+  }
+</script></main></body></html>

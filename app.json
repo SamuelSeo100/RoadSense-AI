@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "RoadSense",
-    "slug": "RoadSense",
+    "slug": "roadsense",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,10 +16,19 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "softwareKeyboardLayoutMode": "resize"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": ["expo-router", "expo-status-bar", "expo-font", "expo-splash-screen"],
+    "scheme": "roadsense",
+    "backgroundColor": "#f8f9ff",
+    "experiments": {
+      "typedRoutes": true
     }
   }
 }
