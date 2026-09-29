@@ -24,7 +24,14 @@
       "bundler": "metro",
       "output": "single"
     },
-    "plugins": ["expo-router", "expo-status-bar", "expo-font", "expo-splash-screen"],
+    "plugins": [
+      "expo-router",
+      "expo-status-bar",
+      "expo-font",
+      "expo-splash-screen",
+      "expo-secure-store",
+      "expo-web-browser"
+    ],
     "scheme": "roadsense",
     "backgroundColor": "#f8f9ff",
     "experiments": {

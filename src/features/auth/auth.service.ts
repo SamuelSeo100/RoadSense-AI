@@ -1,45 +1,14 @@
-import type { SignupValues } from './schemas';
+import { supabase } from '@/lib/supabase';
 
-/**
- * Auth service contract. Screens and hooks depend only on this interface so the
- * provider (Supabase, mock) can be swapped.
- *
- * TODO(Phase 4): Supabase implementation + EXPO_PUBLIC_AUTH_MOCK switch.
- */
-export type SignUpInput = Omit<SignupValues, 'confirmPassword' | 'acceptTerms'>;
+import type { AuthService } from './auth.types';
+import { createMockAuthService } from './services/mockAuthService';
+import { createSupabaseAuthService } from './services/supabaseAuthService';
 
-export interface AuthService {
-  /** `phone` is 10 digits without +91. */
-  sendOtp(phone: string): Promise<void>;
-  verifyOtp(phone: string, code: string): Promise<void>;
-  signInWithEmail(email: string, password: string): Promise<void>;
-  signInWithGoogle(): Promise<void>;
-  /** Creates the account + profile row, then sends an OTP to verify the phone. */
-  signUp(input: SignUpInput): Promise<void>;
-  signOut(): Promise<void>;
-}
+export * from './auth.types';
 
-export class AuthNotConnectedError extends Error {
-  constructor() {
-    super('Sign-in isn’t connected yet — it arrives with the auth wiring.');
-    this.name = 'AuthNotConnectedError';
-  }
-}
+/** The app's auth provider: Supabase, or the in-memory mock when EXPO_PUBLIC_AUTH_MOCK is on. */
+export const authService: AuthService = supabase
+  ? createSupabaseAuthService(supabase)
+  : createMockAuthService();
 
-/** Temporary UI-only implementation: sign-up and phone OTP "succeed" so the flow can be previewed. */
-const previewAuthService: AuthService = {
-  async sendOtp() {},
-  async verifyOtp() {
-    throw new AuthNotConnectedError();
-  },
-  async signInWithEmail() {
-    throw new AuthNotConnectedError();
-  },
-  async signInWithGoogle() {
-    throw new AuthNotConnectedError();
-  },
-  async signUp() {},
-  async signOut() {},
-};
-
-export const authService: AuthService = previewAuthService;
+export const isMockAuth = supabase === null;

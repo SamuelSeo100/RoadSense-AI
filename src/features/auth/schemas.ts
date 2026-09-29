@@ -9,27 +9,18 @@ export const indianMobileSchema = z
   .string()
   .regex(/^[6-9]\d{9}$/, 'Enter a valid 10-digit mobile number');
 
-export const phoneLoginSchema = z.object({
-  phone: indianMobileSchema,
-});
-export type PhoneLoginValues = z.infer<typeof phoneLoginSchema>;
-
 export const emailLoginSchema = z.object({
   email: z.email('Enter a valid email address'),
   password: z.string().min(1, 'Enter your password'),
 });
 export type EmailLoginValues = z.infer<typeof emailLoginSchema>;
 
-export const otpSchema = z.object({
-  code: z.string().regex(/^\d{6}$/, 'Enter the 6-digit code'),
-});
-export type OtpValues = z.infer<typeof otpSchema>;
-
 export const signupSchema = z
   .object({
     name: z.string().trim().min(2, 'Enter your full name'),
-    phone: indianMobileSchema,
-    email: z.union([z.literal(''), z.email('Enter a valid email address')]),
+    // Optional until phone verification exists; stored on the profile.
+    phone: z.union([z.literal(''), indianMobileSchema]),
+    email: z.email('Enter a valid email address'),
     password: z
       .string()
       .min(8, 'Use at least 8 characters')

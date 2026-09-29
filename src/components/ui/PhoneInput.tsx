@@ -26,7 +26,7 @@ export interface PhoneInputProps
       RNTextInputProps,
       'value' | 'onChangeText' | 'style' | 'keyboardType' | 'maxLength' | 'placeholderTextColor'
     >,
-    Pick<FieldProps, 'label' | 'helper' | 'helperIcon' | 'error'> {
+    Pick<FieldProps, 'label' | 'helper' | 'helperIcon' | 'error' | 'optional'> {
   /** Raw digits only, max 10, no country code. */
   value: string;
   onChangeText: (digits: string) => void;
@@ -39,6 +39,7 @@ export function PhoneInput({
   helper,
   helperIcon,
   error,
+  optional,
   value,
   onChangeText,
   onFocus,
@@ -51,7 +52,14 @@ export function PhoneInput({
   const labelId = useId();
 
   return (
-    <Field label={label} helper={helper} helperIcon={helperIcon} error={error} nativeID={labelId}>
+    <Field
+      label={label}
+      helper={helper}
+      helperIcon={helperIcon}
+      error={error}
+      optional={optional}
+      nativeID={labelId}
+    >
       <View className="flex-row items-center gap-2">
         <View
           className="h-12 flex-row items-center gap-1.5 rounded-control bg-surface-container-low px-3"

@@ -1,6 +1,8 @@
 import { Redirect } from 'expo-router';
 
-// Becomes the session-based redirect (login vs. app) in Phase 4.
+import { useAuthStore } from '@/store/authStore';
+
 export default function Index() {
-  return <Redirect href="/login" />;
+  const signedIn = useAuthStore((s) => s.status === 'signedIn');
+  return <Redirect href={signedIn ? '/home' : '/login'} />;
 }

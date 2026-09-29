@@ -28,7 +28,23 @@ After changing `tailwind.config.js` or `src/theme/tokens.ts`, restart with `npx 
 
 ## Environment variables
 
-Added in Phase 4. They will be documented in `.env.example`.
+Copy `.env.example` to `.env` (git-ignored) and fill in the values from Supabase → Project Settings → API. Restart Metro after changing it.
+
+| Variable                               | Purpose                                                                                                |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `EXPO_PUBLIC_SUPABASE_URL`             | Supabase project URL                                                                                   |
+| `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Publishable key (safe in the app; RLS protects data)                                                   |
+| `EXPO_PUBLIC_AUTH_MOCK`                | `true` = fake in-memory auth, no network. Also used automatically when the Supabase values are missing |
+| `EXPO_PUBLIC_API_URL`                  | FastAPI routing/ML backend (later)                                                                     |
+
+## Auth (Supabase)
+
+- Email + password sign-up/login, and Google OAuth via the system browser (works in Expo Go and on web).
+- Database schema lives in `supabase/migrations/`. A trigger creates a `profiles` row (name, phone, city, preferred modes, priority) on sign-up; RLS limits each user to their own row.
+- Supabase dashboard setup:
+  - Authentication → URL Configuration → Redirect URLs: `exp://**`, `roadsense://**`, `http://localhost:8081/**`
+  - Authentication → Sign In / Providers → Email: "Confirm email" off during development
+- On web, open the app at `http://localhost:8081` (Google's pop-up must return to the same origin).
 
 ## Design system
 

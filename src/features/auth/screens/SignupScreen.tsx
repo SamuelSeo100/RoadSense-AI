@@ -1,15 +1,14 @@
 import { useRouter } from 'expo-router';
 import { Alert, Pressable, View } from 'react-native';
 
-import { GoogleIcon } from '@/components/brand/GoogleIcon';
 import { LogoHeader } from '@/components/brand/LogoHeader';
-import { Button } from '@/components/ui/Button';
 import { Divider } from '@/components/ui/Divider';
 import { Screen } from '@/components/ui/Screen';
 import { Text } from '@/components/ui/Text';
 import { usePreferencesStore } from '@/store/preferencesStore';
 
 import { authService } from '../auth.service';
+import { GoogleSignInButton } from '../components/GoogleSignInButton';
 import { SignupForm } from '../components/SignupForm';
 import { useAsyncAction } from '../hooks/useAsyncAction';
 
@@ -17,7 +16,6 @@ export function SignupScreen() {
   const router = useRouter();
   const setPreferences = usePreferencesStore((s) => s.setPreferences);
   const signUp = useAsyncAction(authService.signUp);
-  const googleLogin = useAsyncAction(authService.signInWithGoogle);
 
   const goToLogin = () => (router.canGoBack() ? router.back() : router.replace('/login'));
 
@@ -41,30 +39,23 @@ export function SignupScreen() {
         onOpenTerms={() => Alert.alert('Terms of Service', 'Coming soon.')}
         onOpenPrivacy={() => Alert.alert('Privacy Policy', 'Coming soon.')}
         onSubmit={async ({ confirmPassword: _c, acceptTerms: _t, ...input }) => {
-          const { ok } = await signUp.run(input);
-          if (!ok) return;
+          const res = await signUp.run(input);
+          if (!res.ok) return;
           setPreferences({
             preferredModes: input.preferredModes,
             priority: input.priority,
             city: input.city,
           });
-          router.push({ pathname: '/verify-otp', params: { phone: input.phone } });
+          // Without confirmation the session starts right away and the auth gate
+          // moves us to home; otherwise ask the user to confirm their email.
+          if (res.result.needsEmailConfirmation) {
+            router.replace({ pathname: '/check-email', params: { email: input.email } });
+          }
         }}
       />
 
       <Divider label="or sign up with" className="my-6" />
-
-      <Button
-        variant="secondary"
-        label="Continue with Google"
-        labelWeight="medium"
-        leading={<GoogleIcon />}
-        loading={googleLogin.pending}
-        onPress={async () => {
-          const { error } = await googleLogin.run();
-          if (error) Alert.alert('Google sign-up', error);
-        }}
-      />
+      <GoogleSignInButton />
 
       <View className="mt-6 flex-row items-center justify-center">
         <Text variant="body-md" tone="on-surface-variant">

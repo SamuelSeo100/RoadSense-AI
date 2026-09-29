@@ -129,7 +129,7 @@ export function SignupForm({
               onBlur={field.onBlur}
               ref={field.ref}
               error={visibleError(fieldState.isTouched, fieldState.error?.message)}
-              helper="We’ll send an OTP to verify this number"
+              optional
               returnKeyType="next"
               submitBehavior="submit"
               onSubmitEditing={() => setFocus('email')}
@@ -142,7 +142,6 @@ export function SignupForm({
           render={({ field, fieldState }) => (
             <TextInput
               label="Email"
-              optional
               leftIcon="mail"
               placeholder="name@example.com"
               value={field.value}
