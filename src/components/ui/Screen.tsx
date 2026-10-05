@@ -17,6 +17,8 @@ interface ScreenProps {
   background?: 'surface' | 'surface-container-lowest';
   /** Extra classes for the content container. */
   contentClassName?: string;
+  /** Pad for the bottom safe-area inset (default true). Turn off inside tabs, whose bar already does. */
+  insetBottom?: boolean;
 }
 
 const backgroundClassNames = {
@@ -38,9 +40,12 @@ export function Screen({
   padded = true,
   background = 'surface',
   contentClassName,
+  insetBottom = true,
 }: ScreenProps) {
   const insets = useSafeAreaInsets();
-  const bottomPadding = { paddingBottom: insets.bottom + spacing['space-xl'] };
+  const bottomPadding = {
+    paddingBottom: (insetBottom ? insets.bottom : 0) + spacing['space-xl'],
+  };
   const contentClasses = cn(padded && 'px-margin pt-space-lg', contentClassName);
 
   return (

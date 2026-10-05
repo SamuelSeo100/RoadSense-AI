@@ -190,6 +190,8 @@ export const elevation = {
   selected: '0px 4px 6px -1px rgba(13, 148, 136, 0.12), 0px 2px 4px -2px rgba(13, 148, 136, 0.08)',
   sheet: '0px -4px 16px 0px rgba(15, 23, 42, 0.08)',
   header: '0px 1px 8px 0px rgba(0, 0, 0, 0.04)',
+  /** Bottom tab bar (home.html nav). */
+  tabBar: '0px -4px 16px 0px rgba(0, 0, 0, 0.04)',
   /** Tailwind `shadow-md`, used on the logo tile in login.html. */
   raised: '0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -2px rgba(0, 0, 0, 0.1)',
 } as const;
