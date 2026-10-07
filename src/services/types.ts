@@ -35,6 +35,8 @@ export interface Leg {
   /** True when `polyline` is a stand-in (straight line / borrowed path), not real geometry. */
   approximate?: boolean;
   distanceKm?: number;
+  /** Transit legs: stops travelled (Google's stopCount). */
+  stops?: number;
   from?: string;
   to?: string;
 }
@@ -119,6 +121,27 @@ export interface AiQuery {
   priority?: Priority;
 }
 
+/** A routing mode group that can fail on its own. */
+export type RouteSource = 'transit' | 'road' | 'bike' | 'walk';
+
+/** Something the Routes screen should tell the user about the results. */
+export type RouteNotice =
+  /** No bus or metro option right now (late night, or outside coverage). */
+  | { kind: 'transitUnavailable' }
+  /** Metro isn't running at this hour; transit options are buses only. */
+  | { kind: 'metroClosed' }
+  /** Some modes failed; the rest are shown. */
+  | { kind: 'partialFailure'; failed: RouteSource[] };
+
+export interface RoutesResult {
+  /**
+   * Ranked for the requested priority. Each route carries scores for every
+   * priority, so callers can re-rank locally with `rankRoutes`.
+   */
+  routes: RankedRoute[];
+  notices: RouteNotice[];
+}
+
 // ---- Services ----
 
 export interface RoutingService {
@@ -126,7 +149,7 @@ export interface RoutingService {
     from: Place | LatLng,
     to: Place,
     opts: { priority: Priority; vehicles: Record<Vehicle, boolean>; signal?: AbortSignal },
-  ): Promise<RankedRoute[]>;
+  ): Promise<RoutesResult>;
   /** The 3 cards on Home: AI pick, cheapest, fastest. */
   getPreview(from: Place | LatLng, to: Place): Promise<Route[]>;
   searchPlaces(query: string): Promise<Place[]>;

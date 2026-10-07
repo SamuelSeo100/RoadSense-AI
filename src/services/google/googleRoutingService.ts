@@ -2,19 +2,22 @@ import { autoFare, cabFare, fuelCost, transitLegFare, transitRouteFare } from '.
 import { LruCache } from '../lruCache';
 import { rankRoutes } from '../ranking';
 import { bestIndex, scoreRoutes, trafficLevel, type SpeedReading } from '../scoring';
-import type {
-  DirectionsService,
-  LatLng,
-  Leg,
-  Place,
-  PreferencesService,
-  Priority,
-  RankedRoute,
-  Route,
-  RoutingService,
-  TrafficLevel,
-  Vehicle,
-  WalkingRoute,
+import {
+  PRIORITIES,
+  type DirectionsService,
+  type LatLng,
+  type Leg,
+  type Place,
+  type PreferencesService,
+  type Priority,
+  type RankedRoute,
+  type Route,
+  type RouteNotice,
+  type RouteSource,
+  type RoutingService,
+  type TrafficLevel,
+  type Vehicle,
+  type WalkingRoute,
 } from '../types';
 
 import { googleRequest } from './googleClient';
@@ -22,7 +25,10 @@ import { decodePolyline } from './polyline';
 
 /** Tunables for building route options (fares live in fares.ts, weights in scoring.ts). */
 export const routingConfig = {
+  /** Kept per priority: a route stays if it's in the top 8 for any priority (local re-ranking). */
   maxResults: 8,
+  /** Pune Metro service hours, local time (verify against Maha-Metro's timetable). */
+  metroHours: { open: 6, close: 23 },
   /** The walk-only option is shown only up to this long. */
   maxWalkOnlyMin: 30,
   /**
@@ -140,7 +146,7 @@ interface Draft {
 type ScoredRoute = Omit<Route, 'aiPick'>;
 interface Candidates {
   routes: ScoredRoute[];
-  transitUnavailable: boolean;
+  notices: RouteNotice[];
 }
 
 // ---- Helpers ----
@@ -438,6 +444,7 @@ function transitToRoute(
       polyline: l.path,
       approximate: l.approximate || undefined,
       distanceKm: Math.round(l.distanceM / 100) / 10,
+      stops: l.stops,
       from: l.fromStop,
       to: l.toStop,
     };
@@ -512,7 +519,7 @@ function roadRoute(
     legs: [
       {
         mode,
-        label: `${kind === 'car' ? 'Drive' : name} ${durationMin}m`,
+        label: `${name} ${durationMin}m`,
         durationMin,
         costInr,
         polyline: road.path,
@@ -636,15 +643,22 @@ export function createGoogleRoutingService(deps: {
     const routes: Omit<Route, 'score'>[] = [];
 
     const drafts = transitRes.status === 'fulfilled' ? parseTransit(transitRes.value, at) : [];
-    const transitUnavailable = drafts.length === 0;
-    if (transitUnavailable) {
-      // TODO(routes-ui): surface "No metro/bus right now" once getRoutes returns an object.
-      if (__DEV__)
-        console.info(
-          transitRes.status === 'rejected'
-            ? `Transit failed: ${String(transitRes.reason)}`
-            : 'No transit routes for this trip right now.',
-        );
+    const notices: RouteNotice[] = [];
+    const failed = (
+      [
+        ['transit', transitRes],
+        ['road', driveRes],
+        ['bike', bikeRes],
+        ['walk', walkRes],
+      ] as const
+    ).flatMap(([source, res]): RouteSource[] => (res.status === 'rejected' ? [source] : []));
+    if (failed.length) notices.push({ kind: 'partialFailure', failed });
+    if (transitRes.status === 'fulfilled' && drafts.length === 0) {
+      notices.push({ kind: 'transitUnavailable' });
+    } else if (drafts.length > 0) {
+      const { open, close } = routingConfig.metroHours;
+      const hour = at.getHours();
+      if (hour < open || hour >= close) notices.push({ kind: 'metroClosed' });
     }
     dedupe(drafts.flatMap((d) => walkShortHops(d) ?? []))
       .flatMap(withAutoVariants)
@@ -667,7 +681,7 @@ export function createGoogleRoutingService(deps: {
       routes.push(walkRoute(walkRes.value));
     }
 
-    const result = { routes: scoreRoutes(routes), transitUnavailable };
+    const result = { routes: scoreRoutes(routes), notices };
     cache.set(key, result);
     return result;
   }
@@ -680,16 +694,26 @@ export function createGoogleRoutingService(deps: {
 
   return {
     async getRoutes(from, to, { priority, vehicles, signal }) {
-      const [{ routes }, aiPriority] = await Promise.all([
+      const [{ routes, notices }, aiPriority] = await Promise.all([
         candidates(from, to, vehicles, signal),
         defaultPriority(),
       ]);
-      const ranked = withAiPick(rankRoutes(routes, priority, vehicles), aiPriority);
-      const top = ranked.slice(0, routingConfig.maxResults);
-      // Keep the AI pick visible even when the chosen priority ranks it below the cap.
-      const pick = ranked.find((r) => r.aiPick);
-      if (pick && !top.includes(pick)) top[top.length - 1] = pick;
-      return top.map((r, i): RankedRoute => ({ ...r, rank: i + 1, isBest: i === 0 }));
+      // Keep every route that is in the top N for some priority, so callers can
+      // re-rank locally for another priority without refetching.
+      const keep = new Set(
+        PRIORITIES.flatMap((p) =>
+          rankRoutes(routes, p, vehicles)
+            .slice(0, routingConfig.maxResults)
+            .map((r) => r.id),
+        ),
+      );
+      const ranked = withAiPick(rankRoutes(routes, priority, vehicles), aiPriority).filter(
+        (r) => keep.has(r.id) || r.aiPick,
+      );
+      return {
+        routes: ranked.map((r, i): RankedRoute => ({ ...r, rank: i + 1, isBest: i === 0 })),
+        notices,
+      };
     },
 
     async getPreview(from, to) {

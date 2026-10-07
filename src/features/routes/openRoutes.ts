@@ -9,7 +9,7 @@ export interface RoutesParams {
   /** Omit for the current location. */
   from?: string;
   to: string;
-  /** Reserved for multi-modal ranking (only walking is fetched for now). */
+  /** Ranking to show (AI Mode: "cheapest to college"). */
   priority?: Priority;
 }
 
@@ -20,7 +20,8 @@ export function goToRoutes() {
 }
 
 /** Plans a trip from free text (AI Mode, History "Repeat") and shows Routes. */
-export async function openRoutes({ from, to }: RoutesParams) {
+export async function openRoutes({ from, to, priority }: RoutesParams) {
+  if (priority) useTripStore.getState().setPriority(priority);
   const found = await useTripStore
     .getState()
     .plan(to, from)

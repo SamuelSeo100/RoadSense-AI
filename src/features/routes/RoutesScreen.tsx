@@ -1,31 +1,42 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Keyboard, Pressable, StyleSheet, View, type TextInput } from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
 
+import { Chip } from '@/components/routly/Chip';
+import { RouteCard } from '@/components/routly/RouteCard';
 import { RText } from '@/components/routly/RText';
 import { SkeletonCard } from '@/components/routly/SkeletonCard';
+import { PRIORITIES, priorityLabels, rankRoutes, type Vehicle } from '@/services';
+import { useRoutlyPrefs } from '@/store/routlyPrefsStore';
 import { colors, fonts, radius } from '@/theme/routly';
 
-import { useMapStore, type MapContent } from '../map/mapStore';
+import type { MapContent } from '../map/mapStore';
 import { SheetScrollView } from '../shell/SheetScrollView';
 import { SHEET_FULL, SHEET_PEEK, showToast } from '../shell/shellStore';
 import { useMapContent, useSheet, useTopBar } from '../shell/useScreenChrome';
 import { DirectionsCard } from '../trip/DirectionsCard';
 import { useTripStore } from '../trip/tripStore';
 
-import { DevRoutesList } from './components/DevRoutesList';
-import { WalkingOptionCard } from './components/WalkingOptionCard';
+import { RouteNotices } from './components/RouteNotices';
+import { RouteSteps } from './components/RouteSteps';
 
 const CLEAN_MAP: MapContent = { routes: [], selection: 'none', focused: false };
+const NO_VEHICLES: Record<Vehicle, boolean> = { car: false, bike: false, cycle: false };
+const MAX_SHOWN = 8;
 
 /**
- * Ways to get to the planned destination. For now only walking is fetched;
- * more options (metro, bus, cab…) will join this list.
+ * Ways to get to the planned destination: priority chips, notices and the
+ * ranked route cards. Changing priority re-ranks locally (no refetch). The
+ * selected card is the only route drawn on the map.
  */
 export function RoutesScreen() {
   const from = useTripStore((s) => s.from);
   const to = useTripStore((s) => s.to);
-  const route = useTripStore((s) => s.route);
+  const state = useTripStore((s) => s.routes);
   const retry = useTripStore((s) => s.retry);
+  const priority = useTripStore((s) => s.priority);
+  const setPriority = useTripStore((s) => s.setPriority);
+  const vehicles = useRoutlyPrefs((s) => s.prefs?.vehicles) ?? NO_VEHICLES;
   const sheet = useSheet('routes');
   const toInputRef = useRef<TextInput>(null);
 
@@ -40,56 +51,58 @@ export function RoutesScreen() {
     },
   });
 
-  const walk = route.status === 'ready' ? route.route : null;
+  const ready = state.status === 'ready' ? state : null;
+  const ranked = useMemo(
+    () => (ready ? rankRoutes(ready.routes, priority, vehicles).slice(0, MAX_SHOWN) : []),
+    [ready, priority, vehicles],
+  );
+
+  // The user's pick, valid for the result it was made on. Until they tap, the
+  // top-ranked route is shown without moving the camera (`focused` false).
+  const [picked, setPicked] = useState<{ requestId: number; id: string; open: boolean } | null>(
+    null,
+  );
+  const userPick =
+    ready && picked?.requestId === ready.requestId && ranked.some((r) => r.id === picked.id)
+      ? picked
+      : null;
+  const selected = ranked.find((r) => r.id === userPick?.id) ?? ranked[0] ?? null;
+
   const mapContent = useMemo<MapContent>(
     () =>
-      walk && to
+      selected && to
         ? {
-            routes: [
-              {
-                id: 'walk',
-                legs: [
-                  {
-                    mode: 'walk',
-                    label: 'Walk',
-                    durationMin: Math.round(walk.durationSec / 60),
-                    polyline: walk.path,
-                  },
-                ],
-              },
-            ],
-            selection: 'walk',
-            focused: true,
-            plain: true,
+            routes: [{ id: selected.id, legs: selected.legs }],
+            selection: selected.id,
+            focused: userPick !== null,
+            plain: selected.legs.every((l) => l.mode === 'walk'),
             destination: { name: to.name, location: to.location },
           }
         : CLEAN_MAP,
-    [walk, to],
+    [selected, userPick, to],
   );
   useMapContent('routes', mapContent);
 
-  // A *new* route: show it on the map once (peek). Afterwards the sheet stays
-  // wherever the user drags it.
+  // A *new* result: show the map once (peek). Re-ranks don't move the sheet.
   const setSheetIndex = sheet.setIndex;
+  const requestId = ready?.requestId;
   useEffect(() => {
-    if (!walk) return;
+    if (requestId === undefined) return;
     Keyboard.dismiss();
     setSheetIndex(SHEET_PEEK);
-  }, [walk, setSheetIndex]);
+  }, [requestId, setSheetIndex]);
 
-  const count = walk ? 1 : 0;
+  const onCardPress = (id: string) => {
+    if (!ready) return;
+    // Tapping the open card folds it; any other card is selected and opened.
+    setPicked((p) =>
+      p?.requestId === ready.requestId && p.id === id
+        ? { ...p, open: !p.open }
+        : { requestId: ready.requestId, id, open: true },
+    );
+  };
 
-  // TODO(routes-ui): replace in Feature 2. Start is snapped when the walk route
-  // arrives, so GPS updates don't refetch every mode.
-  const devStart = useMemo(
-    () =>
-      walk
-        ? from.kind === 'place'
-          ? from.place.location
-          : useMapStore.getState().userLocation
-        : null,
-    [walk, from],
-  );
+  const priorityLabel = priorityLabels[priority];
 
   return (
     <SheetScrollView gap={16}>
@@ -97,29 +110,85 @@ export function RoutesScreen() {
 
       {!to && <Notice text="Search for a destination to see ways to get there." />}
 
-      {to && route.status === 'loading' && <SkeletonCard />}
-
-      {to && route.status === 'error' && (
-        <Notice text={route.message} actionLabel="Retry" onAction={retry} />
+      {to && state.status !== 'error' && (
+        <View style={styles.group}>
+          <RText variant="sectionLabel">What matters most?</RText>
+          <View style={styles.chips} accessibilityRole="radiogroup">
+            {PRIORITIES.map((p) => (
+              <Chip
+                key={p}
+                label={priorityLabels[p]}
+                selected={p === priority}
+                onPress={() => setPriority(p)}
+              />
+            ))}
+          </View>
+        </View>
       )}
 
-      {walk && (
+      {to && state.status === 'loading' && (
+        <View style={styles.list}>
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </View>
+      )}
+
+      {to && state.status === 'error' && (
+        <Notice text={state.message} actionLabel="Retry" onAction={retry} />
+      )}
+
+      {to && ready && (
         <>
-          <View style={styles.header}>
-            <RText variant="sectionTitle" size={18} accessibilityRole="header">
-              Ways to get there
-            </RText>
-            <RText variant="caption">{count === 1 ? '1 option' : `${count} options`}</RText>
-          </View>
-          <WalkingOptionCard
-            route={walk}
-            // TODO(navigation): turn-by-turn walking guidance.
-            onStart={() => showToast('Live navigation is coming soon')}
-          />
-          {__DEV__ && devStart && to ? (
-            <DevRoutesList start={devStart} to={to} />
+          <RouteNotices notices={ready.notices} />
+          {ranked.length === 0 ? (
+            <Notice
+              text={
+                ready.notices.some((n) => n.kind === 'partialFailure')
+                  ? 'Couldn’t load routes. Check your connection and try again.'
+                  : 'No routes found for this trip.'
+              }
+              actionLabel="Retry"
+              onAction={retry}
+            />
           ) : (
-            <RText variant="caption">Metro, bus, auto and cab options are coming soon.</RText>
+            <>
+              <View style={styles.header}>
+                <RText variant="sectionTitle" size={18} accessibilityRole="header">
+                  {ranked.length === 1 ? '1 route found' : `${ranked.length} routes found`}
+                </RText>
+                <RText variant="caption">Ranked for {priorityLabel}</RText>
+              </View>
+              <View style={styles.list}>
+                {ranked.map((route) => {
+                  const isSelected = route.id === selected?.id;
+                  const open = isSelected && userPick?.open === true;
+                  return (
+                    // No `layout` transition: on Android (Fabric) it left the next card
+                    // overlapping when a card above expanded.
+                    <Animated.View key={route.id} entering={FadeIn.duration(180)}>
+                      <RouteCard
+                        route={route}
+                        priorityLabel={priorityLabel}
+                        selected={isSelected}
+                        onPress={() => onCardPress(route.id)}
+                      >
+                        {open ? (
+                          <RouteSteps
+                            route={route}
+                            originLabel={fromLabel}
+                            destinationName={to.name}
+                            walk={ready.walk}
+                            // TODO(navigation): turn-by-turn guidance.
+                            onStart={() => showToast('Live navigation is coming soon')}
+                          />
+                        ) : undefined}
+                      </RouteCard>
+                    </Animated.View>
+                  );
+                })}
+              </View>
+            </>
           )}
         </>
       )}
@@ -153,7 +222,16 @@ function Notice({
 }
 
 const styles = StyleSheet.create({
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
+  group: { gap: 10 },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  list: { gap: 16 },
   notice: {
     backgroundColor: colors.surface,
     borderRadius: radius.card,

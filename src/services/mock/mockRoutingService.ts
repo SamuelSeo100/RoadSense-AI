@@ -18,7 +18,10 @@ export function createMockRoutingService(): RoutingService {
   return {
     async getRoutes(from, to, { priority, vehicles }) {
       await delay(LATENCY_MS);
-      return rankRoutes(withPaths(mockData.routes, from, to), priority, vehicles);
+      return {
+        routes: rankRoutes(withPaths(mockData.routes, from, to), priority, vehicles),
+        notices: [],
+      };
     },
 
     async getPreview(from, to) {

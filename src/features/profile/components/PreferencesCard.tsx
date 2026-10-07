@@ -5,7 +5,7 @@ import { Chip } from '@/components/routly/Chip';
 import { Icon } from '@/components/routly/Icon';
 import { RText } from '@/components/routly/RText';
 import { Switch } from '@/components/routly/Switch';
-import { PRIORITIES, priorityLabels, type Preferences } from '@/services';
+import { PRIORITIES, priorityLabels, type Preferences, type Vehicle } from '@/services';
 import { colors, fonts, radius } from '@/theme/routly';
 
 type ToggleKey = 'learnFromTrips' | 'voiceForAiMode' | 'liveTrafficAlerts';
@@ -36,6 +36,12 @@ const toggles: { key: ToggleKey; title: string; hint: string }[] = [
   },
 ];
 
+/** Own vehicles that add Bike / Car routes. Cycle is hidden until cycle routing exists. */
+const vehicleToggles: { key: Vehicle; title: string; hint: string }[] = [
+  { key: 'bike', title: 'Bike', hint: 'Show riding your own two-wheeler' },
+  { key: 'car', title: 'Car', hint: 'Show driving your own car' },
+];
+
 interface PreferencesCardProps {
   prefs: Preferences;
   onChange: (patch: Partial<Preferences>) => void;
@@ -61,6 +67,26 @@ export function PreferencesCard({ prefs, onChange }: PreferencesCardProps) {
             />
           ))}
         </View>
+      </View>
+      <View style={styles.vehicleGroup}>
+        <RText variant="sectionLabel" size={12}>
+          Vehicles I can use
+        </RText>
+        {vehicleToggles.map((v) => (
+          <View key={v.key} style={styles.vehicleRow}>
+            <View style={styles.toggleText}>
+              <RText variant="body" family={fonts.extrabold}>
+                {v.title}
+              </RText>
+              <RText variant="caption">{v.hint}</RText>
+            </View>
+            <Switch
+              value={prefs.vehicles[v.key]}
+              onValueChange={(on) => onChange({ vehicles: { ...prefs.vehicles, [v.key]: on } })}
+              accessibilityLabel={`I can use a ${v.title.toLowerCase()}`}
+            />
+          </View>
+        ))}
       </View>
       <View style={styles.trafficGroup}>
         <View style={styles.trafficRow}>
@@ -152,6 +178,8 @@ const styles = StyleSheet.create({
     paddingTop: 12,
   },
   toggleText: { flex: 1, gap: 2 },
+  vehicleGroup: { borderTopWidth: 1, borderTopColor: colors.divider, paddingTop: 12, gap: 12 },
+  vehicleRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   trafficGroup: { borderTopWidth: 1, borderTopColor: colors.divider, paddingTop: 12, gap: 10 },
   trafficRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },

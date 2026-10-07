@@ -13,6 +13,11 @@ export function ModeBadge({ mode }: { mode: Mode }) {
   );
 }
 
+/** Small white dot ringed in the next leg's colour, at a transfer point. */
+export function TransferDot({ mode }: { mode: Mode }) {
+  return <View style={[styles.transfer, { borderColor: modeColors[mode].line }]} />;
+}
+
 /** Red destination pin with the place-name chip above it. */
 export function DestinationPin({ name }: { name: string }) {
   return (
@@ -54,6 +59,13 @@ const styles = StyleSheet.create({
     borderColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  transfer: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    borderWidth: 3,
+    backgroundColor: colors.surface,
   },
   pinHead: {
     width: 22,

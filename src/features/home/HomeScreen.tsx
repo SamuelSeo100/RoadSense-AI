@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { type TextInput } from 'react-native';
 
-import { choose } from '@/lib/confirm';
 import { aiService } from '@/services';
-import { openBooking, type BookingProvider } from '@/services/bookings';
 import { useAuthStore } from '@/store/authStore';
 import { useRoutlyPrefs } from '@/store/routlyPrefsStore';
 
@@ -12,6 +10,7 @@ import { goToRoutes, openRoutes } from '../routes/openRoutes';
 import { SheetScrollView } from '../shell/SheetScrollView';
 import { SHEET_FULL, showToast, useShellStore } from '../shell/shellStore';
 import { useMapContent, useSheet, useTopBar } from '../shell/useScreenChrome';
+import { book } from '../trip/booking';
 import { DirectionsCard } from '../trip/DirectionsCard';
 import { useTripStore } from '../trip/tripStore';
 
@@ -66,17 +65,7 @@ export function HomeScreen() {
     const to = useTripStore.getState().to;
     const pickup = useMapStore.getState().userLocation ?? undefined;
     const trip = to ? { pickup, drop: { ...to.location, name: to.name } } : {};
-    let provider: BookingProvider | null;
-    if (tile === 'cab') {
-      provider = await choose('Book a cab with', [
-        { value: 'uber', label: 'Uber' },
-        { value: 'ola', label: 'Ola' },
-      ]);
-    } else {
-      provider = tile === 'metro' ? 'puneMetro' : tile === 'bus' ? 'pmpml' : 'rapido';
-    }
-    if (provider && !(await openBooking(provider, trip)))
-      showToast('Couldn’t open the partner app');
+    await book(tile === 'bike' ? 'bikeTaxi' : tile, trip);
   };
 
   return (

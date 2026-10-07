@@ -1,12 +1,12 @@
 import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Platform, StyleSheet } from 'react-native';
+import { PixelRatio, Platform, StyleSheet } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, Polyline, type LatLng } from 'react-native-maps';
 
 import { fallbackOrigin } from '@/services';
 import { modeColors } from '@/theme/routly';
 
-import { DestinationPin, ModeBadge } from './MapMarkers';
+import { DestinationPin, ModeBadge, TransferDot } from './MapMarkers';
 import { mapStyle, tint } from './mapStyle';
 import type { MapContent } from './mapStore';
 
@@ -40,6 +40,12 @@ const FADED_TINT = 0.75;
 const EDGE = 40;
 /** Half-span (degrees) of the box kept around the user when centring on them. */
 const USER_SPAN = 0.006;
+
+/**
+ * Walk legs are dotted. Android turns pattern items into true dots when the
+ * cap is round (gap in px); iOS gets short dashes with round caps (points).
+ */
+const WALK_PATTERN = Platform.OS === 'android' ? [1, 9 * PixelRatio.get()] : [1, 9];
 
 const userBox = (p: LatLng): LatLng[] => [
   { latitude: p.latitude + USER_SPAN, longitude: p.longitude + USER_SPAN },
@@ -153,26 +159,52 @@ export function LiveMap({
       {ordered.map((route) => {
         const highlighted = selection === 'all' || route.id === selection;
         const lighten = highlighted ? ROUTE_TINT : FADED_TINT;
-        return route.legs.map((leg, i) =>
-          leg.polyline && leg.polyline.length > 1 ? (
+        return route.legs.map((leg, i) => {
+          if (!leg.polyline || leg.polyline.length < 2) return null;
+          const walk = leg.mode === 'walk';
+          return (
             <Polyline
-              key={`${route.id}-${i}`}
+              // Pattern changes don't always re-apply natively: remount per style.
+              key={`${route.id}-${i}-${walk ? 'dot' : 'solid'}`}
               coordinates={leg.polyline}
-              strokeColor={tint(modeColors[leg.mode].line, lighten)}
+              strokeColor={tint(modeColors[leg.mode].line, walk ? 0 : lighten)}
               strokeWidth={6}
-              // Butt caps: legs meet end to end without darker overlap dots.
-              lineCap="butt"
+              // Butt caps: solid legs meet end to end without darker overlap dots.
+              lineCap={walk ? 'round' : 'butt'}
               lineJoin="round"
+              lineDashPattern={walk ? WALK_PATTERN : undefined}
               zIndex={highlighted ? 2 : 1}
             />
-          ) : null,
-        );
+          );
+        });
       })}
 
       {ordered
         .filter((r) => !content?.plain && (selection === 'all' || r.id === selection))
         .flatMap((route) =>
+          // Transfer points: where one leg hands over to the next.
+          route.legs.slice(1).map((leg, i) => {
+            const at = leg.polyline?.[0];
+            return at ? (
+              <Marker
+                key={`transfer-${route.id}-${i}`}
+                coordinate={at}
+                anchor={{ x: 0.5, y: 0.5 }}
+                tracksViewChanges={tracks}
+                zIndex={3}
+              >
+                <TransferDot mode={leg.mode} />
+              </Marker>
+            ) : null;
+          }),
+        )}
+
+      {ordered
+        .filter((r) => !content?.plain && (selection === 'all' || r.id === selection))
+        .flatMap((route) =>
           route.legs.map((leg, i) => {
+            // Walk legs are recognisable by their dots; badges only for rides.
+            if (leg.mode === 'walk') return null;
             const mid = leg.polyline?.[Math.floor(leg.polyline.length / 2)];
             return mid ? (
               <Marker

@@ -1,66 +1,95 @@
-import { Fragment } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Fragment, type ReactNode } from 'react';
+import { StyleSheet, View } from 'react-native';
 
 import type { RankedRoute } from '@/services/types';
 import { colors, fonts, radius, shadows } from '@/theme/routly';
 
 import { ModePill } from './ModePill';
+import { PressableBox } from './PressableBox';
 import { RText } from './RText';
-import { formatInr, formatTransfers, formatWalking, trafficTextColor } from './routeFormat';
+import {
+  formatTransfers,
+  formatWalking,
+  routeCost,
+  shortLegLabel,
+  trafficTextColor,
+} from './routeFormat';
 
 interface RouteCardProps {
   route: RankedRoute;
+  /** "Fastest", "Least walking"… for the "Best for" badge. */
+  priorityLabel: string;
+  /** Selected = shown on the map (outlined). */
+  selected: boolean;
   onPress: () => void;
+  /** Expanded detail (step list), rendered under the summary. */
+  children?: ReactNode;
 }
 
-/** Ranked route on the Routes tab. The best one is badged and outlined. */
-export function RouteCard({ route, onPress }: RouteCardProps) {
-  const best = route.isBest;
+/**
+ * Ranked route on the Routes tab: leg strip, time, cost, walk/transfers/traffic.
+ * One badge at most: "AI pick" wins over "Best for <priority>".
+ */
+export function RouteCard({ route, priorityLabel, selected, onPress, children }: RouteCardProps) {
+  const badge = route.aiPick
+    ? 'AI PICK'
+    : route.isBest
+      ? `BEST FOR ${priorityLabel.toUpperCase()}`
+      : null;
+  const cost = routeCost(route);
   return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={`${best ? 'Best for you. ' : ''}${route.durationMin} minutes, ${formatInr(route.costInr)}, ${route.legs.map((l) => l.label).join(', then ')}`}
-      style={[styles.card, best ? [styles.best, shadows.selectedCard] : styles.normal]}
-    >
-      {best && (
-        <View style={styles.badge}>
-          <RText variant="badge" color={colors.textOnPrimary}>
-            ★ BEST FOR YOU
+    <View style={[styles.card, selected ? [styles.selected, shadows.selectedCard] : styles.normal]}>
+      <PressableBox
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityState={{ selected, expanded: children !== undefined }}
+        accessibilityLabel={`${badge ? `${badge.toLowerCase()}. ` : ''}${route.name}, ${route.durationMin} minutes, ${cost}, ${route.legs.map((l) => l.label).join(', then ')}`}
+        style={styles.summary}
+        pressedStyle={styles.pressed}
+      >
+        {badge && (
+          <View style={[styles.badge, route.aiPick ? styles.aiBadge : styles.bestBadge]}>
+            <RText variant="badge" color={route.aiPick ? colors.primary : colors.textOnPrimary}>
+              {route.aiPick ? '✦ ' : '★ '}
+              {badge}
+            </RText>
+          </View>
+        )}
+
+        <View style={styles.row}>
+          <RText variant="bigNumber">
+            {route.durationMin}
+            <RText variant="caption" size={13}>
+              {' '}
+              min
+            </RText>
+          </RText>
+          <RText variant="price" style={styles.price} numberOfLines={1}>
+            {cost}
           </RText>
         </View>
-      )}
 
-      <View style={styles.row}>
-        <RText variant="bigNumber">
-          {route.durationMin}
-          <RText variant="caption" size={13}>
-            {' '}
-            min
-          </RText>
-        </RText>
-        <RText variant="price">{formatInr(route.costInr)}</RText>
-      </View>
+        <View style={styles.legs}>
+          {route.legs.map((leg, i) => (
+            <Fragment key={`${leg.label}-${i}`}>
+              {i > 0 && (
+                <RText variant="body" color={colors.separator}>
+                  ›
+                </RText>
+              )}
+              <ModePill mode={leg.mode} label={shortLegLabel(leg)} icon />
+            </Fragment>
+          ))}
+        </View>
 
-      <View style={styles.legs}>
-        {route.legs.map((leg, i) => (
-          <Fragment key={`${leg.label}-${i}`}>
-            {i > 0 && (
-              <RText variant="body" color={colors.separator}>
-                ›
-              </RText>
-            )}
-            <ModePill mode={leg.mode} label={leg.label} />
-          </Fragment>
-        ))}
-      </View>
-
-      <View style={styles.footer}>
-        <Stat label="Walking" value={formatWalking(route.walkingKm)} />
-        <Stat label="Transfers" value={formatTransfers(route.transfers)} />
-        <Stat label="Traffic" value={route.traffic} color={trafficTextColor[route.traffic]} />
-      </View>
-    </Pressable>
+        <View style={styles.footer}>
+          <Stat label="Walking" value={formatWalking(route.walkingKm)} />
+          <Stat label="Transfers" value={formatTransfers(route.transfers)} />
+          <Stat label="Traffic" value={route.traffic} color={trafficTextColor[route.traffic]} />
+        </View>
+      </PressableBox>
+      {children}
+    </View>
   );
 }
 
@@ -76,18 +105,22 @@ function Stat({ label, value, color }: { label: string; value: string; color?: s
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: colors.surface, borderRadius: radius.card, padding: 16, gap: 12 },
-  // 1px border + 1px padding = same outer size as the 2px best border.
+  card: { backgroundColor: colors.surface, borderRadius: radius.card, gap: 12 },
+  // 1px border + 1px padding = same outer size as the 2px selected border.
   normal: { borderWidth: 1, borderColor: colors.border, padding: 17 },
-  best: { borderWidth: 2, borderColor: colors.primary, padding: 16 },
+  selected: { borderWidth: 2, borderColor: colors.primary, padding: 16 },
+  summary: { gap: 12 },
+  pressed: { opacity: 0.85 },
   badge: {
     alignSelf: 'flex-start',
-    backgroundColor: colors.primary,
     borderRadius: radius.pill,
     paddingVertical: 4,
     paddingHorizontal: 10,
   },
-  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
+  bestBadge: { backgroundColor: colors.primary },
+  aiBadge: { backgroundColor: colors.primaryTint },
+  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 12 },
+  price: { flexShrink: 1, textAlign: 'right' },
   legs: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6 },
   footer: {
     flexDirection: 'row',

@@ -4,21 +4,38 @@ import { create } from 'zustand';
 import {
   directionsService,
   placesService,
+  routingService,
   type LatLng,
   type Place,
+  type Priority,
+  type RankedRoute,
+  type RouteNotice,
+  type Vehicle,
   type WalkingRoute,
 } from '@/services';
+import { useRoutlyPrefs } from '@/store/routlyPrefsStore';
 
 import { useMapStore } from '../map/mapStore';
 
 /** From is either the live GPS position or a searched place. */
 export type Endpoint = { kind: 'current' } | { kind: 'place'; place: Place };
 
-export type RouteState =
+export type RoutesState =
   | { status: 'idle' }
   | { status: 'loading' }
-  | { status: 'ready'; route: WalkingRoute }
+  | {
+      status: 'ready';
+      /** Increments per fetch: a new result (not a re-rank) resets the selection. */
+      requestId: number;
+      /** As returned; re-rank locally with `rankRoutes` for the current priority. */
+      routes: RankedRoute[];
+      notices: RouteNotice[];
+      /** Safe-walk details (via, safety notes) for the walk route's expanded card. */
+      walk: WalkingRoute | null;
+    }
   | { status: 'error'; message: string };
+
+const NO_VEHICLES: Record<Vehicle, boolean> = { car: false, bike: false, cycle: false };
 
 const CURRENT: Endpoint = { kind: 'current' };
 const LOCATION_WAIT_MS = 15000;
@@ -48,7 +65,10 @@ interface TripState {
   /** Typing drafts; `null` = show the picked endpoint's name. */
   fromDraft: string | null;
   toDraft: string | null;
-  route: RouteState;
+  routes: RoutesState;
+  /** Routes ranking. Starts at the Profile default; changing it re-ranks locally. */
+  priority: Priority;
+  setPriority: (priority: Priority) => void;
   /** One Places session per search: keystrokes + the final details call. */
   sessionToken: string;
 
@@ -67,28 +87,32 @@ interface TripState {
 
 /** Only the latest route request wins; older ones are aborted. */
 let inflight: AbortController | null = null;
+let requestCounter = 0;
+/** Set once the user picks a priority on Routes; until then it follows the Profile default. */
+let priorityChosen = false;
 
 /**
- * The trip being planned, shared by Home (search) and Routes (options). For
- * now the only option fetched is walking.
+ * The trip being planned, shared by Home (search) and Routes (options): every
+ * route option plus the safe-walk details.
  */
 export const useTripStore = create<TripState>()((set, get) => {
   const compute = async (origin: Endpoint, destination: Place | null) => {
     inflight?.abort();
     if (!destination) {
-      set({ route: { status: 'idle' } });
+      set({ routes: { status: 'idle' } });
       return;
     }
     const controller = new AbortController();
     inflight = controller;
-    set({ route: { status: 'loading' } });
+    const { signal } = controller;
+    set({ routes: { status: 'loading' } });
     // Right after launch the first GPS fix may not have arrived yet: wait for it.
     const start =
       origin.kind === 'place' ? origin.place.location : await firstUserLocation(LOCATION_WAIT_MS);
     if (controller.signal.aborted) return;
     if (!start) {
       set({
-        route: {
+        routes: {
           status: 'error',
           message: 'Couldn’t get your location. Turn on location, or pick a From place.',
         },
@@ -96,16 +120,33 @@ export const useTripStore = create<TripState>()((set, get) => {
       return;
     }
     try {
-      const route = await directionsService.walking(start, destination.location, {
-        signal: controller.signal,
+      await useRoutlyPrefs.getState().hydrate();
+      const vehicles = useRoutlyPrefs.getState().prefs?.vehicles ?? NO_VEHICLES;
+      // getRoutes throws only when every mode failed; the walk is optional extra detail.
+      const [result, walk] = await Promise.all([
+        routingService.getRoutes(start, destination, {
+          priority: get().priority,
+          vehicles,
+          signal,
+        }),
+        directionsService.walking(start, destination.location, { signal }).catch(() => null),
+      ]);
+      if (signal.aborted) return;
+      set({
+        routes: {
+          status: 'ready',
+          requestId: ++requestCounter,
+          routes: result.routes,
+          notices: result.notices,
+          walk,
+        },
       });
-      if (!controller.signal.aborted) set({ route: { status: 'ready', route } });
     } catch (e) {
-      if (!controller.signal.aborted) {
+      if (!signal.aborted) {
         set({
-          route: {
+          routes: {
             status: 'error',
-            message: e instanceof Error ? e.message : 'Couldn’t get directions.',
+            message: e instanceof Error ? e.message : 'Couldn’t get routes.',
           },
         });
       }
@@ -126,7 +167,13 @@ export const useTripStore = create<TripState>()((set, get) => {
     to: null,
     fromDraft: null,
     toDraft: null,
-    route: { status: 'idle' },
+    routes: { status: 'idle' },
+    priority: useRoutlyPrefs.getState().prefs?.defaultPriority ?? 'fastest',
+
+    setPriority: (priority) => {
+      priorityChosen = true;
+      set({ priority });
+    },
     sessionToken: newSessionToken(),
 
     setFromDraft: (fromDraft) => set({ fromDraft }),
@@ -159,7 +206,7 @@ export const useTripStore = create<TripState>()((set, get) => {
 
     clear: () => {
       inflight?.abort();
-      set({ from: CURRENT, to: null, fromDraft: null, toDraft: null, route: { status: 'idle' } });
+      set({ from: CURRENT, to: null, fromDraft: null, toDraft: null, routes: { status: 'idle' } });
     },
 
     retry: () => compute(get().from, get().to),
@@ -174,4 +221,22 @@ export const useTripStore = create<TripState>()((set, get) => {
       return true;
     },
   };
+});
+
+/**
+ * Follows Profile: the default priority until the user picks one on Routes,
+ * and a refetch when the usable vehicles change during an active trip.
+ */
+useRoutlyPrefs.subscribe((state, prev) => {
+  const prefs = state.prefs;
+  if (!prefs) return;
+  const trip = useTripStore.getState();
+  if (!priorityChosen && prefs.defaultPriority !== trip.priority) {
+    useTripStore.setState({ priority: prefs.defaultPriority });
+  }
+  const before = prev.prefs?.vehicles;
+  const changed =
+    before !== undefined &&
+    (Object.keys(prefs.vehicles) as Vehicle[]).some((v) => before[v] !== prefs.vehicles[v]);
+  if (changed && trip.to) trip.retry();
 });
