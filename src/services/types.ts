@@ -57,7 +57,7 @@ export interface Route {
   legs: Leg[];
   /** Lower = better, per priority; produced by the ML ranking service. */
   score: Record<Priority, number>;
-  /** "Fits your history". */
+  /** Shown as "Top pick" (heuristic). TODO(ml): "AI pick" once the learned ranker is live. */
   aiPick?: boolean;
   /** Preview line: "0.7 km walk · 0 transfers · Low traffic". */
   meta?: string;
@@ -150,7 +150,7 @@ export interface RoutingService {
     to: Place,
     opts: { priority: Priority; vehicles: Record<Vehicle, boolean>; signal?: AbortSignal },
   ): Promise<RoutesResult>;
-  /** The 3 cards on Home: AI pick, cheapest, fastest. */
+  /** The 3 cards on Home: top pick, cheapest, fastest. */
   getPreview(from: Place | LatLng, to: Place): Promise<Route[]>;
   searchPlaces(query: string): Promise<Place[]>;
   /** Best match for a free-text name ("Pune Station", "College"), or null. */

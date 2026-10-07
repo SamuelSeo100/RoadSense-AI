@@ -22,6 +22,15 @@ export const scoringConfig = {
    * a ₹20-vs-₹25 difference to ~1% and cost could not dominate.
    */
   scales: { time: 60, cost: 50, walk: 2, transfers: 2 } satisfies Record<Metric, number>,
+  /**
+   * Per-priority scale overrides. For 'walking' / 'transfers' cost is a
+   * tie-breaker across a wider range: with ₹50 a ₹233 auto and an ₹80 option
+   * both hit the cap and looked equally expensive.
+   */
+  scaleOverrides: {
+    walking: { cost: 200 },
+    transfers: { cost: 200 },
+  } satisfies Partial<Record<Priority, Partial<Record<Metric, number>>>>,
   /** Share of a road route in SLOW / TRAFFIC_JAM above which traffic is Moderate / Heavy. */
   traffic: { moderateShare: 0.15, heavyShare: 0.35 },
 } as const;
@@ -37,24 +46,28 @@ const metricOf: Record<Metric, (r: Scorable) => number> = {
 const METRICS = Object.keys(metricOf) as Metric[];
 
 /** 0..1 (0 = best): distance from the best candidate over a fixed scale, capped at 1. */
-function normaliser(values: number[], scale: number): (v: number) => number {
-  const min = Math.min(...values);
-  return (v) => Math.min(1, Math.max(0, (v - min) / scale));
-}
+const normalise = (v: number, min: number, scale: number) =>
+  Math.min(1, Math.max(0, (v - min) / scale));
 
 /** Per-priority scores (lower = better), relative to the other candidates. */
 export function scoreRoutes<T extends Scorable>(
   routes: T[],
   weights: Record<Priority, Record<Metric, number>> = scoringConfig.weights,
   scales: Record<Metric, number> = scoringConfig.scales,
+  overrides: Partial<
+    Record<Priority, Partial<Record<Metric, number>>>
+  > = scoringConfig.scaleOverrides,
 ): (T & { score: Record<Priority, number> })[] {
-  const norm = Object.fromEntries(
-    METRICS.map((m) => [m, normaliser(routes.map(metricOf[m]), scales[m])]),
-  ) as Record<Metric, (v: number) => number>;
+  const min = Object.fromEntries(
+    METRICS.map((m) => [m, Math.min(...routes.map(metricOf[m]))]),
+  ) as Record<Metric, number>;
   return routes.map((r) => {
     const score = {} as Record<Priority, number>;
     for (const p of Object.keys(weights) as Priority[]) {
-      score[p] = METRICS.reduce((sum, m) => sum + weights[p][m] * norm[m](metricOf[m](r)), 0);
+      score[p] = METRICS.reduce((sum, m) => {
+        const scale = overrides[p]?.[m] ?? scales[m];
+        return sum + weights[p][m] * normalise(metricOf[m](r), min[m], scale);
+      }, 0);
     }
     return { ...r, score };
   });

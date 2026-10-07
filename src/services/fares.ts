@@ -38,6 +38,12 @@ export const fareConfig = {
    * = ₹20 and Vanaz → Ruby Hall (11 stops) = ₹25. Distance can't fit both
    * (13.2 km is ₹20 but 9.0 km is ₹25).
    * TODO(fares): station-to-station table from punemetrorail.org.
+   * TODO(fares): Pune Metro Line 3 (Hinjewadi–Shivajinagar, Pune IT City Metro
+   * Rail / Keolis) has its own fares. Google's transit data has no Line 3 yet
+   * (probed 2026-10-07: Hinjewadi Ph3 → Balewadi Stadium and Hinjewadi Ph1 →
+   * Shivajinagar return only PMPML buses + Purple Line). When it appears, match
+   * its line/agency name, cost it from a `metroLine3` slab (placeholder
+   * ₹10–₹40 by distance) and mark the leg `approximate` ("~₹").
    */
   metroStopSlabs: [
     { upToStops: 3, fare: 10 },

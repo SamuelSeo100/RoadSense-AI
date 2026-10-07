@@ -4,7 +4,7 @@ import type { Route } from '@/services/types';
 import { colors, fonts, modeColors, radius, shadows } from '@/theme/routly';
 
 import { RText } from './RText';
-import { formatInr, primaryMode } from './routeFormat';
+import { formatInr, primaryMode, TOP_PICK_LABEL } from './routeFormat';
 
 interface RoutePreviewCardProps {
   route: Route;
@@ -22,13 +22,13 @@ export function RoutePreviewCard({ route, selected, onPress }: RoutePreviewCardP
       onPress={onPress}
       accessibilityRole="button"
       accessibilityState={{ selected }}
-      accessibilityLabel={`${route.name}, ${route.durationMin} minutes, ${formatInr(route.costInr)}${route.aiPick ? ', AI pick' : ''}`}
+      accessibilityLabel={`${route.name}, ${route.durationMin} minutes, ${formatInr(route.costInr)}${route.aiPick ? `, ${TOP_PICK_LABEL.toLowerCase()}` : ''}`}
       style={[styles.card, selected ? [styles.selected, shadows.selectedCard] : styles.unselected]}
     >
       {route.aiPick && (
         <View style={styles.aiBadge}>
           <RText variant="badge" size={10} family={fonts.extrabold} color={colors.primary}>
-            AI PICK · FITS YOUR HISTORY
+            {TOP_PICK_LABEL.toUpperCase()}
           </RText>
         </View>
       )}

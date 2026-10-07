@@ -6,6 +6,12 @@ export function primaryMode(route: Pick<Route, 'legs'>): Mode {
   return route.legs.find((l) => l.mode !== 'walk')?.mode ?? route.legs[0]?.mode ?? 'walk';
 }
 
+/**
+ * Badge for the route marked `aiPick`. TODO(ml): back to "AI pick" once the
+ * learned ranker (Feature 4) is live; today it's the v1 heuristic.
+ */
+export const TOP_PICK_LABEL = 'Top pick';
+
 export const formatInr = (amount: number) => `₹${amount.toLocaleString('en-IN')}`;
 
 export const trafficTextColor: Record<TrafficLevel, string> = {

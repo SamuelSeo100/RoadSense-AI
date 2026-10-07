@@ -11,6 +11,7 @@ import {
   formatTransfers,
   formatWalking,
   routeCost,
+  TOP_PICK_LABEL,
   shortLegLabel,
   trafficTextColor,
 } from './routeFormat';
@@ -28,11 +29,11 @@ interface RouteCardProps {
 
 /**
  * Ranked route on the Routes tab: leg strip, time, cost, walk/transfers/traffic.
- * One badge at most: "AI pick" wins over "Best for <priority>".
+ * One badge at most: "Top pick" (`aiPick`) wins over "Best for <priority>".
  */
 export function RouteCard({ route, priorityLabel, selected, onPress, children }: RouteCardProps) {
   const badge = route.aiPick
-    ? 'AI PICK'
+    ? TOP_PICK_LABEL.toUpperCase()
     : route.isBest
       ? `BEST FOR ${priorityLabel.toUpperCase()}`
       : null;
