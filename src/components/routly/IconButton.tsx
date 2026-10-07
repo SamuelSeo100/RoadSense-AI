@@ -1,8 +1,9 @@
-import { Pressable, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 
 import { colors, radius, shadows } from '@/theme/routly';
 
 import { Icon, type IconName } from './Icon';
+import { PressableBox } from './PressableBox';
 
 interface IconButtonProps {
   icon: IconName;
@@ -32,13 +33,13 @@ export function IconButton({
 }: IconButtonProps) {
   const size = shape === 'close' ? 36 : 44;
   return (
-    <Pressable
+    <PressableBox
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       accessibilityState={accessibilityState}
       hitSlop={shape === 'close' ? 4 : 0}
-      style={({ pressed }) => [
+      style={[
         styles.base,
         {
           width: size,
@@ -52,16 +53,16 @@ export function IconButton({
             : floating
               ? [styles.idle, styles.floating]
               : [styles.idle, styles.bordered],
-        pressed && styles.pressed,
         style,
       ]}
+      pressedStyle={styles.pressed}
     >
       <Icon
         name={icon}
         size={shape === 'close' ? 18 : 20}
         color={iconColor ?? (active ? colors.textOnPrimary : colors.textPrimary)}
       />
-    </Pressable>
+    </PressableBox>
   );
 }
 

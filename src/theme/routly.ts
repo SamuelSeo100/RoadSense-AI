@@ -70,6 +70,14 @@ export const colors = {
     textModerate: '#B45309',
     textHeavy: '#B42318',
   },
+
+  /** The colours Google's live traffic layer draws (for the Profile legend). */
+  trafficLayer: {
+    free: '#63D668',
+    moderate: '#FF974D',
+    heavy: '#F23C32',
+    stopped: '#811F1F',
+  },
 } as const;
 
 export type Mode = 'walk' | 'metro' | 'bus' | 'auto' | 'cab' | 'bike' | 'cycle' | 'train';

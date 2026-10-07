@@ -1,9 +1,10 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { Icon } from '@/components/routly/Icon';
 import { RText } from '@/components/routly/RText';
 import { Switch } from '@/components/routly/Switch';
 import { colors, fonts, radius } from '@/theme/routly';
+import { PressableBox } from '@/components/routly/PressableBox';
 
 export const QUICK_LAUNCH_COMBOS = [
   { value: 'power+volume_up', label: 'Power + Volume Up' },
@@ -83,16 +84,17 @@ export function QuickLaunchCard({ enabled, combo, onToggle, onChangeCombo }: Qui
         ))}
       </View>
 
-      <Pressable
+      <PressableBox
         onPress={onChangeCombo}
         accessibilityRole="button"
         accessibilityLabel="Change button combo"
-        style={({ pressed }) => [styles.outline, pressed && styles.pressed]}
+        style={styles.outline}
+        pressedStyle={styles.pressed}
       >
         <RText variant="body" size={13} family={fonts.bold} color={colors.textOnPrimary}>
           Change button combo
         </RText>
-      </Pressable>
+      </PressableBox>
     </View>
   );
 }

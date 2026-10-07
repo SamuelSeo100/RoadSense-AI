@@ -403,6 +403,7 @@ export const mockData: MockData = {
       },
     ],
     linkedApps: [],
+    showTraffic: true,
   },
   aiSuggestions: ['Quickest to Pune Station', 'Cheapest to college', 'Take me home'],
 };

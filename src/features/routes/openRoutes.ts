@@ -2,28 +2,40 @@ import { router } from 'expo-router';
 
 import type { Priority } from '@/services/types';
 
-import { useShellStore } from '../shell/shellStore';
+import { SHEET_FULL, SHEET_PEEK, showToast, useShellStore } from '../shell/shellStore';
+import { useTripStore } from '../trip/tripStore';
 
 export interface RoutesParams {
   /** Omit for the current location. */
   from?: string;
   to: string;
+  /** Reserved for multi-modal ranking (only walking is fetched for now). */
   priority?: Priority;
 }
 
-/** Switches to the Routes tab for a trip (Home AI Mode / Find routes, History Repeat). */
-export function openRoutes({ from, to, priority }: RoutesParams) {
-  useShellStore.getState().setSheetIndex('routes', 0);
-  router.navigate({
-    pathname: '/routes',
-    params: { to, ...(from ? { from } : { from: '' }), ...(priority ? { priority } : {}) },
-  });
+/** Shows the Routes tab for the trip already in the trip store. */
+export function goToRoutes() {
+  useShellStore.getState().setSheetIndex('routes', SHEET_PEEK);
+  router.navigate('/routes');
 }
 
-/** History/Profile search button: jump to Home with Plan-a-route open and the sheet expanded. */
+/** Plans a trip from free text (AI Mode, History "Repeat") and shows Routes. */
+export async function openRoutes({ from, to }: RoutesParams) {
+  const found = await useTripStore
+    .getState()
+    .plan(to, from)
+    .catch(() => false);
+  if (!found) {
+    showToast(`Couldn’t find “${to}”`);
+    return false;
+  }
+  goToRoutes();
+  return true;
+}
+
+/** History/Profile search button: jump to Home with the sheet expanded and To focused. */
 export function openHomeSearch() {
   const shell = useShellStore.getState();
-  shell.setHomeSearchOpen(true);
-  shell.setSheetIndex('home', 1);
-  router.navigate('/home');
+  shell.setSheetIndex('home', SHEET_FULL);
+  shell.requestHomeSearch();
 }

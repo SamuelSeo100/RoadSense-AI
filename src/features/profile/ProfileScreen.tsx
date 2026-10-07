@@ -31,7 +31,7 @@ const placeIcon = (label: string): { icon: IconName; bg: string; fg: string } =>
     : { icon: 'home', bg: colors.primaryTint, fg: colors.primary };
 
 /** Profile shows no routes on the map, only the location dot. */
-const NO_ROUTES = { routes: [], selection: 'none' };
+const NO_ROUTES = { routes: [], selection: 'none', focused: false };
 
 export function ProfileScreen() {
   const user = useAuthStore((s) => s.user);

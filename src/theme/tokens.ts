@@ -1,5 +1,5 @@
 /**
- * RoadSense design tokens — single source of truth.
+ * Routly design tokens — single source of truth.
  *
  * Mirrors design/DESIGN.md. `tailwind.config.js` imports this file, so every
  * className (`bg-primary`, `text-headline-lg`, `rounded-card`…) and every

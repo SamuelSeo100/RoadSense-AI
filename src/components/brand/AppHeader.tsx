@@ -16,7 +16,7 @@ interface AppHeaderProps {
   onAvatarPress?: () => void;
 }
 
-/** 56dp top bar: back · ROADSENSE + city badge · avatar (login.html header). */
+/** 56dp top bar: back · ROUTLY + city badge · avatar (login.html header). */
 export function AppHeader({ city = 'Pune', onBack, onAvatarPress }: AppHeaderProps) {
   return (
     <View
@@ -41,7 +41,7 @@ export function AppHeader({ city = 'Pune', onBack, onAvatarPress }: AppHeaderPro
             weight="bold"
             style={{ letterSpacing: WORDMARK_TRACKING }}
           >
-            ROADSENSE
+            ROUTLY
           </Text>
           <CityBadge city={city} />
         </View>

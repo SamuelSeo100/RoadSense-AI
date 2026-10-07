@@ -16,6 +16,13 @@ export interface MapRoute {
 export interface MapContent {
   routes: MapRoute[];
   selection: string;
+  /**
+   * True once the user has picked something (a route, trip or destination):
+   * the camera then frames the selection. Otherwise it stays on the user.
+   */
+  focused: boolean;
+  /** Just the path: no mode badges (the walking-only route). */
+  plain?: boolean;
   destination?: { name: string; location: LatLng };
 }
 

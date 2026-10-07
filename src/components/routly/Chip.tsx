@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import { colors, fonts, radius } from '@/theme/routly';
 
 import { RText } from './RText';
+import { PressableBox } from './PressableBox';
 
 interface ChipProps {
   label: string;
@@ -32,18 +33,18 @@ export function Chip({
   const on = selected === true;
   const fontSize = height === 44 ? 14 : 12;
   return (
-    <Pressable
+    <PressableBox
       onPress={onPress}
       accessibilityRole={selected === undefined ? 'button' : 'radio'}
       accessibilityState={selected === undefined ? undefined : { selected: on, checked: on }}
       accessibilityLabel={accessibilityLabel ?? label}
       hitSlop={height < 44 ? (44 - height) / 2 : 0}
-      style={({ pressed }) => [
+      style={[
         styles.chip,
         { minHeight: height, paddingHorizontal: height === 44 ? 16 : 14 },
         isDark ? styles.dark : on ? styles.selected : styles.unselected,
-        pressed && styles.pressed,
       ]}
+      pressedStyle={styles.pressed}
     >
       {leading}
       <RText
@@ -54,7 +55,7 @@ export function Chip({
       >
         {label}
       </RText>
-    </Pressable>
+    </PressableBox>
   );
 }
 

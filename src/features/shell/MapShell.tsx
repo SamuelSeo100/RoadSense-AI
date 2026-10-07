@@ -14,8 +14,15 @@ import { useRoutlyPrefs } from '@/store/routlyPrefsStore';
 import { colors, layout, radius, shadows } from '@/theme/routly';
 
 import { FloatingNavBar } from './FloatingNavBar';
-import { SheetHandle } from './SheetHandle';
-import { SHEET_FULL, SHEET_PEEK, showToast, useShellStore } from './shellStore';
+import { HANDLE_HEIGHT, SheetHandle } from './SheetHandle';
+import {
+  isSheetIndex,
+  SHEET_COLLAPSED,
+  SHEET_FULL,
+  SHEET_PEEK,
+  showToast,
+  useShellStore,
+} from './shellStore';
 import { tabFromPath, tabInfo, type TabName } from './tabs';
 import { Toast } from './Toast';
 import { TopBar } from './TopBar';
@@ -30,13 +37,22 @@ export function MapShell({ children }: { children: ReactNode }) {
   const insets = useSafeAreaInsets();
   const window = useWindowDimensions();
   const [height, setHeight] = useState(window.height);
+  /**
+   * The sheet mounts only once the real container height is known: changing
+   * snap points under a mounted sheet (Android edge-to-edge) made it report
+   * the collapsed index at startup.
+   */
+  const [measured, setMeasured] = useState(false);
   const tab = tabFromPath(usePathname());
 
   const topBarBottom = insets.top + layout.topBarHeight;
   const peekTop = Math.round(height * layout.sheetPeekTopRatio);
+  // Collapsed: only the drag handle shows, sitting just above the floating nav bar.
+  const collapsedHeight =
+    insets.bottom + layout.navBar.bottomOffset + layout.navBar.height + 8 + HANDLE_HEIGHT;
   const snapPoints = useMemo(
-    () => [height - peekTop, height - topBarBottom],
-    [height, peekTop, topBarBottom],
+    () => [collapsedHeight, height - peekTop, height - topBarBottom],
+    [collapsedHeight, height, peekTop, topBarBottom],
   );
 
   const topBar = useShellStore((s) => s.topBar[tab]);
@@ -44,7 +60,6 @@ export function MapShell({ children }: { children: ReactNode }) {
   const setSheetIndex = useShellStore((s) => s.setSheetIndex);
   const mapContent = useMapStore((s) => s.content[tab]);
   const userLocation = useMapStore((s) => s.userLocation);
-  const area = useMapStore((s) => s.area);
   const { status: locationStatus, retry: enableLocation } = useUserLocation();
 
   const hydratePrefs = useRoutlyPrefs((s) => s.hydrate);
@@ -67,13 +82,16 @@ export function MapShell({ children }: { children: ReactNode }) {
     () => (
       <SheetHandle
         expanded={sheetIndex === SHEET_FULL}
-        onToggle={() => setSheetIndex(tab, sheetIndex === SHEET_FULL ? SHEET_PEEK : SHEET_FULL)}
+        // Tap: full → peek, peek → full, collapsed → peek.
+        onToggle={() => setSheetIndex(tab, sheetIndex === SHEET_PEEK ? SHEET_FULL : SHEET_PEEK)}
       />
     ),
     [sheetIndex, setSheetIndex, tab],
   );
 
   const [satellite, setSatellite] = useState(false);
+  // Traffic lines: Profile › Travel preferences (persisted).
+  const traffic = useRoutlyPrefs((s) => s.prefs?.showTraffic ?? true);
   const [recenterKey, setRecenterKey] = useState(0);
 
   const selectTab = useCallback(
@@ -86,19 +104,25 @@ export function MapShell({ children }: { children: ReactNode }) {
   return (
     <GestureHandlerRootView
       style={styles.root}
-      onLayout={(e) => setHeight(e.nativeEvent.layout.height)}
+      onLayout={(e) => {
+        setHeight(e.nativeEvent.layout.height);
+        setMeasured(true);
+      }}
     >
       <LiveMap
         content={mapContent}
         userLocation={userLocation}
-        area={area}
-        insets={{ top: topBarBottom, bottom: height - peekTop }}
+        // Fit routes above whatever the sheet covers (the full sheet hides the map).
+        insets={{
+          top: topBarBottom,
+          bottom: sheetIndex === SHEET_COLLAPSED ? collapsedHeight : height - peekTop,
+        }}
         satellite={satellite}
+        traffic={traffic}
         recenterKey={recenterKey}
       />
       <MapOverlays
         top={topBarBottom}
-        peekTop={peekTop}
         locationStatus={locationStatus}
         onEnableLocation={enableLocation}
         onRecenter={() => setRecenterKey((k) => k + 1)}
@@ -107,27 +131,30 @@ export function MapShell({ children }: { children: ReactNode }) {
           showToast(satellite ? 'Map view' : 'Satellite view');
         }}
         satellite={satellite}
+        traffic={traffic}
       />
 
-      <BottomSheet
-        ref={sheetRef}
-        index={sheetIndex}
-        snapPoints={snapPoints}
-        enableDynamicSizing={false}
-        enablePanDownToClose={false}
-        animationConfigs={animationConfigs}
-        handleComponent={renderHandle}
-        backgroundStyle={styles.sheetBackground}
-        style={shadows.sheet}
-        keyboardBehavior="extend"
-        keyboardBlurBehavior="restore"
-        android_keyboardInputMode="adjustResize"
-        onChange={(index) => {
-          if (index === SHEET_PEEK || index === SHEET_FULL) setSheetIndex(tab, index);
-        }}
-      >
-        <View style={styles.sheetContent}>{children}</View>
-      </BottomSheet>
+      {measured && (
+        <BottomSheet
+          ref={sheetRef}
+          index={sheetIndex}
+          snapPoints={snapPoints}
+          enableDynamicSizing={false}
+          enablePanDownToClose={false}
+          animationConfigs={animationConfigs}
+          handleComponent={renderHandle}
+          backgroundStyle={styles.sheetBackground}
+          style={shadows.sheet}
+          keyboardBehavior="extend"
+          keyboardBlurBehavior="restore"
+          android_keyboardInputMode="adjustResize"
+          onChange={(index) => {
+            if (isSheetIndex(index)) setSheetIndex(tab, index);
+          }}
+        >
+          <View style={styles.sheetContent}>{children}</View>
+        </BottomSheet>
+      )}
 
       <TopBar config={topBar} />
       <FloatingNavBar active={tab} onSelect={selectTab} />

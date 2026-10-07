@@ -14,7 +14,7 @@ interface TabHeaderProps {
   showAvatar?: boolean;
 }
 
-/** 64dp top bar for the tab screens: logo · ROADSENSE AI / title · avatar (home.html header). */
+/** 64dp top bar for the tab screens: logo · ROUTLY AI / title · avatar (home.html header). */
 export function TabHeader({ title, showAvatar = true }: TabHeaderProps) {
   return (
     <View
@@ -25,7 +25,7 @@ export function TabHeader({ title, showAvatar = true }: TabHeaderProps) {
         <LogoMark size="sm" />
         <View>
           <Text variant="label-sm" tone="primary" caps>
-            RoadSense AI
+            Routly AI
           </Text>
           <Text variant="title-md" role="heading">
             {title}

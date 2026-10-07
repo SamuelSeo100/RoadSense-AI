@@ -9,7 +9,7 @@ export interface OAuthCallbackParams {
 /**
  * Reads the Supabase OAuth redirect, e.g.
  * `exp://127.0.0.1:8081#access_token=…&refresh_token=…` (implicit flow) or
- * `roadsense://?code=…` (PKCE). Params can be in the query and/or the fragment.
+ * `routly://?code=…` (PKCE). Params can be in the query and/or the fragment.
  */
 export function parseOAuthCallback(url: string): OAuthCallbackParams {
   const hashIndex = url.indexOf('#');

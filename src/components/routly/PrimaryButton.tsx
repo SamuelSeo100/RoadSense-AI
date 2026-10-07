@@ -1,9 +1,10 @@
-import { Pressable, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import { colors, radius } from '@/theme/routly';
 
 import { Icon, type IconName } from './Icon';
 import { RText } from './RText';
+import { PressableBox } from './PressableBox';
 
 interface PrimaryButtonProps {
   label: string;
@@ -24,16 +25,13 @@ export function PrimaryButton({
   accessibilityHint,
 }: PrimaryButtonProps) {
   return (
-    <Pressable
+    <PressableBox
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityHint={accessibilityHint}
-      style={({ pressed }) => [
-        styles.button,
-        { minHeight: height },
-        pressed && { backgroundColor: colors.primaryPressed },
-      ]}
+      style={[styles.button, { minHeight: height }]}
+      pressedStyle={styles.pressed}
     >
       {leadingIcon && (
         <Icon name={leadingIcon} size={18} color={colors.textOnPrimary} strokeWidth={2.2} />
@@ -44,11 +42,12 @@ export function PrimaryButton({
       {trailingIcon && (
         <Icon name={trailingIcon} size={18} color={colors.textOnPrimary} strokeWidth={2.2} />
       )}
-    </Pressable>
+    </PressableBox>
   );
 }
 
 const styles = StyleSheet.create({
+  pressed: { backgroundColor: colors.primaryPressed },
   button: {
     backgroundColor: colors.primary,
     borderRadius: radius.input,

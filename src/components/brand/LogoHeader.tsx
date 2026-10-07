@@ -29,13 +29,13 @@ export function LogoHeader({ onBack }: LogoHeaderProps) {
       <View
         className="flex-1 flex-row items-center justify-center gap-space-sm"
         accessibilityRole="header"
-        accessibilityLabel="RoadSense"
+        accessibilityLabel="Routly"
       >
         <LogoMark size="sm" />
         <Text variant="title-md" weight="bold" importantForAccessibility="no">
-          Road
+          Rout
           <Text variant="title-md" weight="bold" tone="primary">
-            Sense
+            ly
           </Text>
         </Text>
       </View>

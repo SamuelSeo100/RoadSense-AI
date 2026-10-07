@@ -1,23 +1,25 @@
 {
   "expo": {
-    "name": "RoadSense",
-    "slug": "roadsense",
+    "name": "Routly",
+    "slug": "routly",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "in.routly.app"
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#FBFAF6",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "softwareKeyboardLayoutMode": "resize"
+      "softwareKeyboardLayoutMode": "resize",
+      "package": "in.routly.app"
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -28,11 +30,18 @@
       "expo-router",
       "expo-status-bar",
       "expo-font",
-      "expo-splash-screen",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 160,
+          "backgroundColor": "#FBFAF6"
+        }
+      ],
       "expo-secure-store",
       "expo-web-browser"
     ],
-    "scheme": "roadsense",
+    "scheme": "routly",
     "backgroundColor": "#f8f9ff",
     "experiments": {
       "typedRoutes": true

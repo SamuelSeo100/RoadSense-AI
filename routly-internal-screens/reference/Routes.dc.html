@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Routly routes</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0A7468}a:hover{color:#075A51}
+button{font-family:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; background: #EEF1F3; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #13202E">
+
+  <div style="position: absolute; left: 0; top: 0; width: 390px; height: 844px">
+    <dc-import name="Map" sel="{{mapSel}}" hint-size="390px,844px"></dc-import>
+  </div>
+
+  <div style="{{sheetStyle}}">
+    <button onPointerDown="{{hDown}}" onPointerMove="{{hMove}}" onPointerUp="{{hUp}}" onPointerCancel="{{hUp}}" onClick="{{hClick}}" aria-label="Drag or tap to expand the panel" aria-expanded="{{sheetFull}}" style="flex-shrink: 0; width: 100%; height: 30px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; touch-action: none; cursor: grab">
+      <span style="width: 40px; height: 5px; border-radius: 3px; background: #C2CAD3"></span>
+    </button>
+    <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 2px 16px 120px; display: flex; flex-direction: column; gap: 16px">
+
+      <!-- From / To -->
+      <div style="background: #FFFFFF; border: 1px solid #E3E7EC; border-radius: 18px; padding: 10px 8px 10px 14px; display: flex; align-items: center; gap: 12px; flex-shrink: 0">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 3px">
+          <div style="width: 10px; height: 10px; border-radius: 5px; background: #2563EB; border: 3px solid #DCE7FD"></div>
+          <div style="width: 2px; height: 22px; background-image: linear-gradient(#C9D0D8 50%, transparent 50%); background-size: 2px 6px"></div>
+          <div style="width: 10px; height: 10px; border-radius: 3px; background: #DC2626"></div>
+        </div>
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+          <label for="from" style="font-size: 10px; color: #5B6878; font-weight: 800; letter-spacing: 0.4px">FROM</label>
+          <input id="from" value="{{fromVal}}" style="background: transparent; border: none; color: #13202E; font-size: 14px; font-weight: 700; padding: 2px 0 6px; font-family: inherit; outline: none; border-bottom: 1px solid #E3E7EC">
+          <label for="to" style="font-size: 10px; color: #5B6878; font-weight: 800; letter-spacing: 0.4px; margin-top: 6px">TO</label>
+          <input id="to" value="{{toVal}}" style="background: transparent; border: none; color: #13202E; font-size: 14px; font-weight: 700; padding: 2px 0; font-family: inherit; outline: none">
+        </div>
+        <button onClick="{{swap}}" aria-label="Swap From and To" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #E3E7EC; background: #FFFFFF; color: #13202E; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16M7 20l-3-3M7 20l3-3M17 20V4M17 4l-3 3M17 4l3 3"></path></svg>
+        </button>
+      </div>
+
+      <!-- Priority -->
+      <div style="display: flex; flex-direction: column; gap: 10px; flex-shrink: 0">
+        <div style="font-size: 13px; font-weight: 700; color: #4A5868">What matters most?</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px">
+          <sc-for list="{{chips}}" as="c" hint-placeholder-count="4">
+            <button onClick="{{c.pick}}" aria-pressed="{{c.on}}" style="{{c.style}}">{{c.label}}</button>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- Vehicles -->
+      <div style="display: flex; flex-direction: column; gap: 10px; flex-shrink: 0">
+        <div style="font-size: 13px; font-weight: 700; color: #4A5868">Include vehicles</div>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+          <button onClick="{{toggleCar}}" aria-pressed="{{carOn}}" style="{{carStyle}}">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3v-5l2-5h14l2 5v5h-2"></path><path d="M3 12h18M9.5 17h5"></path><circle cx="7.5" cy="17" r="2"></circle><circle cx="16.5" cy="17" r="2"></circle></svg>
+            <span style="font-size: 12px; font-weight: 700">Car</span>
+          </button>
+          <button onClick="{{toggleBike}}" aria-pressed="{{bikeOn}}" style="{{bikeStyle}}">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="17" r="3"></circle><circle cx="19" cy="17" r="3"></circle><path d="M5 17l4-6h6l4 6"></path><path d="M15 11l-2-4h-3M8 11h4"></path></svg>
+            <span style="font-size: 12px; font-weight: 700">Bike</span>
+          </button>
+          <button onClick="{{toggleCycle}}" aria-pressed="{{cycleOn}}" style="{{cycleStyle}}">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17" r="3.5"></circle><circle cx="18.5" cy="17" r="3.5"></circle><path d="M5.5 17l3.5-7h7l2.5 7M9 10l3 7h4.5M14 6h3l-1 4"></path></svg>
+            <span style="font-size: 12px; font-weight: 700">Cycle</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div style="display: flex; align-items: baseline; justify-content: space-between; flex-shrink: 0">
+        <div style="font-size: 18px; font-weight: 800">{{countLabel}}</div>
+        <div style="font-size: 12px; color: #5B6878; font-weight: 600">Ranked by AI · {{activeLabel}}</div>
+      </div>
+
+      <sc-for list="{{routes}}" as="r" hint-placeholder-count="4">
+        <div style="{{r.cardStyle}}">
+          <sc-if value="{{r.top}}" hint-placeholder-val="{{false}}">
+            <div style="align-self: flex-start; background: #0A7468; color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; letter-spacing: 0.3px">★ BEST FOR YOU</div>
+          </sc-if>
+          <div style="display: flex; align-items: flex-end; justify-content: space-between">
+            <div style="display: flex; align-items: baseline; gap: 6px">
+              <div style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px">{{r.time}}</div>
+              <div style="font-size: 13px; color: #5B6878; font-weight: 600">min</div>
+            </div>
+            <div style="font-size: 22px; font-weight: 800">{{r.cost}}</div>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px">
+            <sc-for list="{{r.legs}}" as="l" hint-placeholder-count="3">
+              <div style="display: flex; align-items: center; gap: 6px">
+                <div style="{{l.style}}">{{l.label}}</div>
+                <sc-if value="{{l.more}}" hint-placeholder-val="{{true}}">
+                  <div style="color: #8A96A3; font-size: 14px">›</div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; border-top: 1px solid #E3E7EC; padding-top: 12px">
+            <div style="display: flex; flex-direction: column; gap: 2px">
+              <div style="font-size: 11px; color: #5B6878; font-weight: 600">Walking</div>
+              <div style="font-size: 14px; font-weight: 700">{{r.walk}}</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 2px">
+              <div style="font-size: 11px; color: #5B6878; font-weight: 600">Transfers</div>
+              <div style="font-size: 14px; font-weight: 700">{{r.transfers}}</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 2px">
+              <div style="font-size: 11px; color: #5B6878; font-weight: 600">Traffic</div>
+              <div style="{{r.trafficStyle}}">{{r.traffic}}</div>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- Top bar -->
+  <div style="position: absolute; left: 0; top: 0; right: 0; height: 72px; box-sizing: border-box; background: #FFFFFF; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 0 #E3E7EC">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <div style="width: 36px; height: 36px; border-radius: 10px; overflow: hidden; position: relative; flex-shrink: 0">
+        <img src="/_blob/4790f044b54941f04d5575178983d411" alt="Routly logo" style="position: absolute; width: 51px; height: 51px; left: -7.6px; top: -7.6px; max-width: none">
+      </div>
+      <div style="display: flex; flex-direction: column">
+        <div style="font-size: 20px; font-weight: 800; letter-spacing: -0.4px; line-height: 1.1">Routes</div>
+        <div style="font-size: 12px; color: #4A5868; font-weight: 600">{{fromVal}} → {{toVal}}</div>
+      </div>
+    </div>
+    <button onClick="{{openSearch}}" aria-label="Edit route search" style="width: 44px; height: 44px; border-radius: 22px; border: 1px solid #E3E7EC; background: #FFFFFF; color: #13202E; display: flex; align-items: center; justify-content: center">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+    </button>
+  </div>
+
+  <div style="position: absolute; left: 45px; bottom: 20px; width: 300px; height: 72px">
+    <dc-import name="NavBar" active="routes" hint-size="300px,72px"></dc-import>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startExpanded":{"editor":"boolean","default":false},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    this.state = { sheet: null, dragTop: null, pref: 'fastest', car: true, bike: true, cycle: true, from: 'Pimpri', to: 'Pune Station' };
+  }
+  sheetVals() {
+    var self = this, FULL = 72, PEEK = 430;
+    var full = this.state.sheet === null ? !!this.props.startExpanded : this.state.sheet === 'full';
+    var dragging = this.state.dragTop !== null;
+    var top = dragging ? this.state.dragTop : (full ? FULL : PEEK);
+    return {
+      sheetFull: full,
+      sheetStyle: 'position: absolute; left: 0; right: 0; bottom: 0; top: ' + top + 'px; background: #F2F4F6; border-radius: 24px 24px 0 0; box-shadow: 0 -8px 24px rgba(19,32,46,0.14); display: flex; flex-direction: column; overflow: hidden' + (dragging ? '' : '; transition: top 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)'),
+      hDown: function (e) { self._sy = e.clientY; self._st = top; self._mv = false; self._dn = true; try { e.currentTarget.setPointerCapture(e.pointerId); } catch (x) {} },
+      hMove: function (e) {
+        if (!self._dn) return;
+        var dy = e.clientY - self._sy;
+        if (Math.abs(dy) > 5) self._mv = true;
+        if (self._mv) self.setState({ dragTop: Math.max(FULL - 8, Math.min(PEEK + 140, self._st + dy)) });
+      },
+      hUp: function () {
+        if (!self._dn) return;
+        self._dn = false;
+        if (!self._mv) return;
+        var t = self.state.dragTop === null ? self._st : self.state.dragTop;
+        var d = t - self._st;
+        var next = d < -40 ? 'full' : (d > 40 ? 'peek' : (self._st === FULL ? 'full' : 'peek'));
+        self.setState({ dragTop: null, sheet: next });
+      },
+      hClick: function () { if (self._mv) { self._mv = false; return; } self.setState({ sheet: full ? 'peek' : 'full' }); }
+    };
+  }
+  renderVals() {
+    var self = this;
+    var st = this.state;
+    var pref = st.pref;
+    var modes = {
+      walk:  ['#EDE5FD', '#5B21B6'],
+      metro: ['#DCF5E3', '#15803D'],
+      bus:   ['#DCE7FD', '#1D4ED8'],
+      auto:  ['#FFF4C2', '#7A5A00'],
+      cab:   ['#FFE6D5', '#C2410C'],
+      bike:  ['#FBE2E4', '#B42318'],
+      cycle: ['#DFF4EF', '#0A7468']
+    };
+    var all = [
+      { id: 'a', map: 'metro', time: 38, cost: 62, walkKm: 0.6, transfers: 1, traffic: 'Light',
+        legs: [['walk','Walk 5m'],['metro','Metro'],['auto','Auto 12m']],
+        score: { fastest: 2, cheapest: 2, walking: 2, transfers: 2 } },
+      { id: 'b', map: 'bus', time: 54, cost: 25, walkKm: 1.1, transfers: 1, traffic: 'Moderate',
+        legs: [['walk','Walk 8m'],['bus','Bus 312'],['bus','Bus 299'],['walk','Walk 6m']],
+        score: { fastest: 4, cheapest: 1, walking: 4, transfers: 3 } },
+      { id: 'c', map: 'cab', vehicle: 'car', time: 42, cost: 310, walkKm: 0, transfers: 0, traffic: 'Heavy',
+        legs: [['cab','Cab']],
+        score: { fastest: 3, cheapest: 4, walking: 1, transfers: 1 } },
+      { id: 'd', map: 'all', vehicle: 'bike', time: 35, cost: 95, walkKm: 0.2, transfers: 0, traffic: 'Moderate',
+        legs: [['bike','Bike taxi']],
+        score: { fastest: 1, cheapest: 3, walking: 3, transfers: 4 } },
+      { id: 'e', map: 'all', vehicle: 'cycle', time: 48, cost: 0, walkKm: 0, transfers: 0, traffic: 'Light',
+        legs: [['cycle','Cycle']],
+        score: { fastest: 5, cheapest: 0, walking: 1.5, transfers: 1.5 } }
+    ];
+    all = all.filter(function (r) { return !r.vehicle || st[r.vehicle]; });
+    var sorted = all.slice().sort(function (x, y) { return x.score[pref] - y.score[pref]; });
+    var tColor = { Light: '#15803D', Moderate: '#B45309', Heavy: '#B42318' };
+    var routes = sorted.map(function (r, i) {
+      return {
+        top: i === 0,
+        time: r.time,
+        cost: '₹' + r.cost,
+        walk: r.walkKm === 0 ? 'None' : r.walkKm + ' km',
+        transfers: r.transfers === 0 ? 'Direct' : String(r.transfers),
+        traffic: r.traffic,
+        trafficStyle: 'font-size: 14px; font-weight: 700; color: ' + tColor[r.traffic],
+        cardStyle: 'flex-shrink: 0; background: #FFFFFF; border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 12px; ' +
+          (i === 0 ? 'border: 2px solid #0A7468; box-shadow: 0 6px 20px rgba(10,116,104,0.14)' : 'border: 1px solid #E3E7EC'),
+        legs: r.legs.map(function (l, j) {
+          var c = modes[l[0]];
+          return { label: l[1], more: j < r.legs.length - 1,
+            style: 'background: ' + c[0] + '; color: ' + c[1] + '; font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 8px' };
+        })
+      };
+    });
+    var defs = [['fastest','Fastest'],['cheapest','Cheapest'],['walking','Least walking'],['transfers','Fewest transfers']];
+    var chips = defs.map(function (d) {
+      var on = d[0] === pref;
+      return {
+        label: d[1], on: on,
+        pick: function () { self.setState({ pref: d[0] }); },
+        style: 'min-height: 44px; padding: 0 16px; border-radius: 999px; font-size: 14px; font-weight: 700; ' +
+          (on ? 'background: #13202E; color: #FFFFFF; border: 1px solid #13202E' : 'background: #FFFFFF; color: #13202E; border: 1px solid #CFD6DE')
+      };
+    });
+    var activeLabel = defs.filter(function (d) { return d[0] === pref; })[0][1];
+    var vStyle = function (on) {
+      return 'min-height: 64px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; ' +
+        (on ? 'background: #DFF4EF; color: #0A7468; border: 2px solid #0A7468' : 'background: #FFFFFF; color: #6B7785; border: 1px solid #CFD6DE');
+    };
+    var tog = function (k) { return function () { var o = {}; o[k] = !self.state[k]; self.setState(o); }; };
+    return Object.assign(this.sheetVals(), {
+      mapSel: sorted.length ? sorted[0].map : 'none',
+      chips: chips, routes: routes, activeLabel: activeLabel,
+      countLabel: routes.length + (routes.length === 1 ? ' route found' : ' routes found'),
+      carOn: st.car, bikeOn: st.bike, cycleOn: st.cycle,
+      carStyle: vStyle(st.car), bikeStyle: vStyle(st.bike), cycleStyle: vStyle(st.cycle),
+      toggleCar: tog('car'), toggleBike: tog('bike'), toggleCycle: tog('cycle'),
+      fromVal: st.from, toVal: st.to,
+      swap: function () { self.setState({ from: self.state.to, to: self.state.from }); },
+      openSearch: function () { self.setState({ sheet: 'full' }); }
+    });
+  }
+}
+</script>
+</body>
+</html>

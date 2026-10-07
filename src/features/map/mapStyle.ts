@@ -20,7 +20,18 @@ export const mapStyle: MapStyleElement[] = [
   { featureType: 'water', elementType: 'geometry', stylers: [{ color: colors.map.water }] },
 ];
 
-/** `#RRGGBB` + opacity → `rgba()`, for faded (unselected) polylines. */
+/**
+ * `#RRGGBB` mixed toward white by `amount` (0 = unchanged, 1 = white): a solid,
+ * opaque but faint colour, so overlapping segments never look darker.
+ */
+export function tint(hex: string, amount: number) {
+  const n = parseInt(hex.slice(1), 16);
+  const mix = (c: number) => Math.round(c + (255 - c) * amount);
+  const to2 = (c: number) => mix(c).toString(16).padStart(2, '0');
+  return `#${to2((n >> 16) & 255)}${to2((n >> 8) & 255)}${to2(n & 255)}`;
+}
+
+/** `#RRGGBB` + opacity → `rgba()`. */
 export function withAlpha(hex: string, alpha: number) {
   const n = parseInt(hex.slice(1), 16);
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${alpha})`;

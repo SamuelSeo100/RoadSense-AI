@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { useMapStore, type MapContent } from '../map/mapStore';
 
-import { useShellStore } from './shellStore';
+import { useShellStore, type SheetIndex } from './shellStore';
 import type { TabName } from './tabs';
 
 interface TopBarInput {
@@ -42,9 +42,13 @@ export function useMapContent(tab: TabName, content: MapContent) {
   }, [setContent, tab, content]);
 }
 
-/** This tab's sheet position, and a setter that snaps the shared sheet. */
+/**
+ * This tab's sheet position, and a setter that snaps the shared sheet. The
+ * setter is stable, so effects depending on it don't re-run on every render.
+ */
 export function useSheet(tab: TabName) {
   const index = useShellStore((s) => s.sheetIndex[tab]);
   const setSheetIndex = useShellStore((s) => s.setSheetIndex);
-  return { index, setIndex: (i: 0 | 1) => setSheetIndex(tab, i) } as const;
+  const setIndex = useCallback((i: SheetIndex) => setSheetIndex(tab, i), [setSheetIndex, tab]);
+  return { index, setIndex } as const;
 }

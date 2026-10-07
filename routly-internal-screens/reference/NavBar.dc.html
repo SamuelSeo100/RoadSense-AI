@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Routly nav bar</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<nav aria-label="Main" style="width: 300px; height: 72px; box-sizing: border-box; background: #FFFFFF; border-radius: 36px; box-shadow: 0 10px 28px rgba(19,32,46,0.18), 0 1px 3px rgba(19,32,46,0.08); padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #13202E">
+  <sc-for list="{{items}}" as="it" hint-placeholder-count="4">
+    <a href="{{it.href}}" aria-label="{{it.label}}" aria-current="{{it.current}}" style="{{it.style}}">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{it.sw}}" stroke-linecap="round" stroke-linejoin="round"><path d="{{it.d}}"></path></svg>
+    </a>
+  </sc-for>
+</nav>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"active":{"editor":"enum","options":["home","routes","history","profile"],"default":"home"},"$preview":{"width":300,"height":72}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var active = this.props.active ?? 'home';
+    var defs = [
+      { id: 'home', label: 'Home', href: 'Home.dc.html', d: 'M3 11 12 3l9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z' },
+      { id: 'routes', label: 'Routes', href: 'Routes.dc.html', d: 'M6 17a2 2 0 1 0 0 4 2 2 0 1 0 0-4Z M18 3a2 2 0 1 0 0 4 2 2 0 1 0 0-4Z M8 19h8a3 3 0 0 0 0-6H8a3 3 0 0 1 0-6h8' },
+      { id: 'history', label: 'History', href: 'History.dc.html', d: 'M12 3a9 9 0 1 0 0 18 9 9 0 1 0 0-18Z M12 7v5l3 2' },
+      { id: 'profile', label: 'Profile', href: 'Profile.dc.html', d: 'M12 4a4 4 0 1 0 0 8 4 4 0 1 0 0-8Z M4 21c0-4 4-6 8-6s8 2 8 6' }
+    ];
+    var items = defs.map(function (d) {
+      var on = d.id === active;
+      return {
+        href: d.href, label: d.label, d: d.d,
+        current: on ? 'page' : undefined,
+        sw: on ? 2.2 : 1.9,
+        style: 'display: flex; align-items: center; justify-content: center; text-decoration: none; border-radius: 999px; flex-shrink: 0; ' +
+          (on
+            ? 'width: 56px; height: 56px; background: #0A7468; color: #FFFFFF; box-shadow: 0 6px 16px rgba(10,116,104,0.35)'
+            : 'width: 48px; height: 48px; background: transparent; color: #6B7785')
+      };
+    });
+    return { items: items };
+  }
+}
+</script>
+</body>
+</html>

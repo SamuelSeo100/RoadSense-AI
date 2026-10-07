@@ -85,9 +85,9 @@ export function createSupabaseAuthService(supabase: SupabaseClient): AuthService
     },
 
     async signInWithGoogle() {
-      // Expo Go: exp://<host>:8081 · dev/standalone build: roadsense:// · web: the page origin.
+      // Expo Go: exp://<host>:8081 · dev/standalone build: routly:// · web: the page origin.
       // Each must be in Supabase → Authentication → URL Configuration → Redirect URLs.
-      const redirectTo = makeRedirectUri({ scheme: 'roadsense' });
+      const redirectTo = makeRedirectUri({ scheme: 'routly' });
 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',

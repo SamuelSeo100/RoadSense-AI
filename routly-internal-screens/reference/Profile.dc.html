@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Routly profile</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0A7468}a:hover{color:#075A51}
+button{font-family:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; background: #EEF1F3; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #13202E">
+
+  <div style="position: absolute; left: 0; top: 0; width: 390px; height: 844px">
+    <dc-import name="Map" sel="none" hint-size="390px,844px"></dc-import>
+  </div>
+
+  <div style="{{sheetStyle}}">
+    <button onPointerDown="{{hDown}}" onPointerMove="{{hMove}}" onPointerUp="{{hUp}}" onPointerCancel="{{hUp}}" onClick="{{hClick}}" aria-label="Drag or tap to expand the panel" aria-expanded="{{sheetFull}}" style="flex-shrink: 0; width: 100%; height: 30px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; touch-action: none; cursor: grab">
+      <span style="width: 40px; height: 5px; border-radius: 3px; background: #C2CAD3"></span>
+    </button>
+    <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 2px 16px 120px; display: flex; flex-direction: column; gap: 16px">
+
+      <!-- Identity -->
+      <div style="display: flex; align-items: center; gap: 14px; flex-shrink: 0">
+        <div style="width: 60px; height: 60px; border-radius: 30px; background: #0A7468; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; flex-shrink: 0">D</div>
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+          <div style="font-size: 20px; font-weight: 800">Danny</div>
+          <div style="font-size: 13px; font-weight: 600; color: #5B6878">Pune · [phone number]</div>
+        </div>
+        <button style="min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid #CFD6DE; background: #FFFFFF; color: #13202E; font-size: 13px; font-weight: 700">Edit</button>
+      </div>
+
+      <!-- Quick Launch (moved from Home) -->
+      <div style="background: #13202E; color: #FFFFFF; border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+          <div style="display: flex; align-items: center; gap: 10px">
+            <div style="width: 40px; height: 40px; border-radius: 12px; background: #1F3043; color: #3FD3B4; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="3"></rect><path d="M21 8v4M11 18h2"></path></svg>
+            </div>
+            <div style="display: flex; flex-direction: column">
+              <div style="font-size: 15px; font-weight: 800">Quick Launch</div>
+              <div style="font-size: 12px; color: #A9B6C4; font-weight: 600">Works with screen off</div>
+            </div>
+          </div>
+          <button onClick="{{toggleQl}}" aria-pressed="{{qlOn}}" aria-label="Quick Launch" style="{{qlTrack}}">
+            <span style="width: 24px; height: 24px; border-radius: 12px; background: #FFFFFF"></span>
+          </button>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+          <div style="background: #1F3043; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 4px">
+            <div style="font-size: 18px; font-weight: 800; color: #3FD3B4">1</div>
+            <div style="font-size: 11px; font-weight: 700; line-height: 1.35">Press Power + Volume Up</div>
+          </div>
+          <div style="background: #1F3043; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 4px">
+            <div style="font-size: 18px; font-weight: 800; color: #3FD3B4">2</div>
+            <div style="font-size: 11px; font-weight: 700; line-height: 1.35">Say where you want to go</div>
+          </div>
+          <div style="background: #1F3043; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 4px">
+            <div style="font-size: 18px; font-weight: 800; color: #3FD3B4">3</div>
+            <div style="font-size: 11px; font-weight: 700; line-height: 1.35">Pick a route, it becomes a live mini-map</div>
+          </div>
+        </div>
+        <button style="min-height: 44px; border-radius: 12px; border: 1px solid #34475C; background: transparent; color: #FFFFFF; font-size: 13px; font-weight: 700">Change button combo</button>
+      </div>
+
+      <!-- Saved places -->
+      <div style="display: flex; flex-direction: column; gap: 10px; flex-shrink: 0">
+        <div style="font-size: 16px; font-weight: 800">Saved places</div>
+        <div style="background: #FFFFFF; border: 1px solid #E3E7EC; border-radius: 18px; display: flex; flex-direction: column">
+          <button style="min-height: 60px; border: none; background: transparent; color: #13202E; display: flex; align-items: center; gap: 12px; padding: 0 14px; text-align: left; border-bottom: 1px solid #EEF1F3">
+            <span style="width: 36px; height: 36px; border-radius: 10px; background: #DFF4EF; color: #0A7468; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 11 12 3l9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"></path></svg>
+            </span>
+            <span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 800">Home</span><span style="font-size: 12px; font-weight: 600; color: #5B6878">[Set address]</span></span>
+          </button>
+          <button style="min-height: 60px; border: none; background: transparent; color: #13202E; display: flex; align-items: center; gap: 12px; padding: 0 14px; text-align: left; border-bottom: 1px solid #EEF1F3">
+            <span style="width: 36px; height: 36px; border-radius: 10px; background: #DCE7FD; color: #1D4ED8; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5Z"></path><path d="M6 11v5c3 2 9 2 12 0v-5"></path></svg>
+            </span>
+            <span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 800">College</span><span style="font-size: 12px; font-weight: 600; color: #5B6878">[Set address]</span></span>
+          </button>
+          <button style="min-height: 52px; border: none; background: transparent; color: #0A7468; display: flex; align-items: center; gap: 12px; padding: 0 14px; font-size: 14px; font-weight: 800">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>Add a place
+          </button>
+        </div>
+      </div>
+
+      <!-- Travel preferences -->
+      <div style="display: flex; flex-direction: column; gap: 10px; flex-shrink: 0">
+        <div style="font-size: 16px; font-weight: 800">Travel preferences</div>
+        <div style="background: #FFFFFF; border: 1px solid #E3E7EC; border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 14px">
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <div style="font-size: 12px; font-weight: 700; color: #4A5868">Default priority</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px">
+              <sc-for list="{{prefs}}" as="p" hint-placeholder-count="4">
+                <button onClick="{{p.pick}}" aria-pressed="{{p.on}}" style="{{p.style}}">{{p.label}}</button>
+              </sc-for>
+            </div>
+          </div>
+          <sc-for list="{{toggles}}" as="t" hint-placeholder-count="3">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid #EEF1F3; padding-top: 12px">
+              <div style="display: flex; flex-direction: column; gap: 2px">
+                <div style="font-size: 14px; font-weight: 800">{{t.label}}</div>
+                <div style="font-size: 12px; font-weight: 600; color: #5B6878">{{t.hint}}</div>
+              </div>
+              <button onClick="{{t.flip}}" aria-pressed="{{t.on}}" aria-label="{{t.label}}" style="{{t.track}}">
+                <span style="width: 24px; height: 24px; border-radius: 12px; background: #FFFFFF"></span>
+              </button>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- Linked apps -->
+      <div style="display: flex; flex-direction: column; gap: 10px; flex-shrink: 0">
+        <div style="font-size: 16px; font-weight: 800">Linked apps for booking</div>
+        <div style="background: #FFFFFF; border: 1px solid #E3E7EC; border-radius: 18px; display: flex; flex-direction: column">
+          <div style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; border-bottom: 1px solid #EEF1F3">
+            <span style="font-size: 14px; font-weight: 800">Uber</span>
+            <button style="min-height: 34px; padding: 0 12px; border-radius: 999px; border: 1px solid #0A7468; background: #FFFFFF; color: #0A7468; font-size: 12px; font-weight: 800">Connect</button>
+          </div>
+          <div style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; border-bottom: 1px solid #EEF1F3">
+            <span style="font-size: 14px; font-weight: 800">Ola</span>
+            <button style="min-height: 34px; padding: 0 12px; border-radius: 999px; border: 1px solid #0A7468; background: #FFFFFF; color: #0A7468; font-size: 12px; font-weight: 800">Connect</button>
+          </div>
+          <div style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px">
+            <span style="font-size: 14px; font-weight: 800">Pune Metro tickets</span>
+            <button style="min-height: 34px; padding: 0 12px; border-radius: 999px; border: 1px solid #0A7468; background: #FFFFFF; color: #0A7468; font-size: 12px; font-weight: 800">Connect</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings -->
+      <div style="background: #FFFFFF; border: 1px solid #E3E7EC; border-radius: 18px; display: flex; flex-direction: column; flex-shrink: 0">
+        <button style="min-height: 52px; border: none; border-bottom: 1px solid #EEF1F3; background: transparent; color: #13202E; text-align: left; padding: 0 14px; font-size: 14px; font-weight: 700">Notifications</button>
+        <button style="min-height: 52px; border: none; border-bottom: 1px solid #EEF1F3; background: transparent; color: #13202E; text-align: left; padding: 0 14px; font-size: 14px; font-weight: 700">Language · English</button>
+        <button style="min-height: 52px; border: none; border-bottom: 1px solid #EEF1F3; background: transparent; color: #13202E; text-align: left; padding: 0 14px; font-size: 14px; font-weight: 700">Help &amp; feedback</button>
+        <button style="min-height: 52px; border: none; background: transparent; color: #B42318; text-align: left; padding: 0 14px; font-size: 14px; font-weight: 800">Log out</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top bar -->
+  <div style="position: absolute; left: 0; top: 0; right: 0; height: 72px; box-sizing: border-box; background: #FFFFFF; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 0 #E3E7EC">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <div style="width: 36px; height: 36px; border-radius: 10px; overflow: hidden; position: relative; flex-shrink: 0">
+        <img src="/_blob/4790f044b54941f04d5575178983d411" alt="Routly logo" style="position: absolute; width: 51px; height: 51px; left: -7.6px; top: -7.6px; max-width: none">
+      </div>
+      <div style="display: flex; flex-direction: column">
+        <div style="font-size: 20px; font-weight: 800; letter-spacing: -0.4px; line-height: 1.1">Profile</div>
+        <div style="font-size: 12px; color: #4A5868; font-weight: 600">Settings &amp; Quick Launch</div>
+      </div>
+    </div>
+    <a href="Home.dc.html" aria-label="Search route" style="width: 44px; height: 44px; box-sizing: border-box; border-radius: 22px; border: 1px solid #E3E7EC; background: #FFFFFF; color: #13202E; display: flex; align-items: center; justify-content: center">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+    </a>
+  </div>
+
+  <div style="position: absolute; left: 45px; bottom: 20px; width: 300px; height: 72px">
+    <dc-import name="NavBar" active="profile" hint-size="300px,72px"></dc-import>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startExpanded":{"editor":"boolean","default":false},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    this.state = { sheet: null, dragTop: null, ql: true, pref: 'fastest', learn: true, voice: true, alerts: true };
+  }
+  sheetVals() {
+    var self = this, FULL = 72, PEEK = 430;
+    var full = this.state.sheet === null ? !!this.props.startExpanded : this.state.sheet === 'full';
+    var dragging = this.state.dragTop !== null;
+    var top = dragging ? this.state.dragTop : (full ? FULL : PEEK);
+    return {
+      sheetFull: full,
+      sheetStyle: 'position: absolute; left: 0; right: 0; bottom: 0; top: ' + top + 'px; background: #F2F4F6; border-radius: 24px 24px 0 0; box-shadow: 0 -8px 24px rgba(19,32,46,0.14); display: flex; flex-direction: column; overflow: hidden' + (dragging ? '' : '; transition: top 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)'),
+      hDown: function (e) { self._sy = e.clientY; self._st = top; self._mv = false; self._dn = true; try { e.currentTarget.setPointerCapture(e.pointerId); } catch (x) {} },
+      hMove: function (e) {
+        if (!self._dn) return;
+        var dy = e.clientY - self._sy;
+        if (Math.abs(dy) > 5) self._mv = true;
+        if (self._mv) self.setState({ dragTop: Math.max(FULL - 8, Math.min(PEEK + 140, self._st + dy)) });
+      },
+      hUp: function () {
+        if (!self._dn) return;
+        self._dn = false;
+        if (!self._mv) return;
+        var t = self.state.dragTop === null ? self._st : self.state.dragTop;
+        var d = t - self._st;
+        var next = d < -40 ? 'full' : (d > 40 ? 'peek' : (self._st === FULL ? 'full' : 'peek'));
+        self.setState({ dragTop: null, sheet: next });
+      },
+      hClick: function () { if (self._mv) { self._mv = false; return; } self.setState({ sheet: full ? 'peek' : 'full' }); }
+    };
+  }
+  renderVals() {
+    var self = this;
+    var s = this.state;
+    var track = function (on, dark) {
+      return 'width: 52px; height: 30px; border-radius: 15px; border: none; padding: 3px; display: flex; flex-shrink: 0; ' +
+        (on ? 'background: ' + (dark ? '#3FD3B4' : '#0A7468') + '; justify-content: flex-end' : 'background: #9AA6B2; justify-content: flex-start');
+    };
+    var defs = [['fastest','Fastest'],['cheapest','Cheapest'],['walking','Least walking'],['transfers','Fewest transfers']];
+    var prefs = defs.map(function (d) {
+      var on = d[0] === s.pref;
+      return {
+        label: d[1], on: on,
+        pick: function () { self.setState({ pref: d[0] }); },
+        style: 'min-height: 38px; padding: 0 12px; border-radius: 999px; font-size: 12px; font-weight: 700; ' +
+          (on ? 'background: #13202E; color: #FFFFFF; border: 1px solid #13202E' : 'background: #FFFFFF; color: #13202E; border: 1px solid #CFD6DE')
+      };
+    });
+    var tdefs = [
+      ['learn', 'Learn from my trips', 'Personalise route ranking with your history'],
+      ['voice', 'Voice for AI Mode', 'Speak your destination instead of typing'],
+      ['alerts', 'Live traffic alerts', 'Warn me when my route slows down']
+    ];
+    var toggles = tdefs.map(function (t) {
+      return {
+        label: t[1], hint: t[2], on: s[t[0]], track: track(s[t[0]], false),
+        flip: function () { var o = {}; o[t[0]] = !self.state[t[0]]; self.setState(o); }
+      };
+    });
+    return Object.assign(this.sheetVals(), {
+      prefs: prefs, toggles: toggles,
+      qlOn: s.ql, qlTrack: track(s.ql, true),
+      toggleQl: function () { self.setState({ ql: !self.state.ql }); }
+    });
+  }
+}
+</script>
+</body>
+</html>

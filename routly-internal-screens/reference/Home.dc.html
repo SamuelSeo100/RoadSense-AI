@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Routly home</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0A7468}a:hover{color:#075A51}
+button{font-family:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; background: #EEF1F3; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #13202E">
+
+  <!-- Live map (shared component) -->
+  <div style="position: absolute; left: 0; top: 0; width: 390px; height: 844px">
+    <dc-import name="Map" sel="{{mapSel}}" hint-size="390px,844px"></dc-import>
+  </div>
+
+  <!-- Draggable bottom sheet -->
+  <div style="{{sheetStyle}}">
+    <button onPointerDown="{{hDown}}" onPointerMove="{{hMove}}" onPointerUp="{{hUp}}" onPointerCancel="{{hUp}}" onClick="{{hClick}}" aria-label="Drag or tap to expand the panel" aria-expanded="{{sheetFull}}" style="flex-shrink: 0; width: 100%; height: 30px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; touch-action: none; cursor: grab">
+      <span style="width: 40px; height: 5px; border-radius: 3px; background: #C2CAD3"></span>
+    </button>
+    <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 2px 16px 120px; display: flex; flex-direction: column; gap: 18px">
+
+      <!-- AI Mode -->
+      <div style="background: #13202E; border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 12px; color: #FFFFFF; flex-shrink: 0">
+        <div style="display: flex; align-items: center; justify-content: space-between">
+          <div style="display: flex; align-items: center; gap: 8px">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3FD3B4" stroke-width="2" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"></path><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8Z"></path></svg>
+            <div style="font-size: 15px; font-weight: 800">AI Mode</div>
+          </div>
+          <button onClick="{{toggleAi}}" aria-pressed="{{aiOn}}" aria-label="AI Mode" style="{{aiTrack}}">
+            <span style="width: 24px; height: 24px; border-radius: 12px; background: #FFFFFF"></span>
+          </button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; background: #1F3043; border-radius: 14px; padding: 6px 6px 6px 14px">
+          <label for="ask" style="position: absolute; width: 1px; height: 1px; overflow: hidden">Ask Routly</label>
+          <input id="ask" placeholder="Tell me the quickest way to Pune Station" style="flex: 1; min-width: 0; background: transparent; border: none; color: #FFFFFF; font-size: 14px; font-weight: 500; font-family: inherit; outline: none">
+          <button aria-label="Speak your destination" style="width: 44px; height: 44px; border-radius: 12px; border: none; background: #3FD3B4; color: #0B2A26; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg>
+          </button>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px">
+          <button style="min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid #34475C; background: transparent; color: #DCE4EC; font-size: 12px; font-weight: 600">Quickest to Pune Station</button>
+          <button style="min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid #34475C; background: transparent; color: #DCE4EC; font-size: 12px; font-weight: 600">Cheapest to college</button>
+          <button style="min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid #34475C; background: transparent; color: #DCE4EC; font-size: 12px; font-weight: 600">Take me home</button>
+        </div>
+      </div>
+
+      <!-- From / To search (opens from the search button) -->
+      <sc-if value="{{searchOpen}}" hint-placeholder-val="{{true}}">
+        <div style="background: #FFFFFF; border: 2px solid #0A7468; border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 6px 18px rgba(10,116,104,0.12); flex-shrink: 0">
+          <div style="display: flex; align-items: center; justify-content: space-between">
+            <div style="font-size: 15px; font-weight: 800">Plan a route</div>
+            <button onClick="{{toggleSearch}}" aria-label="Close search" style="width: 36px; height: 36px; border-radius: 18px; border: none; background: #F2F4F6; color: #13202E; display: flex; align-items: center; justify-content: center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+            </button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding-top: 4px">
+              <div style="width: 12px; height: 12px; border-radius: 6px; background: #2563EB; border: 3px solid #DCE7FD"></div>
+              <div style="width: 2px; height: 38px; background-image: linear-gradient(#C9D0D8 50%, transparent 50%); background-size: 2px 6px"></div>
+              <div style="width: 12px; height: 12px; border-radius: 3px; background: #DC2626"></div>
+            </div>
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px">
+              <div style="background: #F2F4F6; border-radius: 12px; padding: 8px 12px; display: flex; flex-direction: column">
+                <label for="from" style="font-size: 10px; font-weight: 800; color: #5B6878; letter-spacing: 0.4px">FROM</label>
+                <input id="from" value="{{fromVal}}" style="background: transparent; border: none; font-size: 14px; font-weight: 700; color: #13202E; font-family: inherit; outline: none; padding: 2px 0">
+              </div>
+              <div style="background: #F2F4F6; border-radius: 12px; padding: 8px 12px; display: flex; flex-direction: column">
+                <label for="to" style="font-size: 10px; font-weight: 800; color: #5B6878; letter-spacing: 0.4px">TO</label>
+                <input id="to" value="{{toVal}}" placeholder="Where to?" style="background: transparent; border: none; font-size: 14px; font-weight: 700; color: #13202E; font-family: inherit; outline: none; padding: 2px 0">
+              </div>
+            </div>
+            <button onClick="{{swap}}" aria-label="Swap From and To" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #E3E7EC; background: #FFFFFF; color: #13202E; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16M7 20l-3-3M7 20l3-3M17 20V4M17 4l-3 3M17 4l3 3"></path></svg>
+            </button>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px">
+            <button style="min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid #CFD6DE; background: #FFFFFF; color: #13202E; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path></svg>Use my location
+            </button>
+            <button style="min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid #CFD6DE; background: #FFFFFF; color: #13202E; font-size: 12px; font-weight: 700">Home</button>
+            <button style="min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid #CFD6DE; background: #FFFFFF; color: #13202E; font-size: 12px; font-weight: 700">College</button>
+          </div>
+          <a href="Routes.dc.html" style="min-height: 48px; border-radius: 14px; background: #0A7468; color: #FFFFFF; font-size: 15px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+            Find routes
+          </a>
+        </div>
+      </sc-if>
+
+      <!-- Route previews -->
+      <div style="display: flex; flex-direction: column; gap: 10px; flex-shrink: 0">
+        <div style="display: flex; align-items: baseline; justify-content: space-between">
+          <div style="font-size: 17px; font-weight: 800">Routes to Pune Station</div>
+          <a href="Routes.dc.html" style="font-size: 13px; font-weight: 700; text-decoration: none">See all</a>
+        </div>
+        <div style="display: flex; gap: 10px; overflow-x: auto; margin: 0 -16px; padding: 2px 16px 6px">
+          <sc-for list="{{routes}}" as="r" hint-placeholder-count="3">
+            <button onClick="{{r.pick}}" aria-pressed="{{r.on}}" style="{{r.cardStyle}}">
+              <sc-if value="{{r.ai}}" hint-placeholder-val="{{false}}">
+                <span style="align-self: flex-start; background: #DFF4EF; color: #0A7468; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 999px; letter-spacing: 0.3px">AI PICK · FITS YOUR HISTORY</span>
+              </sc-if>
+              <span style="display: flex; align-items: baseline; justify-content: space-between; width: 100%">
+                <span style="font-size: 22px; font-weight: 800">{{r.time}}<span style="font-size: 12px; color: #5B6878; font-weight: 600"> min</span></span>
+                <span style="font-size: 16px; font-weight: 800">{{r.cost}}</span>
+              </span>
+              <span style="display: flex; align-items: center; gap: 6px">
+                <span style="{{r.dot}}"></span>
+                <span style="font-size: 12px; font-weight: 700; color: #3B4856">{{r.legs}}</span>
+              </span>
+              <span style="font-size: 11px; font-weight: 600; color: #5B6878">{{r.meta}}</span>
+            </button>
+          </sc-for>
+        </div>
+        <button style="min-height: 52px; border-radius: 14px; border: none; background: #0A7468; color: #FFFFFF; font-size: 15px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px">
+          Start journey · {{selName}}
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+        </button>
+      </div>
+
+      <!-- Tickets & rides -->
+      <div style="display: flex; flex-direction: column; gap: 10px; flex-shrink: 0">
+        <div style="font-size: 17px; font-weight: 800">Tickets &amp; rides</div>
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+          <button style="min-height: 84px; border-radius: 16px; border: 1px solid #E3E7EC; background: #FFFFFF; color: #13202E; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px">
+            <span style="width: 36px; height: 36px; border-radius: 18px; background: #DCF5E3; color: #15803D; display: flex; align-items: center; justify-content: center">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="3" width="14" height="15" rx="4"></rect><path d="M5 11h14M8 21l2-3M16 21l-2-3"></path></svg>
+            </span>
+            <span style="font-size: 11px; font-weight: 700">Metro</span>
+          </button>
+          <button style="min-height: 84px; border-radius: 16px; border: 1px solid #E3E7EC; background: #FFFFFF; color: #13202E; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px">
+            <span style="width: 36px; height: 36px; border-radius: 18px; background: #DCE7FD; color: #1D4ED8; display: flex; align-items: center; justify-content: center">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="3" width="16" height="15" rx="3"></rect><path d="M4 11h16M7 21v-3M17 21v-3"></path></svg>
+            </span>
+            <span style="font-size: 11px; font-weight: 700">Bus pass</span>
+          </button>
+          <button style="min-height: 84px; border-radius: 16px; border: 1px solid #E3E7EC; background: #FFFFFF; color: #13202E; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px">
+            <span style="width: 36px; height: 36px; border-radius: 18px; background: #FFE6D5; color: #C2410C; display: flex; align-items: center; justify-content: center">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 16v-5l3-6h10l3 6v5Z"></path><path d="M4 11h16"></path></svg>
+            </span>
+            <span style="font-size: 11px; font-weight: 700">Uber / Ola</span>
+          </button>
+          <button style="min-height: 84px; border-radius: 16px; border: 1px solid #E3E7EC; background: #FFFFFF; color: #13202E; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px">
+            <span style="width: 36px; height: 36px; border-radius: 18px; background: #FBE2E4; color: #B42318; display: flex; align-items: center; justify-content: center">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="17" r="3"></circle><circle cx="19" cy="17" r="3"></circle><path d="M5 17l4-6h6l4 6M15 11l-2-4h-3"></path></svg>
+            </span>
+            <span style="font-size: 11px; font-weight: 700">Bike taxi</span>
+          </button>
+        </div>
+        <div style="font-size: 11px; color: #5B6878; font-weight: 600">Cab and bike bookings open in the partner app.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top bar -->
+  <div style="position: absolute; left: 0; top: 0; right: 0; height: 72px; box-sizing: border-box; background: #FFFFFF; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 0 #E3E7EC">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <div style="width: 36px; height: 36px; border-radius: 10px; overflow: hidden; position: relative; flex-shrink: 0">
+        <img src="/_blob/4790f044b54941f04d5575178983d411" alt="Routly logo" style="position: absolute; width: 51px; height: 51px; left: -7.6px; top: -7.6px; max-width: none">
+      </div>
+      <div style="display: flex; flex-direction: column">
+        <div style="font-size: 20px; font-weight: 800; letter-spacing: -0.4px; line-height: 1.1">Routly</div>
+        <div style="font-size: 12px; color: #4A5868; font-weight: 600">Good evening, Danny</div>
+      </div>
+    </div>
+    <button onClick="{{toggleSearch}}" aria-label="Search route" aria-expanded="{{searchOpen}}" style="{{searchBtn}}">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+    </button>
+  </div>
+
+  <!-- Floating nav bar (shared component) -->
+  <div style="position: absolute; left: 45px; bottom: 20px; width: 300px; height: 72px">
+    <dc-import name="NavBar" active="home" hint-size="300px,72px"></dc-import>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startExpanded":{"editor":"boolean","default":false},"searchOpenByDefault":{"editor":"boolean","default":true},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    this.state = { sheet: null, dragTop: null, sel: 'metro', ai: true, search: null, from: 'Current location · Pimpri', to: 'Pune Station' };
+  }
+  sheetVals() {
+    var self = this, FULL = 72, PEEK = 430;
+    var full = this.state.sheet === null ? !!this.props.startExpanded : this.state.sheet === 'full';
+    var dragging = this.state.dragTop !== null;
+    var top = dragging ? this.state.dragTop : (full ? FULL : PEEK);
+    return {
+      sheetFull: full,
+      sheetStyle: 'position: absolute; left: 0; right: 0; bottom: 0; top: ' + top + 'px; background: #F2F4F6; border-radius: 24px 24px 0 0; box-shadow: 0 -8px 24px rgba(19,32,46,0.14); display: flex; flex-direction: column; overflow: hidden' + (dragging ? '' : '; transition: top 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)'),
+      hDown: function (e) { self._sy = e.clientY; self._st = top; self._mv = false; self._dn = true; try { e.currentTarget.setPointerCapture(e.pointerId); } catch (x) {} },
+      hMove: function (e) {
+        if (!self._dn) return;
+        var dy = e.clientY - self._sy;
+        if (Math.abs(dy) > 5) self._mv = true;
+        if (self._mv) self.setState({ dragTop: Math.max(FULL - 8, Math.min(PEEK + 140, self._st + dy)) });
+      },
+      hUp: function () {
+        if (!self._dn) return;
+        self._dn = false;
+        if (!self._mv) return;
+        var t = self.state.dragTop === null ? self._st : self.state.dragTop;
+        var d = t - self._st;
+        var next = d < -40 ? 'full' : (d > 40 ? 'peek' : (self._st === FULL ? 'full' : 'peek'));
+        self.setState({ dragTop: null, sheet: next });
+      },
+      hClick: function () { if (self._mv) { self._mv = false; return; } self.setState({ sheet: full ? 'peek' : 'full' }); }
+    };
+  }
+  renderVals() {
+    var self = this;
+    var s = this.state;
+    var defs = [
+      { id: 'metro', name: 'Metro', time: 34, cost: '₹30', color: '#16A34A', legs: 'Walk › Metro › Walk', meta: '0.7 km walk · 0 transfers · Low traffic', ai: true },
+      { id: 'bus', name: 'Bus + Walk', time: 49, cost: '₹20', color: '#2563EB', legs: 'Bus › Walk', meta: '1.2 km walk · 1 transfer · Medium traffic', ai: false },
+      { id: 'cab', name: 'Cab', time: 29, cost: '₹240', color: '#EA580C', legs: 'Cab (Uber / Ola)', meta: 'No walking · Direct · Heavy on Old Mumbai Rd', ai: false }
+    ];
+    var routes = defs.map(function (d) {
+      var on = d.id === s.sel;
+      return {
+        on: on, ai: d.ai, time: d.time, cost: d.cost, legs: d.legs, meta: d.meta,
+        pick: function () { self.setState({ sel: d.id }); },
+        dot: 'width: 10px; height: 10px; border-radius: 5px; flex-shrink: 0; background: ' + d.color,
+        cardStyle: 'flex: 0 0 232px; text-align: left; color: #13202E; background: #FFFFFF; border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 8px; ' +
+          (on ? 'border: 2px solid #0A7468; box-shadow: 0 6px 18px rgba(10,116,104,0.14)' : 'border: 1px solid #E3E7EC')
+      };
+    });
+    var sel = defs.filter(function (d) { return d.id === s.sel; })[0];
+    var open = s.search === null ? (this.props.searchOpenByDefault ?? true) : s.search;
+    return Object.assign(this.sheetVals(), {
+      mapSel: s.sel,
+      routes: routes, selName: sel.name,
+      searchOpen: open,
+      toggleSearch: function () { self.setState({ search: !open, sheet: !open ? 'full' : self.state.sheet }); },
+      searchBtn: 'width: 44px; height: 44px; border-radius: 22px; display: flex; align-items: center; justify-content: center; ' +
+        (open ? 'border: none; background: #0A7468; color: #FFFFFF' : 'border: 1px solid #E3E7EC; background: #FFFFFF; color: #13202E'),
+      fromVal: s.from, toVal: s.to,
+      swap: function () { self.setState({ from: self.state.to, to: self.state.from }); },
+      aiOn: s.ai,
+      aiTrack: 'width: 52px; height: 30px; border-radius: 15px; border: none; padding: 3px; display: flex; flex-shrink: 0; ' + (s.ai ? 'background: #3FD3B4; justify-content: flex-end' : 'background: #9AA6B2; justify-content: flex-start'),
+      toggleAi: function () { self.setState({ ai: !self.state.ai }); }
+    });
+  }
+}
+</script>
+</body>
+</html>

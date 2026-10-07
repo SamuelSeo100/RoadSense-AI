@@ -57,7 +57,7 @@ export function LoginScreen() {
 
           <View className="mt-6 flex-row items-center justify-center">
             <Text variant="body-md" tone="on-surface-variant">
-              New to RoadSense?{' '}
+              New to Routly?{' '}
             </Text>
             <Link href="/signup" className="py-3" accessibilityRole="link">
               <Text variant="body-md" tone="primary" weight="semibold">

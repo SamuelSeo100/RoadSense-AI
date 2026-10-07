@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Routly live map</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; background: #EEF1F3; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #13202E">
+  <svg width="390" height="844" viewBox="0 0 390 844" style="position: absolute; left: 0; top: 0">
+    <rect width="390" height="844" fill="#EEF1F3"></rect>
+    <rect x="236" y="116" width="120" height="56" rx="14" fill="#D9EEDB"></rect>
+    <rect x="22" y="228" width="84" height="64" rx="14" fill="#D9EEDB"></rect>
+    <rect x="300" y="470" width="90" height="110" rx="14" fill="#D9EEDB"></rect>
+    <path d="M-30 300 C 40 330, 70 400, 150 470 S 260 560, 420 600" stroke="#C7E2F7" stroke-width="22" fill="none"></path>
+    <g stroke="#FFFFFF" stroke-linecap="round" fill="none">
+      <path d="M0 200 L390 175" stroke-width="12"></path>
+      <path d="M0 350 L390 320" stroke-width="12"></path>
+      <path d="M150 72 L200 844" stroke-width="12"></path>
+      <path d="M0 120 L390 100" stroke-width="7"></path>
+      <path d="M0 270 L390 250" stroke-width="7"></path>
+      <path d="M0 430 L390 405" stroke-width="7"></path>
+      <path d="M0 560 L390 540" stroke-width="7"></path>
+      <path d="M0 700 L390 680" stroke-width="7"></path>
+      <path d="M70 72 L105 844" stroke-width="7"></path>
+      <path d="M285 72 L330 844" stroke-width="7"></path>
+      <path d="M20 72 L380 700" stroke-width="5"></path>
+    </g>
+    <g stroke-linecap="round" fill="none" opacity="0.6">
+      <path d="M0 200 L160 187" stroke="#DC2626" stroke-width="8"></path>
+      <path d="M160 187 L390 175" stroke="#F59E0B" stroke-width="8"></path>
+      <path d="M0 350 L190 334" stroke="#22C55E" stroke-width="8"></path>
+      <path d="M190 334 L390 320" stroke="#F59E0B" stroke-width="8"></path>
+      <path d="M150 72 L158 190" stroke="#DC2626" stroke-width="8"></path>
+      <path d="M158 190 L174 430" stroke="#22C55E" stroke-width="8"></path>
+    </g>
+    <g transform="translate(28 45) scale(0.867)">
+      <g fill="none" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="11 9">
+        <g opacity="{{opBus}}">
+          <path d="M110 110 C 70 140, 50 190, 62 232 C 72 270, 120 292, 160 318" stroke="#2563EB"></path>
+          <path d="M160 318 C 205 345, 255 365, 292 392" stroke="#7C3AED"></path>
+        </g>
+        <path opacity="{{opMetro}}" d="M110 110 C 165 165, 140 225, 198 258 C 250 290, 285 335, 292 392" stroke="#16A34A"></path>
+        <path opacity="{{opCab}}" d="M110 110 C 205 105, 300 120, 322 196 C 342 268, 305 335, 292 392" stroke="#EA580C"></path>
+      </g>
+      <g opacity="{{opBus}}">
+        <circle cx="62" cy="228" r="18" fill="#2563EB" stroke="#FFFFFF" stroke-width="3"></circle>
+        <rect x="54" y="219" width="16" height="15" rx="3" fill="none" stroke="#FFFFFF" stroke-width="2"></rect>
+        <path d="M54 227 H70" stroke="#FFFFFF" stroke-width="2"></path>
+        <circle cx="168" cy="322" r="18" fill="#7C3AED" stroke="#FFFFFF" stroke-width="3"></circle>
+        <circle cx="169" cy="313" r="2.5" fill="#FFFFFF"></circle>
+        <path d="M168 317 L166 325 L162 331 M166 325 L171 331 M164 320 L172 322" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" fill="none"></path>
+      </g>
+      <g opacity="{{opMetro}}">
+        <circle cx="196" cy="256" r="18" fill="#16A34A" stroke="#FFFFFF" stroke-width="3"></circle>
+        <rect x="189" y="246" width="14" height="16" rx="4" fill="none" stroke="#FFFFFF" stroke-width="2"></rect>
+        <path d="M189 255 H203 M191 266 L193 262 M201 266 L199 262" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"></path>
+      </g>
+      <g opacity="{{opCab}}">
+        <circle cx="322" cy="194" r="18" fill="#EA580C" stroke="#FFFFFF" stroke-width="3"></circle>
+        <path d="M313 199 V194 L316 188 H328 L331 194 V199 Z M313 194 H331" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round" fill="none"></path>
+      </g>
+      <g opacity="{{opDest}}">
+        <path d="M292 404 C 292 404, 277 387, 277 377 A 15 15 0 0 1 307 377 C 307 387, 292 404, 292 404 Z" fill="#DC2626"></path>
+        <circle cx="292" cy="377" r="5.5" fill="#FFFFFF"></circle>
+      </g>
+      <circle cx="110" cy="110" r="24" fill="#2563EB" opacity="0.15"></circle>
+      <circle cx="110" cy="110" r="10" fill="#2563EB" stroke="#FFFFFF" stroke-width="3"></circle>
+    </g>
+  </svg>
+
+  <div style="position: absolute; left: 144px; top: 126px; background: #FFFFFF; border-radius: 10px; padding: 6px 10px; font-size: 12px; font-weight: 700; box-shadow: 0 2px 8px rgba(19,32,46,0.15)">You · Pimpri</div>
+  <sc-if value="{{showDest}}" hint-placeholder-val="{{true}}">
+    <div style="position: absolute; left: 170px; top: 352px; background: #FFFFFF; border-radius: 10px; padding: 6px 10px; font-size: 12px; font-weight: 700; box-shadow: 0 2px 8px rgba(19,32,46,0.15)">Pune Station</div>
+  </sc-if>
+
+  <div style="position: absolute; left: 12px; top: 84px; background: #13202E; color: #FFFFFF; border-radius: 999px; padding: 7px 12px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700">
+    <div style="width: 8px; height: 8px; border-radius: 4px; background: #3FD3B4; box-shadow: 0 0 0 4px rgba(63,211,180,0.25)"></div>
+    Live location · Live traffic
+  </div>
+
+  <div style="position: absolute; right: 12px; top: 84px; display: flex; flex-direction: column; gap: 8px">
+    <button aria-label="Recenter on my location" style="width: 44px; height: 44px; border-radius: 12px; border: none; background: #FFFFFF; color: #13202E; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(19,32,46,0.15); cursor: pointer">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path></svg>
+    </button>
+    <button aria-label="Map layers" style="width: 44px; height: 44px; border-radius: 12px; border: none; background: #FFFFFF; color: #13202E; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(19,32,46,0.15); cursor: pointer">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3 2 8l10 5 10-5-10-5Z"></path><path d="m2 13 10 5 10-5"></path></svg>
+    </button>
+  </div>
+
+  <div style="position: absolute; left: 12px; top: 352px; background: #FFFFFF; border-radius: 12px; padding: 7px 10px; display: flex; flex-direction: column; gap: 5px; box-shadow: 0 2px 8px rgba(19,32,46,0.15)">
+    <div style="font-size: 10px; font-weight: 800; color: #4A5868; letter-spacing: 0.3px">TRAFFIC NOW</div>
+    <div style="display: flex; gap: 8px; font-size: 11px; font-weight: 700">
+      <div style="display: flex; align-items: center; gap: 4px"><div style="width: 12px; height: 4px; border-radius: 2px; background: #22C55E"></div>Low</div>
+      <div style="display: flex; align-items: center; gap: 4px"><div style="width: 12px; height: 4px; border-radius: 2px; background: #F59E0B"></div>Med</div>
+      <div style="display: flex; align-items: center; gap: 4px"><div style="width: 12px; height: 4px; border-radius: 2px; background: #DC2626"></div>Heavy</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"sel":{"editor":"enum","options":["all","metro","bus","cab","none"],"default":"all"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var sel = this.props.sel ?? 'all';
+    var op = function (id) {
+      if (sel === 'none') return 0;
+      if (sel === 'all') return 1;
+      return id === sel ? 1 : 0.25;
+    };
+    return {
+      opMetro: op('metro'), opBus: op('bus'), opCab: op('cab'),
+      opDest: sel === 'none' ? 0 : 1,
+      showDest: sel !== 'none'
+    };
+  }
+}
+</script>
+</body>
+</html>

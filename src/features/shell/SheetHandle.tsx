@@ -7,6 +7,8 @@ interface SheetHandleProps {
   onToggle: () => void;
 }
 
+export const HANDLE_HEIGHT = 30;
+
 /** 30pt drag handle. Dragging moves the sheet (gorhom); tapping toggles peek/full. */
 export function SheetHandle({ expanded, onToggle }: SheetHandleProps) {
   return (
@@ -23,6 +25,6 @@ export function SheetHandle({ expanded, onToggle }: SheetHandleProps) {
 }
 
 const styles = StyleSheet.create({
-  hit: { height: 30, alignItems: 'center', justifyContent: 'center' },
+  hit: { height: HANDLE_HEIGHT, alignItems: 'center', justifyContent: 'center' },
   pill: { width: 40, height: 5, borderRadius: 3, backgroundColor: colors.handle },
 });

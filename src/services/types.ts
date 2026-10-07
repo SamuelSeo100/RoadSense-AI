@@ -106,6 +106,8 @@ export interface Preferences {
   savedPlaces: SavedPlace[];
   /** Booking providers the user has linked (Profile › Linked apps). */
   linkedApps: string[];
+  /** Google's live traffic lines on the map (Profile › Travel preferences). */
+  showTraffic: boolean;
 }
 
 export interface AiQuery {
@@ -151,6 +153,70 @@ export interface LocationService {
   watch(cb: (pos: LatLng) => void): () => void;
   /** Neighbourhood name for "You · {area}", or null when unknown. */
   areaName(pos: LatLng): Promise<string | null>;
+}
+
+export interface PlaceSuggestion {
+  placeId: string;
+  /** "Pune Railway Station" */
+  primary: string;
+  /** "Agarkar Nagar, Pune, Maharashtra" */
+  secondary?: string;
+}
+
+/** Place search (Google Places API (New) when a key is configured). */
+export interface PlacesService {
+  /**
+   * Suggestions for a partial query. `sessionToken` groups the keystrokes of
+   * one search with the final `details` call into a single billed session.
+   */
+  autocomplete(
+    input: string,
+    opts: { sessionToken: string; near?: LatLng; signal?: AbortSignal },
+  ): Promise<PlaceSuggestion[]>;
+  /** Coordinates and name for a picked suggestion (ends the session). */
+  details(placeId: string, opts: { sessionToken: string; signal?: AbortSignal }): Promise<Place>;
+}
+
+export interface WalkingRoute {
+  distanceMeters: number;
+  durationSec: number;
+  path: LatLng[];
+  /** Main roads, e.g. "Service Rd and Old Mumbai Hwy". */
+  via?: string;
+  /** Provider warnings, e.g. "This route may be missing sidewalks". */
+  warnings: string[];
+  safety: {
+    /** Picked with night-time rules (20:00–06:00 local). */
+    night: boolean;
+    /** Seconds slower than the fastest alternative (0 = it is the fastest). */
+    extraSec: number;
+    /** Why this route was chosen, for the UI. */
+    notes: string[];
+  };
+}
+
+/** Turn-by-turn geometry (Google Routes API when a key is configured). */
+export interface DirectionsService {
+  /** The safest sensible walking route at time `at` (default: now). */
+  walking(
+    from: LatLng,
+    to: LatLng,
+    opts?: { signal?: AbortSignal; at?: Date },
+  ): Promise<WalkingRoute>;
+}
+
+/** An area to route around: crime reports, unlit stretches, closures… */
+export interface UnsafeZone {
+  center: LatLng;
+  radiusM: number;
+  /** Only avoided at night (e.g. unlit or deserted after dark). */
+  nightOnly: boolean;
+  reason: string;
+}
+
+/** Safety data for routing. TODO(safety): backend-fed (reports, lighting, closures). */
+export interface SafetyService {
+  unsafeZones(near: LatLng): Promise<UnsafeZone[]>;
 }
 
 export const PRIORITIES: readonly Priority[] = ['fastest', 'cheapest', 'walking', 'transfers'];

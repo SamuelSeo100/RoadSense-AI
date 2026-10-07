@@ -1,5 +1,5 @@
 ---
-name: RoadSense Pune Transit System
+name: Routly Pune Transit System
 colors:
   surface: '#f8f9ff'
   surface-dim: '#cbdbf5'

@@ -1,4 +1,4 @@
-# RoadSense (mobile app)
+# Routly (mobile app)
 
 AI-powered multi-modal route planner for Pune: walk, PMPML bus, Pune Metro, suburban train, auto, cab and bike.
 Expo SDK 57 · TypeScript (strict) · Expo Router · NativeWind v4.
@@ -42,7 +42,7 @@ Copy `.env.example` to `.env` (git-ignored) and fill in the values from Supabase
 - Email + password sign-up/login, and Google OAuth via the system browser (works in Expo Go and on web).
 - Database schema lives in `supabase/migrations/`. A trigger creates a `profiles` row (name, phone, city, preferred modes, priority) on sign-up; RLS limits each user to their own row.
 - Supabase dashboard setup:
-  - Authentication → URL Configuration → Redirect URLs: `exp://**`, `roadsense://**`, `http://localhost:8081/**`
+  - Authentication → URL Configuration → Redirect URLs: `exp://**`, `routly://**`, `http://localhost:8081/**`
   - Authentication → Sign In / Providers → Email: "Confirm email" off during development
 - On web, open the app at `http://localhost:8081` (Google's pop-up must return to the same origin).
 

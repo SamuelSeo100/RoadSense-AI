@@ -1,7 +1,8 @@
 import { Children, Fragment, type ReactNode } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { colors, radius } from '@/theme/routly';
+import { PressableBox } from '@/components/routly/PressableBox';
 
 /** White rounded list with 1px dividers between rows. */
 export function GroupedList({ children }: { children: ReactNode }) {
@@ -36,14 +37,15 @@ export function ListRow({
   const style = [styles.row, { minHeight }];
   if (!onPress) return <View style={style}>{children}</View>;
   return (
-    <Pressable
+    <PressableBox
       onPress={onPress}
       accessibilityRole={accessibilityRole}
       accessibilityLabel={accessibilityLabel}
-      style={({ pressed }) => [style, pressed && styles.pressed]}
+      style={style}
+      pressedStyle={styles.pressed}
     >
       {children}
-    </Pressable>
+    </PressableBox>
   );
 }
 

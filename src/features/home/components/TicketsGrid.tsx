@@ -1,9 +1,10 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { Icon, type IconName } from '@/components/routly/Icon';
 import { RText } from '@/components/routly/RText';
 import { SectionHeader } from '@/components/routly/SectionHeader';
 import { colors, fonts, modeColors, radius, type Mode } from '@/theme/routly';
+import { PressableBox } from '@/components/routly/PressableBox';
 
 export type TicketTile = 'metro' | 'bus' | 'cab' | 'bike';
 
@@ -21,12 +22,13 @@ export function TicketsGrid({ onPress }: { onPress: (tile: TicketTile) => void }
       <SectionHeader title="Tickets & rides" />
       <View style={styles.grid}>
         {tiles.map((t) => (
-          <Pressable
+          <PressableBox
             key={t.id}
             onPress={() => onPress(t.id)}
             accessibilityRole="link"
             accessibilityLabel={`${t.label}, opens the partner app`}
-            style={({ pressed }) => [styles.tile, pressed && styles.pressed]}
+            style={styles.tile}
+            pressedStyle={styles.pressed}
           >
             <View style={[styles.chip, { backgroundColor: modeColors[t.mode].pillBg }]}>
               <Icon name={t.icon} size={20} color={modeColors[t.mode].pillText} />
@@ -34,7 +36,7 @@ export function TicketsGrid({ onPress }: { onPress: (tile: TicketTile) => void }
             <RText variant="small" family={fonts.bold} color={colors.textPrimary} numberOfLines={1}>
               {t.label}
             </RText>
-          </Pressable>
+          </PressableBox>
         ))}
       </View>
       <RText variant="small">Cab and bike bookings open in the partner app.</RText>

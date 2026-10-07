@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Routly trip history</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0A7468}a:hover{color:#075A51}
+button{font-family:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; background: #EEF1F3; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #13202E">
+
+  <div style="position: absolute; left: 0; top: 0; width: 390px; height: 844px">
+    <dc-import name="Map" sel="{{mapSel}}" hint-size="390px,844px"></dc-import>
+  </div>
+
+  <div style="{{sheetStyle}}">
+    <button onPointerDown="{{hDown}}" onPointerMove="{{hMove}}" onPointerUp="{{hUp}}" onPointerCancel="{{hUp}}" onClick="{{hClick}}" aria-label="Drag or tap to expand the panel" aria-expanded="{{sheetFull}}" style="flex-shrink: 0; width: 100%; height: 30px; border: none; background: transparent; display: flex; align-items: center; justify-content: center; touch-action: none; cursor: grab">
+      <span style="width: 40px; height: 5px; border-radius: 3px; background: #C2CAD3"></span>
+    </button>
+    <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 2px 16px 120px; display: flex; flex-direction: column; gap: 16px">
+
+      <!-- This month -->
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; flex-shrink: 0">
+        <div style="background: #FFFFFF; border: 1px solid #E3E7EC; border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 2px">
+          <div style="font-size: 11px; font-weight: 700; color: #5B6878">Trips</div>
+          <div style="font-size: 22px; font-weight: 800">18</div>
+          <div style="font-size: 11px; font-weight: 600; color: #5B6878">this month</div>
+        </div>
+        <div style="background: #FFFFFF; border: 1px solid #E3E7EC; border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 2px">
+          <div style="font-size: 11px; font-weight: 700; color: #5B6878">Spent</div>
+          <div style="font-size: 22px; font-weight: 800">₹1,240</div>
+          <div style="font-size: 11px; font-weight: 600; color: #5B6878">on travel</div>
+        </div>
+        <div style="background: #DFF4EF; border: 1px solid #B9E6DA; border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 2px">
+          <div style="font-size: 11px; font-weight: 700; color: #0A7468">Saved</div>
+          <div style="font-size: 22px; font-weight: 800; color: #0A7468">₹2,860</div>
+          <div style="font-size: 11px; font-weight: 600; color: #0A7468">vs. cab only</div>
+        </div>
+      </div>
+
+      <!-- Mode mix (feeds personalised ranking) -->
+      <div style="background: #FFFFFF; border: 1px solid #E3E7EC; border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 10px; flex-shrink: 0">
+        <div style="display: flex; align-items: center; justify-content: space-between">
+          <div style="font-size: 14px; font-weight: 800">How you travel</div>
+          <div style="font-size: 11px; font-weight: 700; color: #0A7468; background: #DFF4EF; padding: 3px 8px; border-radius: 999px">Used by AI ranking</div>
+        </div>
+        <div style="display: flex; height: 12px; border-radius: 6px; overflow: hidden; gap: 2px">
+          <div style="width: 45%; background: #16A34A"></div>
+          <div style="width: 30%; background: #2563EB"></div>
+          <div style="width: 15%; background: #EA580C"></div>
+          <div style="width: 10%; background: #7C3AED"></div>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; font-weight: 700">
+          <div style="display: flex; align-items: center; gap: 5px"><div style="width: 8px; height: 8px; border-radius: 4px; background: #16A34A"></div>Metro 45%</div>
+          <div style="display: flex; align-items: center; gap: 5px"><div style="width: 8px; height: 8px; border-radius: 4px; background: #2563EB"></div>Bus 30%</div>
+          <div style="display: flex; align-items: center; gap: 5px"><div style="width: 8px; height: 8px; border-radius: 4px; background: #EA580C"></div>Cab 15%</div>
+          <div style="display: flex; align-items: center; gap: 5px"><div style="width: 8px; height: 8px; border-radius: 4px; background: #7C3AED"></div>Walk 10%</div>
+        </div>
+      </div>
+
+      <!-- Trips -->
+      <sc-for list="{{trips}}" as="t" hint-placeholder-count="5">
+        <div style="display: flex; flex-direction: column; gap: 8px; flex-shrink: 0">
+          <sc-if value="{{t.showDay}}" hint-placeholder-val="{{false}}">
+            <div style="font-size: 12px; font-weight: 800; color: #5B6878; letter-spacing: 0.4px; margin-top: 4px">{{t.day}}</div>
+          </sc-if>
+          <button onClick="{{t.pick}}" aria-pressed="{{t.on}}" style="{{t.rowStyle}}">
+            <span style="{{t.badge}}">{{t.modeShort}}</span>
+            <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <span style="font-size: 14px; font-weight: 800">{{t.from}} → {{t.to}}</span>
+              <span style="font-size: 12px; font-weight: 600; color: #5B6878">{{t.when}} · {{t.modeLabel}} · {{t.dur}}</span>
+            </span>
+            <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px">
+              <span style="font-size: 14px; font-weight: 800">{{t.cost}}</span>
+              <span style="font-size: 11px; font-weight: 800; color: #0A7468">Repeat</span>
+            </span>
+          </button>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- Top bar -->
+  <div style="position: absolute; left: 0; top: 0; right: 0; height: 72px; box-sizing: border-box; background: #FFFFFF; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 0 #E3E7EC">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <div style="width: 36px; height: 36px; border-radius: 10px; overflow: hidden; position: relative; flex-shrink: 0">
+        <img src="/_blob/4790f044b54941f04d5575178983d411" alt="Routly logo" style="position: absolute; width: 51px; height: 51px; left: -7.6px; top: -7.6px; max-width: none">
+      </div>
+      <div style="display: flex; flex-direction: column">
+        <div style="font-size: 20px; font-weight: 800; letter-spacing: -0.4px; line-height: 1.1">History</div>
+        <div style="font-size: 12px; color: #4A5868; font-weight: 600">Tap a trip to see it on the map</div>
+      </div>
+    </div>
+    <a href="Home.dc.html" aria-label="Search route" style="width: 44px; height: 44px; box-sizing: border-box; border-radius: 22px; border: 1px solid #E3E7EC; background: #FFFFFF; color: #13202E; display: flex; align-items: center; justify-content: center">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+    </a>
+  </div>
+
+  <div style="position: absolute; left: 45px; bottom: 20px; width: 300px; height: 72px">
+    <dc-import name="NavBar" active="history" hint-size="300px,72px"></dc-import>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startExpanded":{"editor":"boolean","default":false},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    this.state = { sheet: null, dragTop: null, trip: 0 };
+  }
+  sheetVals() {
+    var self = this, FULL = 72, PEEK = 430;
+    var full = this.state.sheet === null ? !!this.props.startExpanded : this.state.sheet === 'full';
+    var dragging = this.state.dragTop !== null;
+    var top = dragging ? this.state.dragTop : (full ? FULL : PEEK);
+    return {
+      sheetFull: full,
+      sheetStyle: 'position: absolute; left: 0; right: 0; bottom: 0; top: ' + top + 'px; background: #F2F4F6; border-radius: 24px 24px 0 0; box-shadow: 0 -8px 24px rgba(19,32,46,0.14); display: flex; flex-direction: column; overflow: hidden' + (dragging ? '' : '; transition: top 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)'),
+      hDown: function (e) { self._sy = e.clientY; self._st = top; self._mv = false; self._dn = true; try { e.currentTarget.setPointerCapture(e.pointerId); } catch (x) {} },
+      hMove: function (e) {
+        if (!self._dn) return;
+        var dy = e.clientY - self._sy;
+        if (Math.abs(dy) > 5) self._mv = true;
+        if (self._mv) self.setState({ dragTop: Math.max(FULL - 8, Math.min(PEEK + 140, self._st + dy)) });
+      },
+      hUp: function () {
+        if (!self._dn) return;
+        self._dn = false;
+        if (!self._mv) return;
+        var t = self.state.dragTop === null ? self._st : self.state.dragTop;
+        var d = t - self._st;
+        var next = d < -40 ? 'full' : (d > 40 ? 'peek' : (self._st === FULL ? 'full' : 'peek'));
+        self.setState({ dragTop: null, sheet: next });
+      },
+      hClick: function () { if (self._mv) { self._mv = false; return; } self.setState({ sheet: full ? 'peek' : 'full' }); }
+    };
+  }
+  renderVals() {
+    var self = this;
+    var colors = { metro: ['#DCF5E3', '#15803D'], bus: ['#DCE7FD', '#1D4ED8'], cab: ['#FFE6D5', '#C2410C'], walk: ['#EDE5FD', '#5B21B6'] };
+    var data = [
+      { day: 'TODAY', from: 'Pimpri', to: 'Pune Station', mode: 'metro', modeShort: 'M', modeLabel: 'Metro', when: '9:12 AM', dur: '34 min', cost: '₹30' },
+      { day: 'TODAY', from: 'Pune Station', to: 'Shivajinagar', mode: 'bus', modeShort: 'B', modeLabel: 'Bus + Walk', when: '1:40 PM', dur: '22 min', cost: '₹15' },
+      { day: 'YESTERDAY', from: 'College', to: 'Pimpri', mode: 'cab', modeShort: 'C', modeLabel: 'Cab', when: '7:05 PM', dur: '31 min', cost: '₹210' },
+      { day: 'YESTERDAY', from: 'Pimpri', to: 'College', mode: 'metro', modeShort: 'M', modeLabel: 'Metro', when: '8:20 AM', dur: '41 min', cost: '₹35' },
+      { day: 'SATURDAY', from: 'Pimpri', to: 'Phoenix Mall', mode: 'bus', modeShort: 'B', modeLabel: 'Bus', when: '5:30 PM', dur: '48 min', cost: '₹25' }
+    ];
+    var sel = this.state.trip;
+    var trips = data.map(function (t, i) {
+      var c = colors[t.mode];
+      var on = i === sel;
+      return Object.assign({}, t, {
+        on: on,
+        showDay: i === 0 || data[i - 1].day !== t.day,
+        pick: function () { self.setState({ trip: i, sheet: 'peek' }); },
+        badge: 'width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; background: ' + c[0] + '; color: ' + c[1],
+        rowStyle: 'width: 100%; text-align: left; color: #13202E; background: #FFFFFF; border-radius: 16px; padding: 12px; display: flex; align-items: center; gap: 12px; ' +
+          (on ? 'border: 2px solid #0A7468' : 'border: 1px solid #E3E7EC')
+      });
+    });
+    return Object.assign(this.sheetVals(), { trips: trips, mapSel: data[sel].mode });
+  }
+}
+</script>
+</body>
+</html>

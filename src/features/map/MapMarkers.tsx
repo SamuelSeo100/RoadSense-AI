@@ -4,22 +4,6 @@ import { Icon, modeIcon } from '@/components/routly/Icon';
 import { RText } from '@/components/routly/RText';
 import { colors, fonts, modeColors, shadows, type Mode } from '@/theme/routly';
 
-/** Blue location dot: 15% halo, 3px white ring, plus the "You · {area}" chip. */
-export function UserDot({ label }: { label: string }) {
-  return (
-    <View style={styles.center}>
-      <View style={styles.labelChip}>
-        <RText variant="body" size={12} family={fonts.bold}>
-          {label}
-        </RText>
-      </View>
-      <View style={styles.halo}>
-        <View style={styles.dot} />
-      </View>
-    </View>
-  );
-}
-
 /** 36px mode-coloured circle with a white icon and a 3px white ring. */
 export function ModeBadge({ mode }: { mode: Mode }) {
   return (
@@ -32,9 +16,9 @@ export function ModeBadge({ mode }: { mode: Mode }) {
 /** Red destination pin with the place-name chip above it. */
 export function DestinationPin({ name }: { name: string }) {
   return (
-    <View style={styles.center}>
+    <View style={styles.markerBox}>
       <View style={styles.labelChip}>
-        <RText variant="body" size={12} family={fonts.bold}>
+        <RText variant="body" size={12} family={fonts.bold} numberOfLines={1}>
           {name}
         </RText>
       </View>
@@ -44,31 +28,23 @@ export function DestinationPin({ name }: { name: string }) {
   );
 }
 
+/**
+ * Android snapshots custom markers to a bitmap sized from the root view, so
+ * give label + pin markers a fixed box (content bottom-centred) or the lower
+ * part gets clipped.
+ */
+export const MARKER_BOX = { width: 200, height: 84 };
+
 const styles = StyleSheet.create({
-  center: { alignItems: 'center' },
+  markerBox: { ...MARKER_BOX, alignItems: 'center', justifyContent: 'flex-end' },
   labelChip: {
+    maxWidth: MARKER_BOX.width - 8,
     backgroundColor: colors.surface,
     borderRadius: 10,
     paddingVertical: 6,
     paddingHorizontal: 10,
     marginBottom: 6,
     ...shadows.mapControl,
-  },
-  halo: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: colors.userLocationHalo,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dot: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: colors.userLocation,
-    borderWidth: 3,
-    borderColor: colors.surface,
   },
   badge: {
     width: 36,

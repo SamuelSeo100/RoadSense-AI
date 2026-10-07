@@ -43,7 +43,8 @@ export function HistoryScreen() {
     historyService.getMonthlyStats().then(setStats);
   }, []);
 
-  const selected = trips?.find((t) => t.id === selectedId) ?? trips?.[0];
+  // Nothing on the map until the user taps a trip.
+  const selected = trips?.find((t) => t.id === selectedId);
   const mapContent = useMemo(() => {
     const end = selected?.path?.[selected.path.length - 1];
     return {
@@ -63,9 +64,10 @@ export function HistoryScreen() {
           ]
         : [],
       selection: selected?.id ?? 'none',
+      focused: selectedId !== null,
       destination: selected && end ? { name: selected.to, location: end } : undefined,
     };
-  }, [selected]);
+  }, [selected, selectedId]);
   useMapContent('history', mapContent);
 
   const groups = useMemo(() => groupByDay(trips ?? []), [trips]);
