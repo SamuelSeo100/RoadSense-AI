@@ -64,7 +64,14 @@ export interface Route {
 }
 
 export interface RankedRoute extends Route {
+  /** Position as displayed (1 = top). */
   rank: number;
+  /**
+   * Position under the scoring heuristic for the same priority (rankRoutes).
+   * Equal to `rank` today; logged separately so a learned ranker can be
+   * compared against the heuristic.
+   */
+  heuristicRank: number;
   isBest: boolean;
 }
 

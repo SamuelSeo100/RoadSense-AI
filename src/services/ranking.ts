@@ -13,5 +13,5 @@ export function rankRoutes(
   return routes
     .filter((r) => !r.vehicle || vehicles[r.vehicle])
     .sort((a, b) => a.score[priority] - b.score[priority])
-    .map((r, i) => ({ ...r, rank: i + 1, isBest: i === 0 }));
+    .map((r, i) => ({ ...r, rank: i + 1, heuristicRank: i + 1, isBest: i === 0 }));
 }

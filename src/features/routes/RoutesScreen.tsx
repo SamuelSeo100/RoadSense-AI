@@ -6,7 +6,7 @@ import { Chip } from '@/components/routly/Chip';
 import { RouteCard } from '@/components/routly/RouteCard';
 import { RText } from '@/components/routly/RText';
 import { SkeletonCard } from '@/components/routly/SkeletonCard';
-import { PRIORITIES, priorityLabels, rankRoutes, type RankedRoute, type Vehicle } from '@/services';
+import { PRIORITIES, priorityLabels, type RankedRoute, type Vehicle } from '@/services';
 import { useRoutlyPrefs } from '@/store/routlyPrefsStore';
 import { colors, fonts, radius } from '@/theme/routly';
 

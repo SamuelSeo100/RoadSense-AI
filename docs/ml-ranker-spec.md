@@ -1,7 +1,7 @@
 # Route ranker: data contract and model spec
 
 For: Tejas (ML). Owner on the app side: Dhanesh.
-Status: draft, 2026-10-08. Data volume today is tiny (5 requests, 11 choices,
+Status: draft, updated 2026-10-08. Data volume today is tiny (5 requests, 11 choices,
 2 trips, all from internal testing), and "Clear my trip history" will reset it
 before real collection starts. Treat everything below as the contract, not as
 a dataset you can train on yet.
@@ -47,7 +47,8 @@ Each `options[]` element:
 | walking_km | number | |
 | transfers | int | |
 | traffic | text | `Light` / `Moderate` / `Heavy` |
-| rank | int | heuristic rank under the **request's** `priority` (1 = top) |
+| rank | int | displayed rank under the request's `priority` (1 = top) |
+| heuristic_rank | int | rank under the scoring heuristic for the request's `priority`. Same as `rank` today; once a learned ranker orders the cards, `rank` is the model's and this stays the heuristic's. Missing in rows logged before 2026-10-08. |
 | score | object | heuristic score per priority, 0–1, **lower is better**, relative to the other options in the same request |
 
 Example (coordinates removed, user id omitted):
@@ -90,7 +91,8 @@ Example (coordinates removed, user id omitted):
 | request_id | uuid | → route_requests.id |
 | user_id | uuid | |
 | chosen_route_id | text | matches `options[].id` of that request |
-| chosen_rank | smallint | heuristic rank of that option **under `priority` below** at the moment of the action |
+| chosen_rank | smallint | displayed rank of that option under `priority` (below) at the moment of the action |
+| heuristic_rank | smallint, nullable | heuristic rank of that option under `priority`; null before 2026-10-08 (migration `20261008120000_route_choices_heuristic_rank.sql`) |
 | priority | text | ranking on screen when the user acted. May differ from the request's `priority`: users can switch priority without a new request row |
 | action | text | `expand` (opened details), `start` (started the trip), `book` (opened a ride-hailing app), `ticket` (opened a transit ticket) |
 | created_at | timestamptz | |
@@ -110,8 +112,8 @@ Example, all for the request above:
 | transit-0 | 5 | fastest | ticket | 17:20:21 |
 
 Note the last two rows: 16 minutes later the same user went back to the same
-result and acted strongly on a *different* option. A request can have more
-than one positive.
+result and acted strongly on a *different* option. Per §2 only that last
+strong action (the bus `ticket`) becomes the label.
 
 ### trips: journeys the user started (History)
 
@@ -140,28 +142,62 @@ be re-pulled rather than accumulated.
 
 ## 2. Labels
 
-The unit is a **query group** = (request, priority the user acted under).
+The unit is a **query group = one request**, with exactly one positive:
 
-- **Positive (relevance 2):** an option with a `start`, `book` or `ticket`
-  choice in that group.
-- **Weak positive (relevance 1):** an option with only `expand` in that group.
-- **Negative (relevance 0):** every other option of the same request, in a
-  group where some option got a strong action.
-- **Don't use as negatives:** options in a group with no strong action
-  (browsing only: keep for weak-label experiments, drop from the main set),
-  and anything inferred across priorities. If the user acted under `cheapest`,
-  that says nothing about how they'd have judged options while looking at
-  `fastest`, so an option is never a negative in a priority group it wasn't
-  shown under.
-- Repeated actions count once (take the max relevance per option per group).
-- Ranks inside a group must be recomputed for that group's priority:
-  sort `options` by `score.<priority>` ascending. `options[].rank` is only
-  right when the group's priority equals the request's.
+- **Positive (relevance 2):** the option of the request's **last strong
+  action** (`start`, `book` or `ticket`, latest `created_at`). The group's
+  priority is that action's `priority`.
+- **Earlier strong actions are dropped.** If the user booked an auto and later
+  bought a bus ticket in the same request, the bus is the label; the auto is
+  removed from the group (neither positive nor negative), since it was
+  considered seriously and then abandoned.
+- **Weak positive (relevance 1):** an option with an `expand` but no strong
+  action. Optional; train with and without it.
+- **Negative (relevance 0):** every other option of the request.
+- **Requests with no strong action** are not training groups (browsing only).
+- **Different priority isn't a negative.** Options are ranked and judged only
+  under the group's priority (the last strong action's). Expands made while
+  the user was looking at another priority don't make an option a weak
+  positive either; drop them.
+- Ranks inside a group: use `route_choices.heuristic_rank` for the chosen
+  option, and for the others sort `options` by `score.<group priority>`
+  ascending. `options[].heuristic_rank` is only right when the group's
+  priority equals the request's.
 
-Ambiguity to decide together: in the example, one request has strong actions
-on two options. Both are positives under the rule above. If that turns out to
-be mostly "tried a cab, fell back to bus", we may want to keep only the last
-strong action, or only `start`.
+```sql
+-- One labelled row per (request, option). Positive = last strong action.
+with last_strong as (
+  select distinct on (request_id)
+    request_id, chosen_route_id, priority, heuristic_rank, created_at
+  from route_choices
+  where action in ('start', 'book', 'ticket')
+  order by request_id, created_at desc
+),
+earlier_strong as (
+  select distinct c.request_id, c.chosen_route_id
+  from route_choices c
+  join last_strong l using (request_id)
+  where c.action in ('start', 'book', 'ticket')
+    and c.chosen_route_id <> l.chosen_route_id
+),
+expanded as (
+  select distinct c.request_id, c.chosen_route_id
+  from route_choices c
+  join last_strong l using (request_id)
+  where c.action = 'expand' and c.priority = l.priority
+)
+select r.id as request_id, l.priority as group_priority, o->>'id' as option_id,
+       case when o->>'id' = l.chosen_route_id then 2
+            when e.chosen_route_id is not null then 1
+            else 0 end as relevance,
+       o as option, r.hour, r.weekday, r.is_night
+from route_requests r
+join last_strong l on l.request_id = r.id
+cross join lateral jsonb_array_elements(r.options) o
+left join earlier_strong es on es.request_id = r.id and es.chosen_route_id = o->>'id'
+left join expanded e on e.request_id = r.id and e.chosen_route_id = o->>'id'
+where es.chosen_route_id is null;
+```
 
 ## 3. Features
 
@@ -189,31 +225,30 @@ Per context:
 
 ## 4. Baseline to beat
 
-The current heuristic's rank-1 hit rate on logged starts: of the requests where
-the user started a trip, how often was the started option ranked 1 under the
-priority they were looking at? `chosen_rank` already holds exactly that rank.
+The heuristic's rank-1 hit rate on the labels: of the requests with a strong
+action, how often was the **last** strong action's option ranked 1 by the
+heuristic under the priority the user was looking at
+(`route_choices.heuristic_rank`).
 
 ```sql
--- Heuristic rank-1 hit rate on starts (first start per request).
-with first_start as (
-  select distinct on (request_id)
-    request_id, chosen_route_id, chosen_rank, priority
+-- Heuristic rank-1 hit rate (and MRR) on the last strong action per request.
+with last_strong as (
+  select distinct on (request_id) request_id, priority, heuristic_rank
   from route_choices
-  where action = 'start'
-  order by request_id, created_at
+  where action in ('start', 'book', 'ticket')
+  order by request_id, created_at desc
 )
 select
-  count(*)                                         as starts,
-  count(*) filter (where chosen_rank = 1)          as rank1_hits,
-  round(avg((chosen_rank = 1)::int)::numeric, 3)   as rank1_hit_rate,
-  round(avg(1.0 / chosen_rank)::numeric, 3)        as mrr
-from first_start;
+  count(*)                                             as labelled_requests,
+  count(*) filter (where heuristic_rank = 1)           as rank1_hits,
+  round(avg((heuristic_rank = 1)::int)::numeric, 3)    as rank1_hit_rate,
+  round(avg(1.0 / heuristic_rank)::numeric, 3)         as mrr
+from last_strong
+where heuristic_rank is not null;   -- rows before 2026-10-08 have none
 ```
 
-Report the model on the same population (first start per request, held out
-by time, not randomly) with hit@1 and MRR, plus a per-priority breakdown
-(`group by priority`). On today's data this is 2 starts, so the number means
-nothing yet.
+Report the model on the same population (held out by time, not randomly)
+with hit@1 and MRR, plus a per-priority breakdown (`group by priority`).
 
 ## 5. Suggested model
 
@@ -239,7 +274,7 @@ Authorization: Bearer <Supabase access token>     -- backend derives user_id fro
 Content-Type: application/json
 ```
 
-Request:
+Request (`heuristic_rank` = `options[].heuristic_rank` as logged):
 
 ```json
 {
@@ -253,8 +288,8 @@ Request:
 }
 ```
 
-The options carry the same fields as `route_requests.options` (with `rank`
-sent as `heuristic_rank`), so serving features match training features.
+The options carry the same fields as `route_requests.options`, so serving
+features match training features.
 
 Response `200`:
 
@@ -276,10 +311,9 @@ Response `200`:
 - The endpoint must not write anything; logging stays in the app's tables.
 
 App-side follow-up (not done yet): record `model_version` / `ranker` on
-`route_requests` so offline evaluation can separate model-ranked from
-heuristic-ranked impressions. Once the model ranks, `options[].rank` and
-`chosen_rank` become the *model's* rank, so the heuristic rank must be logged
-separately before launch.
+`route_requests`, so offline evaluation can separate model-ranked from
+heuristic-ranked impressions. The heuristic rank is already logged separately
+(`heuristic_rank` in options and choices), so it survives the switch.
 
 ## 7. Read-only database access
 
@@ -301,7 +335,7 @@ from public.route_requests;
 
 create or replace view ml.route_choices as
 select id, request_id, md5('<salt>' || user_id::text) as user_key,
-       chosen_route_id, chosen_rank, priority, action, created_at
+       chosen_route_id, chosen_rank, heuristic_rank, priority, action, created_at
 from public.route_choices;
 
 create or replace view ml.trips as

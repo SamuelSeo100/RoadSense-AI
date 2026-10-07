@@ -108,6 +108,7 @@ export function createSupabaseTripLogService(supabase: SupabaseClient): TripLogS
           transfers: r.transfers,
           traffic: r.traffic,
           rank: r.rank,
+          heuristic_rank: r.heuristicRank,
           score: Object.fromEntries(
             PRIORITIES.map((p) => [toDbPriority(p), Math.round(r.score[p] * 1000) / 1000]),
           ),
@@ -120,6 +121,7 @@ export function createSupabaseTripLogService(supabase: SupabaseClient): TripLogS
         request_id: requestId,
         chosen_route_id: route.id,
         chosen_rank: route.rank,
+        heuristic_rank: route.heuristicRank,
         priority: toDbPriority(priority),
         action,
         created_at: new Date().toISOString(),
