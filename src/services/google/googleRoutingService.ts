@@ -416,6 +416,7 @@ function transitToRoute(
   const transitLegs = draft.legs.filter(isTransit).map((l) => ({
     mode: l.mode,
     distanceKm: l.distanceM / 1000,
+    stops: l.stops,
   }));
   const transitCost = transitRouteFare(transitLegs, draft.googleFareInr, draft.transitUnchanged);
   // Google gives a route total (bus-only routes); otherwise every leg is costed here.
@@ -427,7 +428,8 @@ function transitToRoute(
   const legs: Leg[] = draft.legs.map((l) => {
     let costInr: number | undefined;
     if (l.mode === 'auto') costInr = autoFare(l.distanceM / 1000, at);
-    else if (isTransit(l) && !googleTotal) costInr = transitLegFare(l.mode, l.distanceM / 1000);
+    else if (isTransit(l) && !googleTotal)
+      costInr = transitLegFare({ mode: l.mode, distanceKm: l.distanceM / 1000, stops: l.stops });
     return {
       mode: l.mode,
       label: legLabel(l),

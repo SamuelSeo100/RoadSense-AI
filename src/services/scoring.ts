@@ -12,8 +12,9 @@ export const scoringConfig = {
   weights: {
     fastest: { time: 0.7, cost: 0.1, walk: 0.1, transfers: 0.1 },
     cheapest: { time: 0.05, cost: 0.85, walk: 0.05, transfers: 0.05 },
-    walking: { time: 0.1, cost: 0.1, walk: 0.7, transfers: 0.1 },
-    transfers: { time: 0.1, cost: 0.1, walk: 0.1, transfers: 0.7 },
+    // Cost 0.25 so a ₹300+ auto doesn't win "least walking" just by having no walk.
+    walking: { time: 0.15, cost: 0.25, walk: 0.6, transfers: 0 },
+    transfers: { time: 0.15, cost: 0.25, walk: 0, transfers: 0.6 },
   } satisfies Record<Priority, Record<Metric, number>>,
   /**
    * How far behind the best option counts as "as bad as it gets" (score 1) per

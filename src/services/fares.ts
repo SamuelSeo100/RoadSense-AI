@@ -33,15 +33,21 @@ export const fareConfig = {
     car: 7,
   },
   /**
-   * Maha-Metro Pune: fare by distance travelled (upper bound km → ₹), on the
-   * leg distance Google returns.
-   *
-   * Known mismatch: no distance slab fits both published fares. Google gives
-   * Civil Court → PCMC as ~13.2 km (₹20 published) and Vanaz → Ruby Hall as
-   * ~9.0 km (₹25 published): the longer trip is cheaper, so these slabs get
-   * Vanaz → Ruby Hall right (₹25) and overstate Civil Court → PCMC (₹30).
+   * Maha-Metro Pune: fare by stops travelled (Google's `stopCount`, upper
+   * bound → ₹). Calibrated on 2 published fares: Civil Court → PCMC (9 stops)
+   * = ₹20 and Vanaz → Ruby Hall (11 stops) = ₹25. Distance can't fit both
+   * (13.2 km is ₹20 but 9.0 km is ₹25).
    * TODO(fares): station-to-station table from punemetrorail.org.
    */
+  metroStopSlabs: [
+    { upToStops: 3, fare: 10 },
+    { upToStops: 6, fare: 15 },
+    { upToStops: 9, fare: 20 },
+    { upToStops: 12, fare: 25 },
+    { upToStops: 16, fare: 30 },
+    { upToStops: Infinity, fare: 35 },
+  ],
+  /** Fallback by leg distance (km → ₹), only when Google gives no `stopCount`. */
   metroSlabs: [
     { upToKm: 2, fare: 10 },
     { upToKm: 4, fare: 15 },
@@ -97,8 +103,18 @@ export function fuelCost(
   return round(distanceKm * cfg[vehicle]);
 }
 
-export function metroFare(distanceKm: number, slabs = fareConfig.metroSlabs): number {
-  const slab = slabs.find((s) => distanceKm <= s.upToKm) ?? slabs[slabs.length - 1];
+/** By stop count when known (calibrated), else by distance. */
+export function metroFare(
+  distanceKm: number,
+  stops?: number,
+  cfg: Pick<typeof fareConfig, 'metroSlabs' | 'metroStopSlabs'> = fareConfig,
+): number {
+  if (stops !== undefined && stops > 0) {
+    const bySlab = cfg.metroStopSlabs.find((s) => stops <= s.upToStops);
+    return (bySlab ?? cfg.metroStopSlabs[cfg.metroStopSlabs.length - 1])?.fare ?? 0;
+  }
+  const slab =
+    cfg.metroSlabs.find((s) => distanceKm <= s.upToKm) ?? cfg.metroSlabs[cfg.metroSlabs.length - 1];
   return slab?.fare ?? 0;
 }
 
@@ -106,9 +122,15 @@ export function busFare(distanceKm: number, cfg = fareConfig.bus): number {
   return Math.max(1, Math.ceil(distanceKm / cfg.stageKm)) * cfg.perStage;
 }
 
+export interface TransitFareLeg {
+  mode: 'metro' | 'train' | 'bus';
+  distanceKm: number;
+  stops?: number;
+}
+
 /** Fare of one transit leg when Google gives none. Rail lines use the metro slabs. */
-export function transitLegFare(mode: 'metro' | 'train' | 'bus', distanceKm: number): number {
-  return mode === 'bus' ? busFare(distanceKm) : metroFare(distanceKm);
+export function transitLegFare({ mode, distanceKm, stops }: TransitFareLeg): number {
+  return mode === 'bus' ? busFare(distanceKm) : metroFare(distanceKm, stops);
 }
 
 /**
@@ -117,11 +139,11 @@ export function transitLegFare(mode: 'metro' | 'train' | 'bus', distanceKm: numb
  * leg is costed from the slabs.
  */
 export function transitRouteFare(
-  legs: { mode: 'metro' | 'train' | 'bus'; distanceKm: number }[],
+  legs: TransitFareLeg[],
   googleFareInr: number | null,
   unchanged: boolean,
 ): number {
   const busOnly = legs.length > 0 && legs.every((l) => l.mode === 'bus');
   if (googleFareInr !== null && busOnly && unchanged) return googleFareInr;
-  return legs.reduce((sum, l) => sum + transitLegFare(l.mode, l.distanceKm), 0);
+  return legs.reduce((sum, l) => sum + transitLegFare(l), 0);
 }
