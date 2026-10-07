@@ -8,7 +8,7 @@ import { cityInfo } from '@/constants/cities';
 import { authService } from '@/features/auth/auth.service';
 import { choose, confirm } from '@/lib/confirm';
 import { bookingProviderNames, type BookingProvider } from '@/services/bookings';
-import type { SavedPlace } from '@/services';
+import { historyService, type SavedPlace } from '@/services';
 import { useAuthStore } from '@/store/authStore';
 import { usePreferencesStore } from '@/store/preferencesStore';
 import { useRoutlyPrefs } from '@/store/routlyPrefsStore';
@@ -18,6 +18,7 @@ import { openHomeSearch } from '../routes/openRoutes';
 import { SheetScrollView } from '../shell/SheetScrollView';
 import { showToast } from '../shell/shellStore';
 import { useMapContent, useTopBar } from '../shell/useScreenChrome';
+import { useHistoryVersion } from '../trip/tripLog';
 
 import { GroupedList, ListRow } from './components/GroupedList';
 import { PreferencesCard } from './components/PreferencesCard';
@@ -74,6 +75,22 @@ export function ProfileScreen() {
         ? `${bookingProviderNames[provider]} disconnected`
         : `${bookingProviderNames[provider]} connected`,
     );
+  };
+
+  const clearHistory = async () => {
+    const ok = await confirm(
+      'Clear trip history?',
+      'This deletes your trips, route searches and choices from Routly. It can’t be undone.',
+      'Clear',
+    );
+    if (!ok) return;
+    try {
+      await historyService.clearHistory();
+      useHistoryVersion.getState().bump();
+      showToast('Trip history cleared');
+    } catch {
+      showToast('Couldn’t clear history. Try again.');
+    }
   };
 
   const logOut = async () => {
@@ -223,6 +240,11 @@ export function ProfileScreen() {
           </ListRow>
           <ListRow minHeight={52} onPress={comingSoon('Help & feedback')}>
             <RText variant="body">Help & feedback</RText>
+          </ListRow>
+          <ListRow minHeight={52} onPress={clearHistory}>
+            <RText variant="body" color={colors.danger}>
+              Clear my trip history
+            </RText>
           </ListRow>
           <ListRow minHeight={52} onPress={logOut}>
             <RText variant="body" family={fonts.extrabold} color={colors.danger}>

@@ -19,5 +19,7 @@ export function createMockHistoryService(): HistoryService {
     async getMonthlyStats() {
       return mockData.monthlyStats;
     },
+    // Mock history is fixed sample data; nothing is stored.
+    async clearHistory() {},
   };
 }

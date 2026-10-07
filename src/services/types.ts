@@ -83,6 +83,8 @@ export interface Trip {
   costInr: number;
   /** Recorded path, for showing the trip on the map. */
   path?: LatLng[];
+  /** Per-leg geometry (mode-coloured on the map) when the trip was logged with it. */
+  legs?: Leg[];
 }
 
 export interface MonthlyStats {
@@ -160,6 +162,50 @@ export interface RoutingService {
 export interface HistoryService {
   getTrips(): Promise<Trip[]>;
   getMonthlyStats(): Promise<MonthlyStats>;
+  /** Deletes the user's trips, route requests and choices. */
+  clearHistory(): Promise<void>;
+}
+
+/** What the user did with a shown route option (ranker label strength differs). */
+export type ChoiceAction = 'expand' | 'book' | 'ticket' | 'start';
+
+/** One ranked result the user was shown. */
+export interface RouteRequestLog {
+  /** Client-generated UUID, so choices can reference it before the insert lands. */
+  id: string;
+  at: Date;
+  from: { name: string; location: LatLng };
+  to: { name: string; location: LatLng };
+  priority: Priority;
+  routes: RankedRoute[];
+}
+
+export interface StartTripLog {
+  /** Null when the request wasn't logged ("Learn from my trips" off). */
+  requestId: string | null;
+  at: Date;
+  from: string;
+  to: string;
+  route: Route;
+  /** Cab estimate for the same trip ("saved vs cab"), when known. */
+  cabEquivalentInr: number | null;
+}
+
+/**
+ * Route requests, choices and trips (History + ML ranker training data).
+ * Fire-and-forget: methods never throw and never block the UI.
+ */
+export interface TripLogService {
+  logRequest(request: RouteRequestLog): void;
+  logChoice(choice: {
+    requestId: string;
+    route: RankedRoute;
+    /** Ranking the user was looking at (may differ from the request's). */
+    priority: Priority;
+    action: ChoiceAction;
+  }): void;
+  /** Resolves true once the trip is stored (false: skipped or queued for retry). */
+  startTrip(trip: StartTripLog): Promise<boolean>;
 }
 
 export interface AiService {

@@ -18,6 +18,8 @@ interface RouteStepsProps {
   destinationName: string;
   /** Safe-walk details, shown on the walk-only route. */
   walk: WalkingRoute | null;
+  /** Before redirecting: 'ticket' (bus / metro) or 'book' (auto / cab). */
+  onBook: (action: 'ticket' | 'book') => void;
   onStart: () => void;
 }
 
@@ -51,6 +53,7 @@ export function RouteSteps({
   originLabel,
   destinationName,
   walk,
+  onBook,
   onStart,
 }: RouteStepsProps) {
   const isWalkOnly = route.legs.every((l) => l.mode === 'walk');
@@ -81,7 +84,10 @@ export function RouteSteps({
               </RText>
               {action && (
                 <PressableBox
-                  onPress={() => book(action.kind, trip)}
+                  onPress={() => {
+                    onBook(action.label === 'Book' ? 'book' : 'ticket');
+                    void book(action.kind, trip);
+                  }}
                   accessibilityRole="button"
                   accessibilityLabel={`${action.label}: ${leg.label}`}
                   hitSlop={4}

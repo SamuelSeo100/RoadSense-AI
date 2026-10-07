@@ -9,6 +9,7 @@ import { openHomeSearch, openRoutes } from '../routes/openRoutes';
 import { SheetScrollView } from '../shell/SheetScrollView';
 import { SHEET_PEEK } from '../shell/shellStore';
 import { useMapContent, useSheet, useTopBar } from '../shell/useScreenChrome';
+import { useHistoryVersion } from '../trip/tripLog';
 
 import { ModeMixCard } from './components/ModeMixCard';
 import { StatsGrid } from './components/StatsGrid';
@@ -38,10 +39,31 @@ export function HistoryScreen() {
     onSearch: openHomeSearch,
   });
 
+  // Refetch when a trip is stored or history is cleared.
+  const version = useHistoryVersion((s) => s.version);
+  const [failed, setFailed] = useState(false);
   useEffect(() => {
-    historyService.getTrips().then(setTrips);
-    historyService.getMonthlyStats().then(setStats);
-  }, []);
+    let live = true;
+    const fail = (e: unknown) => {
+      if (__DEV__) console.info('[history]', e instanceof Error ? e.message : e);
+      if (live) setFailed(true);
+    };
+    historyService
+      .getTrips()
+      .then((t) => {
+        if (!live) return;
+        setTrips(t);
+        setFailed(false);
+      })
+      .catch(fail);
+    historyService
+      .getMonthlyStats()
+      .then((st) => live && setStats(st))
+      .catch(fail);
+    return () => {
+      live = false;
+    };
+  }, [version]);
 
   // Nothing on the map until the user taps a trip.
   const selected = trips?.find((t) => t.id === selectedId);
@@ -52,14 +74,17 @@ export function HistoryScreen() {
         ? [
             {
               id: selected.id,
-              legs: [
-                {
-                  mode: selected.mode,
-                  label: selected.modeLabel,
-                  durationMin: selected.durationMin,
-                  polyline: selected.path,
-                },
-              ],
+              // Logged trips keep per-leg geometry (mode colours, dotted walks).
+              legs: selected.legs?.some((l) => l.polyline)
+                ? selected.legs
+                : [
+                    {
+                      mode: selected.mode,
+                      label: selected.modeLabel,
+                      durationMin: selected.durationMin,
+                      polyline: selected.path,
+                    },
+                  ],
             },
           ]
         : [],
@@ -76,6 +101,14 @@ export function HistoryScreen() {
     <SheetScrollView gap={16}>
       {stats && <StatsGrid stats={stats} />}
       {stats && <ModeMixCard mix={stats.modeMix} />}
+
+      {failed && !trips && (
+        <View style={styles.empty}>
+          <RText variant="body" style={styles.center}>
+            Couldn’t load your trips. Check your connection.
+          </RText>
+        </View>
+      )}
 
       {trips && trips.length === 0 && (
         <View style={styles.empty}>

@@ -6,23 +6,23 @@ import { Chip } from '@/components/routly/Chip';
 import { RouteCard } from '@/components/routly/RouteCard';
 import { RText } from '@/components/routly/RText';
 import { SkeletonCard } from '@/components/routly/SkeletonCard';
-import { PRIORITIES, priorityLabels, rankRoutes, type Vehicle } from '@/services';
+import { PRIORITIES, priorityLabels, rankRoutes, type RankedRoute, type Vehicle } from '@/services';
 import { useRoutlyPrefs } from '@/store/routlyPrefsStore';
 import { colors, fonts, radius } from '@/theme/routly';
 
-import type { MapContent } from '../map/mapStore';
+import { useMapStore, type MapContent } from '../map/mapStore';
 import { SheetScrollView } from '../shell/SheetScrollView';
 import { SHEET_FULL, SHEET_PEEK, showToast } from '../shell/shellStore';
 import { useMapContent, useSheet, useTopBar } from '../shell/useScreenChrome';
 import { DirectionsCard } from '../trip/DirectionsCard';
-import { useTripStore } from '../trip/tripStore';
+import { logChoice, startTrip } from '../trip/tripLog';
+import { shownRoutes, useTripStore } from '../trip/tripStore';
 
 import { RouteNotices } from './components/RouteNotices';
 import { RouteSteps } from './components/RouteSteps';
 
 const CLEAN_MAP: MapContent = { routes: [], selection: 'none', focused: false };
 const NO_VEHICLES: Record<Vehicle, boolean> = { car: false, bike: false, cycle: false };
-const MAX_SHOWN = 8;
 
 /**
  * Ways to get to the planned destination: priority chips, notices and the
@@ -37,6 +37,7 @@ export function RoutesScreen() {
   const priority = useTripStore((s) => s.priority);
   const setPriority = useTripStore((s) => s.setPriority);
   const vehicles = useRoutlyPrefs((s) => s.prefs?.vehicles) ?? NO_VEHICLES;
+  const area = useMapStore((s) => s.area);
   const sheet = useSheet('routes');
   const toInputRef = useRef<TextInput>(null);
 
@@ -53,13 +54,13 @@ export function RoutesScreen() {
 
   const ready = state.status === 'ready' ? state : null;
   const ranked = useMemo(
-    () => (ready ? rankRoutes(ready.routes, priority, vehicles).slice(0, MAX_SHOWN) : []),
+    () => (ready ? shownRoutes(ready.routes, priority, vehicles) : []),
     [ready, priority, vehicles],
   );
 
   // The user's pick, valid for the result it was made on. Until they tap, the
   // top-ranked route is shown without moving the camera (`focused` false).
-  const [picked, setPicked] = useState<{ requestId: number; id: string; open: boolean } | null>(
+  const [picked, setPicked] = useState<{ requestId: string; id: string; open: boolean } | null>(
     null,
   );
   const userPick =
@@ -92,14 +93,30 @@ export function RoutesScreen() {
     setSheetIndex(SHEET_PEEK);
   }, [requestId, setSheetIndex]);
 
-  const onCardPress = (id: string) => {
+  const onCardPress = (route: RankedRoute) => {
     if (!ready) return;
     // Tapping the open card folds it; any other card is selected and opened.
-    setPicked((p) =>
-      p?.requestId === ready.requestId && p.id === id
-        ? { ...p, open: !p.open }
-        : { requestId: ready.requestId, id, open: true },
-    );
+    const same = userPick?.id === route.id;
+    const opening = !same || !userPick.open;
+    setPicked({ requestId: ready.requestId, id: route.id, open: opening });
+    if (opening) logChoice(ready.requestId, route, priority, 'expand');
+  };
+
+  const onStart = (route: RankedRoute) => {
+    if (!ready || !to) return;
+    logChoice(ready.requestId, route, priority, 'start');
+    // The cab estimate for the same trip, for "saved vs cab" in History.
+    const cab = ready.routes.find((r) => r.mapKey === 'cab' && !r.vehicle);
+    startTrip({
+      requestId: ready.requestId,
+      at: new Date(),
+      from: fromLabel === 'Your location' ? (area ?? 'Current location') : fromLabel,
+      to: to.name,
+      route,
+      cabEquivalentInr: cab?.costInr ?? null,
+    });
+    // TODO(navigation): turn-by-turn guidance.
+    showToast('Live navigation is coming soon');
   };
 
   const priorityLabel = priorityLabels[priority];
@@ -171,7 +188,7 @@ export function RoutesScreen() {
                         route={route}
                         priorityLabel={priorityLabel}
                         selected={isSelected}
-                        onPress={() => onCardPress(route.id)}
+                        onPress={() => onCardPress(route)}
                       >
                         {open ? (
                           <RouteSteps
@@ -179,8 +196,8 @@ export function RoutesScreen() {
                             originLabel={fromLabel}
                             destinationName={to.name}
                             walk={ready.walk}
-                            // TODO(navigation): turn-by-turn guidance.
-                            onStart={() => showToast('Live navigation is coming soon')}
+                            onBook={(action) => logChoice(ready.requestId, route, priority, action)}
+                            onStart={() => onStart(route)}
                           />
                         ) : undefined}
                       </RouteCard>

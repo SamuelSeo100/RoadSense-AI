@@ -4,6 +4,7 @@ import { create } from 'zustand';
 import {
   directionsService,
   placesService,
+  rankRoutes,
   routingService,
   type LatLng,
   type Place,
@@ -17,6 +18,8 @@ import { useRoutlyPrefs } from '@/store/routlyPrefsStore';
 
 import { useMapStore } from '../map/mapStore';
 
+import { logRequest } from './tripLog';
+
 /** From is either the live GPS position or a searched place. */
 export type Endpoint = { kind: 'current' } | { kind: 'place'; place: Place };
 
@@ -25,8 +28,11 @@ export type RoutesState =
   | { status: 'loading' }
   | {
       status: 'ready';
-      /** Increments per fetch: a new result (not a re-rank) resets the selection. */
-      requestId: number;
+      /**
+       * New per fetch (UUID): keys the selection (a re-rank keeps it) and is the
+       * logged route_requests id that choices and trips refer to.
+       */
+      requestId: string;
       /** As returned; re-rank locally with `rankRoutes` for the current priority. */
       routes: RankedRoute[];
       notices: RouteNotice[];
@@ -36,6 +42,16 @@ export type RoutesState =
   | { status: 'error'; message: string };
 
 const NO_VEHICLES: Record<Vehicle, boolean> = { car: false, bike: false, cycle: false };
+
+/** Route cards shown on Routes (and logged as the request's options). */
+export const MAX_SHOWN_ROUTES = 8;
+
+/** What Routes displays: ranked for `priority`, own vehicles filtered, capped. */
+export const shownRoutes = (
+  routes: RankedRoute[],
+  priority: Priority,
+  vehicles: Record<Vehicle, boolean>,
+) => rankRoutes(routes, priority, vehicles).slice(0, MAX_SHOWN_ROUTES);
 
 const CURRENT: Endpoint = { kind: 'current' };
 const LOCATION_WAIT_MS = 15000;
@@ -87,7 +103,6 @@ interface TripState {
 
 /** Only the latest route request wins; older ones are aborted. */
 let inflight: AbortController | null = null;
-let requestCounter = 0;
 /** Set once the user picks a priority on Routes; until then it follows the Profile default. */
 let priorityChosen = false;
 
@@ -132,10 +147,25 @@ export const useTripStore = create<TripState>()((set, get) => {
         directionsService.walking(start, destination.location, { signal }).catch(() => null),
       ]);
       if (signal.aborted) return;
+      const requestId = Crypto.randomUUID();
+      const fromName =
+        origin.kind === 'place'
+          ? origin.place.name
+          : (useMapStore.getState().area ?? 'Current location');
+      // Once per result; priority changes re-rank locally and aren't logged.
+      logRequest({
+        id: requestId,
+        at: new Date(),
+        from: { name: fromName, location: start },
+        to: { name: destination.name, location: destination.location },
+        priority: get().priority,
+        // Exactly what the user is shown, so ranks match the cards.
+        routes: shownRoutes(result.routes, get().priority, vehicles),
+      });
       set({
         routes: {
           status: 'ready',
-          requestId: ++requestCounter,
+          requestId,
           routes: result.routes,
           notices: result.notices,
           walk,
