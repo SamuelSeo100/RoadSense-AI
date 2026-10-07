@@ -387,10 +387,11 @@ export const mockData: MockData = {
     aiModeEnabled: true,
     quickLaunchEnabled: true,
     quickLaunchCombo: 'power+volume_up',
+    // Own vehicles are opt-in (Profile › Travel preferences).
     vehicles: {
-      car: true,
-      bike: true,
-      cycle: true,
+      car: false,
+      bike: false,
+      cycle: false,
     },
     savedPlaces: [
       {

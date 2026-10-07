@@ -6,11 +6,12 @@
  * fare chart before release. Fuel costs follow the Pune petrol price.
  */
 export const fareConfig = {
+  /** Pune/PCMC RTA auto meter revision effective 2026-09-01. Verify on next RTO revision. */
   auto: {
     /** Meter minimum, covers the first `baseKm`. */
-    baseFare: 26,
+    baseFare: 30,
     baseKm: 1.5,
-    perKm: 17,
+    perKm: 20,
     /** Multiplier on the meter fare between `nightStartHour` and `nightEndHour` (local time). */
     nightSurcharge: 0.25,
     nightStartHour: 0,
@@ -31,7 +32,16 @@ export const fareConfig = {
     /** ~₹105/L petrol at ~15 km/L. */
     car: 7,
   },
-  /** Maha-Metro Pune: fare by distance travelled (upper bound km → ₹). */
+  /**
+   * Maha-Metro Pune: fare by distance travelled (upper bound km → ₹), on the
+   * leg distance Google returns.
+   *
+   * Known mismatch: no distance slab fits both published fares. Google gives
+   * Civil Court → PCMC as ~13.2 km (₹20 published) and Vanaz → Ruby Hall as
+   * ~9.0 km (₹25 published): the longer trip is cheaper, so these slabs get
+   * Vanaz → Ruby Hall right (₹25) and overstate Civil Court → PCMC (₹30).
+   * TODO(fares): station-to-station table from punemetrorail.org.
+   */
   metroSlabs: [
     { upToKm: 2, fare: 10 },
     { upToKm: 4, fare: 15 },
@@ -40,6 +50,12 @@ export const fareConfig = {
     { upToKm: 18, fare: 30 },
     { upToKm: Infinity, fare: 35 },
   ],
+  /**
+   * Metro discount for students and on weekends (fraction off). Off until a
+   * profile flag exists; not applied anywhere yet.
+   * TODO(fares): wire `enabled` to a student / weekend profile flag.
+   */
+  metroConcession: { rate: 0.3, enabled: false },
   /** PMPML: one stage = `stageKm`, ₹`perStage` per started stage (₹10 minimum). */
   bus: { stageKm: 5, perStage: 10 },
 } as const;
