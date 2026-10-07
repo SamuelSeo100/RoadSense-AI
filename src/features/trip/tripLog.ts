@@ -15,6 +15,8 @@ export const useHistoryVersion = create<{ version: number; bump: () => void }>()
   version: 0,
   bump: () => set((s) => ({ version: s.version + 1 })),
 }));
+// Trips can land late (queued offline, or left over from the last session).
+tripLogService.onTripStored(() => useHistoryVersion.getState().bump());
 
 /** "Learn from my trips": off → only trips are stored (History still works). */
 const learning = () => useRoutlyPrefs.getState().prefs?.learnFromTrips ?? true;
@@ -42,9 +44,8 @@ export function logChoice(
 
 /** Stores the trip for History (always, even with learning off). Never blocks. */
 export function startTrip(trip: Omit<StartTripLog, 'requestId'> & { requestId: string }) {
-  void tripLogService
-    .startTrip({ ...trip, requestId: logged.has(trip.requestId) ? trip.requestId : null })
-    .then((stored) => {
-      if (stored) useHistoryVersion.getState().bump();
-    });
+  tripLogService.startTrip({
+    ...trip,
+    requestId: logged.has(trip.requestId) ? trip.requestId : null,
+  });
 }

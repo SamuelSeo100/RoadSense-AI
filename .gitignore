@@ -41,3 +41,6 @@ yarn-error.*
 /ios
 /android
 scripts/transit-probe.json
+
+# Supabase CLI local state
+supabase/.temp/

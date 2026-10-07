@@ -8,7 +8,7 @@ import { cityInfo } from '@/constants/cities';
 import { authService } from '@/features/auth/auth.service';
 import { choose, confirm } from '@/lib/confirm';
 import { bookingProviderNames, type BookingProvider } from '@/services/bookings';
-import { historyService, type SavedPlace } from '@/services';
+import { historyService, tripLogService, type SavedPlace } from '@/services';
 import { useAuthStore } from '@/store/authStore';
 import { usePreferencesStore } from '@/store/preferencesStore';
 import { useRoutlyPrefs } from '@/store/routlyPrefsStore';
@@ -85,6 +85,8 @@ export function ProfileScreen() {
     );
     if (!ok) return;
     try {
+      // Unsent writes first, so nothing queued re-creates rows after the delete.
+      tripLogService.clearPending();
       await historyService.clearHistory();
       useHistoryVersion.getState().bump();
       showToast('Trip history cleared');

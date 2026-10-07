@@ -193,7 +193,8 @@ export interface StartTripLog {
 
 /**
  * Route requests, choices and trips (History + ML ranker training data).
- * Fire-and-forget: methods never throw and never block the UI.
+ * Fire-and-forget: methods never throw and never block the UI. Writes are
+ * queued on the device until the server has them (they survive restarts).
  */
 export interface TripLogService {
   logRequest(request: RouteRequestLog): void;
@@ -204,8 +205,11 @@ export interface TripLogService {
     priority: Priority;
     action: ChoiceAction;
   }): void;
-  /** Resolves true once the trip is stored (false: skipped or queued for retry). */
-  startTrip(trip: StartTripLog): Promise<boolean>;
+  startTrip(trip: StartTripLog): void;
+  /** Called whenever a trip lands on the server (possibly after a retry). Returns unsubscribe. */
+  onTripStored(listener: () => void): () => void;
+  /** Drops queued writes not yet sent (before "Clear my trip history"). */
+  clearPending(): void;
 }
 
 export interface AiService {

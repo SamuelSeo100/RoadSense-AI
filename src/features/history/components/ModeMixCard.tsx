@@ -2,6 +2,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { RText } from '@/components/routly/RText';
 import type { MonthlyStats } from '@/services';
+import { useRoutlyPrefs } from '@/store/routlyPrefsStore';
 import { colors, fonts, modeColors, radius, type Mode } from '@/theme/routly';
 
 const modeLabel: Record<Mode, string> = {
@@ -17,6 +18,8 @@ const modeLabel: Record<Mode, string> = {
 
 /** "How you travel": proportional stacked bar + legend. */
 export function ModeMixCard({ mix }: { mix: MonthlyStats['modeMix'] }) {
+  // Only claim learning while "Learn from my trips" is on (hidden until prefs load).
+  const learning = useRoutlyPrefs((s) => s.prefs?.learnFromTrips === true);
   const summary = mix.map((m) => `${modeLabel[m.mode]} ${m.percent}%`).join(', ');
   return (
     <View style={styles.card}>
@@ -24,11 +27,13 @@ export function ModeMixCard({ mix }: { mix: MonthlyStats['modeMix'] }) {
         <RText variant="body" family={fonts.extrabold} accessibilityRole="header">
           How you travel
         </RText>
-        <View style={styles.badge}>
-          <RText variant="badge" color={colors.primary}>
-            Used by AI ranking
-          </RText>
-        </View>
+        {learning && (
+          <View style={styles.badge}>
+            <RText variant="badge" color={colors.primary}>
+              Learning from your trips
+            </RText>
+          </View>
+        )}
       </View>
       <View style={styles.bar} accessible accessibilityLabel={`Mode mix: ${summary}`}>
         {mix.map((m) => (
