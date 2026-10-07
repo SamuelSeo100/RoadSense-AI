@@ -5,13 +5,14 @@ import { RText } from '@/components/routly/RText';
 import { SkeletonCard } from '@/components/routly/SkeletonCard';
 import { colors, fonts, radius } from '@/theme/routly';
 
-import type { MapContent } from '../map/mapStore';
+import { useMapStore, type MapContent } from '../map/mapStore';
 import { SheetScrollView } from '../shell/SheetScrollView';
 import { SHEET_FULL, SHEET_PEEK, showToast } from '../shell/shellStore';
 import { useMapContent, useSheet, useTopBar } from '../shell/useScreenChrome';
 import { DirectionsCard } from '../trip/DirectionsCard';
 import { useTripStore } from '../trip/tripStore';
 
+import { DevRoutesList } from './components/DevRoutesList';
 import { WalkingOptionCard } from './components/WalkingOptionCard';
 
 const CLEAN_MAP: MapContent = { routes: [], selection: 'none', focused: false };
@@ -78,6 +79,18 @@ export function RoutesScreen() {
 
   const count = walk ? 1 : 0;
 
+  // TODO(routes-ui): replace in Feature 2. Start is snapped when the walk route
+  // arrives, so GPS updates don't refetch every mode.
+  const devStart = useMemo(
+    () =>
+      walk
+        ? from.kind === 'place'
+          ? from.place.location
+          : useMapStore.getState().userLocation
+        : null,
+    [walk, from],
+  );
+
   return (
     <SheetScrollView gap={16}>
       <DirectionsCard toInputRef={toInputRef} onError={showToast} />
@@ -103,7 +116,11 @@ export function RoutesScreen() {
             // TODO(navigation): turn-by-turn walking guidance.
             onStart={() => showToast('Live navigation is coming soon')}
           />
-          <RText variant="caption">Metro, bus, auto and cab options are coming soon.</RText>
+          {__DEV__ && devStart && to ? (
+            <DevRoutesList start={devStart} to={to} />
+          ) : (
+            <RText variant="caption">Metro, bus, auto and cab options are coming soon.</RText>
+          )}
         </>
       )}
     </SheetScrollView>

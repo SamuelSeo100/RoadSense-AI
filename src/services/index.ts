@@ -1,6 +1,7 @@
 import { hasGoogleMapsKey } from './config';
 import { createGoogleDirectionsService } from './google/googleDirectionsService';
 import { createGooglePlacesService } from './google/googlePlacesService';
+import { createGoogleRoutingService } from './google/googleRoutingService';
 import { createLocationService } from './locationService';
 import { createMockDirectionsService } from './mock/mockDirectionsService';
 import { createMockPlacesService } from './mock/mockPlacesService';
@@ -33,7 +34,6 @@ export { hasGoogleMapsKey, serviceConfig } from './config';
  * that call `serviceConfig.apiBaseUrl` (and Google's Routes / Places /
  * Geocoding APIs with `serviceConfig.googleMapsApiKey`) and pick them here instead of the mocks.
  */
-export const routingService: RoutingService = createMockRoutingService();
 export const historyService: HistoryService = createMockHistoryService();
 export const aiService: AiService = createMockAiService();
 export const preferencesService: PreferencesService = createLocalPreferencesService();
@@ -48,3 +48,16 @@ export const placesService: PlacesService = hasGoogleMapsKey
 export const directionsService: DirectionsService = hasGoogleMapsKey
   ? createGoogleDirectionsService(safetyService)
   : createMockDirectionsService();
+
+const mockRouting = createMockRoutingService();
+/**
+ * Real multimodal routes (Google Routes API) when a key is set, the mock
+ * otherwise. Place search / geocoding stay on the mock for now.
+ */
+export const routingService: RoutingService = hasGoogleMapsKey
+  ? createGoogleRoutingService({
+      directions: directionsService,
+      preferences: preferencesService,
+      places: mockRouting,
+    })
+  : mockRouting;

@@ -32,6 +32,9 @@ export interface Leg {
   costInr?: number;
   /** Geometry for the map. */
   polyline?: LatLng[];
+  /** True when `polyline` is a stand-in (straight line / borrowed path), not real geometry. */
+  approximate?: boolean;
+  distanceKm?: number;
   from?: string;
   to?: string;
 }
@@ -122,7 +125,7 @@ export interface RoutingService {
   getRoutes(
     from: Place | LatLng,
     to: Place,
-    opts: { priority: Priority; vehicles: Record<Vehicle, boolean> },
+    opts: { priority: Priority; vehicles: Record<Vehicle, boolean>; signal?: AbortSignal },
   ): Promise<RankedRoute[]>;
   /** The 3 cards on Home: AI pick, cheapest, fastest. */
   getPreview(from: Place | LatLng, to: Place): Promise<Route[]>;
