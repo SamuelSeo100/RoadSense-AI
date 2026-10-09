@@ -42,6 +42,20 @@ export default ({ config }: ConfigContext): ExpoConfig => {
             'Routly uses your location to plan routes from where you are and show live traffic around you.',
         },
       ],
+      // On-device speech-to-text for AI Mode voice (adds RECORD_AUDIO on Android).
+      [
+        'expo-speech-recognition',
+        {
+          microphonePermission: 'Routly uses the microphone so you can speak your destination.',
+          speechRecognitionPermission:
+            'Routly uses speech recognition to turn what you say into a destination.',
+          // Recognizers the app may bind to (Android 11+ package visibility).
+          androidSpeechServicePackages: [
+            'com.google.android.googlequicksearchbox',
+            'com.google.android.as',
+          ],
+        },
+      ],
       // react-native-maps 1.27 needs its own plugin entry: it writes the Android
       // manifest key, and on iOS adds the Google Maps pod + GMSServices init.
       [

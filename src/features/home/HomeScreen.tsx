@@ -16,6 +16,7 @@ import { useTripStore } from '../trip/tripStore';
 
 import { applyAiQuery, runAiQuery, type AiClarify } from './aiMode';
 import { AiModeCard } from './components/AiModeCard';
+import { useVoiceInput } from './useVoiceInput';
 import { TicketsGrid, type TicketTile } from './components/TicketsGrid';
 import { firstName, timeOfDay } from './greeting';
 
@@ -31,6 +32,8 @@ export function HomeScreen() {
   const toInputRef = useRef<TextInput>(null);
   const [aiBusy, setAiBusy] = useState(false);
   const [clarify, setClarify] = useState<AiClarify | null>(null);
+  const [aiText, setAiText] = useState('');
+  const voiceOn = prefs?.voiceForAiMode ?? true;
 
   // Search button on History / Profile lands here.
   useEffect(() => {
@@ -65,6 +68,15 @@ export function HomeScreen() {
     }
   };
 
+  const voice = useVoiceInput({
+    onTranscript: setAiText,
+    onDone: (text) => {
+      setAiText(text);
+      void submitAi(text);
+    },
+    onError: showToast,
+  });
+
   const pickClarify = async (option: string) => {
     if (!clarify) return;
     const { base } = clarify;
@@ -93,9 +105,12 @@ export function HomeScreen() {
       <AiModeCard
         enabled={prefs?.aiModeEnabled ?? true}
         onToggle={(aiModeEnabled) => updatePrefs({ aiModeEnabled })}
-        showMic={prefs?.voiceForAiMode ?? true}
-        // TODO(voice): speech-to-text (needs a native speech module + dev build).
-        onMic={() => showToast('Voice coming soon')}
+        text={aiText}
+        onChangeText={setAiText}
+        showMic={voiceOn}
+        listening={voice.listening}
+        micStarting={voice.starting}
+        onMic={voice.toggle}
         onSubmit={submitAi}
         busy={aiBusy}
         clarify={clarify}

@@ -1,5 +1,4 @@
 import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
-import { useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 
 import { Chip } from '@/components/routly/Chip';
@@ -17,7 +16,14 @@ export const AI_SUGGESTIONS = [
 interface AiModeCardProps {
   enabled: boolean;
   onToggle: (on: boolean) => void;
+  /** The request text (typed, or the live voice transcript). */
+  text: string;
+  onChangeText: (text: string) => void;
   showMic: boolean;
+  /** Listening for speech: the mic turns into a stop button. */
+  listening?: boolean;
+  /** Mic tapped, recognizer not ready yet: don't speak yet. */
+  micStarting?: boolean;
   onMic: () => void;
   onSubmit: (text: string) => void;
   /** Parsing the request (the LLM call). */
@@ -31,15 +37,17 @@ interface AiModeCardProps {
 export function AiModeCard({
   enabled,
   onToggle,
+  text,
+  onChangeText,
   showMic,
+  listening = false,
+  micStarting = false,
   onMic,
   onSubmit,
   busy = false,
   clarify,
   onClarifyPick,
 }: AiModeCardProps) {
-  const [text, setText] = useState('');
-
   const submit = (value: string) => {
     if (value.trim() && !busy) onSubmit(value.trim());
   };
@@ -66,8 +74,14 @@ export function AiModeCard({
           <View style={styles.inputRow}>
             <BottomSheetTextInput
               value={text}
-              onChangeText={setText}
-              placeholder="Tell me the quickest way to Pune Station"
+              onChangeText={onChangeText}
+              placeholder={
+                listening
+                  ? 'Listening…'
+                  : micStarting
+                    ? 'Starting mic…'
+                    : 'Tell me the quickest way to Pune Station'
+              }
               placeholderTextColor={colors.dark.placeholder}
               accessibilityLabel="Ask Routly"
               returnKeyType="go"
@@ -84,10 +98,23 @@ export function AiModeCard({
               <Pressable
                 onPress={onMic}
                 accessibilityRole="button"
-                accessibilityLabel="Speak your destination"
-                style={styles.mic}
+                accessibilityLabel={
+                  listening
+                    ? 'Stop listening'
+                    : micStarting
+                      ? 'Starting microphone'
+                      : 'Speak your destination'
+                }
+                accessibilityState={{ busy: listening || micStarting }}
+                style={[styles.mic, listening && styles.micListening]}
               >
-                <Icon name="mic" size={20} color={colors.textOnAccent} />
+                {listening ? (
+                  <View style={styles.stopSquare} />
+                ) : micStarting ? (
+                  <ActivityIndicator color={colors.textOnAccent} />
+                ) : (
+                  <Icon name="mic" size={20} color={colors.textOnAccent} />
+                )}
               </Pressable>
             )}
           </View>
@@ -119,7 +146,7 @@ export function AiModeCard({
                 height={36}
                 surface="dark"
                 onPress={() => {
-                  setText(s);
+                  onChangeText(s);
                   submit(s);
                 }}
               />
@@ -162,6 +189,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  micListening: {
+    backgroundColor: colors.textOnPrimary,
+    borderWidth: 3,
+    borderColor: colors.accent,
+  },
+  stopSquare: { width: 14, height: 14, borderRadius: 3, backgroundColor: colors.danger },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   clarify: {
     gap: 10,
