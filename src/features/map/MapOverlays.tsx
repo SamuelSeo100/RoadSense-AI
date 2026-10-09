@@ -2,7 +2,8 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { IconButton } from '@/components/routly/IconButton';
 import { RText } from '@/components/routly/RText';
-import { colors, fonts, radius } from '@/theme/routly';
+import { modeNames } from '@/services';
+import { colors, fonts, modeColors, radius, type Mode } from '@/theme/routly';
 
 import type { LocationStatus } from './mapStore';
 
@@ -15,6 +16,8 @@ interface MapOverlaysProps {
   onLayers: () => void;
   satellite: boolean;
   traffic: boolean;
+  /** Modes of the route on the map, in order (legend chip); empty hides it. */
+  legend: Mode[];
 }
 
 /**
@@ -29,6 +32,7 @@ export function MapOverlays({
   onLayers,
   satellite,
   traffic,
+  legend,
 }: MapOverlaysProps) {
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
@@ -53,6 +57,31 @@ export function MapOverlays({
           <RText variant="body" size={12} family={fonts.bold} color={colors.textOnPrimary}>
             {traffic ? 'Live location · Live traffic' : 'Live location'}
           </RText>
+        </View>
+      )}
+
+      {legend.length > 0 && (
+        <View
+          style={[styles.legend, { top: top + 60 }]}
+          accessible
+          accessibilityLabel={`Map key: ${legend.map((m) => modeNames[m]).join(', ')}`}
+        >
+          {legend.map((mode) => (
+            <View key={mode} style={styles.legendItem}>
+              {mode === 'walk' ? (
+                <View style={styles.walkSwatch}>
+                  {[0, 1, 2].map((d) => (
+                    <View key={d} style={[styles.dot, { backgroundColor: modeColors.walk.line }]} />
+                  ))}
+                </View>
+              ) : (
+                <View style={[styles.lineSwatch, { backgroundColor: modeColors[mode].line }]} />
+              )}
+              <RText variant="body" size={11} family={fonts.bold}>
+                {modeNames[mode]}
+              </RText>
+            </View>
+          ))}
         </View>
       )}
 
@@ -99,4 +128,24 @@ const styles = StyleSheet.create({
   liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.accent },
   offDot: { backgroundColor: colors.toggleOff },
   controls: { position: 'absolute', right: 12, gap: 8 },
+  legend: {
+    position: 'absolute',
+    left: 12,
+    maxWidth: 260,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    columnGap: 10,
+    rowGap: 4,
+    backgroundColor: colors.surface,
+    borderRadius: radius.pill,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  legendItem: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  lineSwatch: { width: 16, height: 5, borderRadius: 3 },
+  walkSwatch: { width: 16, flexDirection: 'row', justifyContent: 'space-between' },
+  dot: { width: 4, height: 4, borderRadius: 2 },
 });

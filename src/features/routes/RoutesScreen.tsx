@@ -10,6 +10,7 @@ import { PRIORITIES, priorityLabels, type RankedRoute, type Vehicle } from '@/se
 import { useRoutlyPrefs } from '@/store/routlyPrefsStore';
 import { colors, fonts, radius } from '@/theme/routly';
 
+import { useRouteGeometry } from '../map/legGeometry';
 import { useMapStore, type MapContent } from '../map/mapStore';
 import { SheetScrollView } from '../shell/SheetScrollView';
 import { SHEET_FULL, SHEET_PEEK, showToast } from '../shell/shellStore';
@@ -72,19 +73,21 @@ export function RoutesScreen() {
       ? picked
       : null;
   const selected = ranked.find((r) => r.id === userPick?.id) ?? ranked[0] ?? null;
+  // Estimated legs of the selected route get real geometry once it loads.
+  const selectedLegs = useRouteGeometry(selected);
 
   const mapContent = useMemo<MapContent>(
     () =>
       selected && to
         ? {
-            routes: [{ id: selected.id, legs: selected.legs }],
+            routes: [{ id: selected.id, legs: selectedLegs }],
             selection: selected.id,
             focused: userPick !== null,
-            plain: selected.legs.every((l) => l.mode === 'walk'),
+            plain: selectedLegs.every((l) => l.mode === 'walk'),
             destination: { name: to.name, location: to.location },
           }
         : CLEAN_MAP,
-    [selected, userPick, to],
+    [selected, selectedLegs, userPick, to],
   );
   useMapContent('routes', mapContent);
 
@@ -119,8 +122,9 @@ export function RoutesScreen() {
       route,
       cabEquivalentInr: cab?.costInr ?? null,
     });
-    // TODO(navigation): turn-by-turn guidance.
-    showToast('Live navigation is coming soon');
+    // TODO(navigation): turn-by-turn guidance (Phase 2). Until then "I'm
+    // taking this" only records the choice and the trip.
+    showToast('Saved to History. Turn-by-turn navigation is coming soon.');
   };
 
   const priorityLabel = priorityLabels[priority];
@@ -212,7 +216,7 @@ export function RoutesScreen() {
                       >
                         {open ? (
                           <RouteSteps
-                            route={route}
+                            route={{ ...route, legs: selectedLegs }}
                             originLabel={fromLabel}
                             destinationName={to.name}
                             walk={ready.walk}

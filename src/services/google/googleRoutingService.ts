@@ -21,6 +21,7 @@ import {
 } from '../types';
 
 import { googleRequest } from './googleClient';
+import { stepPath } from './googleDirectionsService';
 import { decodePolyline } from './polyline';
 
 /** Tunables for building route options (fares live in fares.ts, weights in scoring.ts). */
@@ -67,8 +68,10 @@ const TRANSIT_MASK = [
   'routes.legs.steps.transitDetails.transitLine.nameShort',
   'routes.legs.steps.transitDetails.transitLine.vehicle.type',
 ].join(',');
+// The overview polyline is kept only for traffic (speed intervals index into it);
+// the drawn path comes from the step polylines.
 const ROAD_MASK =
-  'routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline,routes.travelAdvisory.speedReadingIntervals';
+  'routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline,routes.legs.steps.polyline.encodedPolyline,routes.travelAdvisory.speedReadingIntervals';
 
 // ---- Routes API response shapes (only the masked fields) ----
 
@@ -105,6 +108,7 @@ interface RoadResponse {
     duration?: string;
     distanceMeters?: number;
     polyline?: { encodedPolyline?: string };
+    legs?: { steps?: { polyline?: { encodedPolyline?: string } }[] }[];
     travelAdvisory?: {
       speedReadingIntervals?: {
         startPolylinePointIndex?: number;
@@ -483,7 +487,8 @@ interface RoadInfo {
 function parseRoad(res: RoadResponse): RoadInfo | null {
   const r = res.routes?.[0];
   if (!r) return null;
-  const path = decode(r.polyline?.encodedPolyline);
+  const overview = decode(r.polyline?.encodedPolyline);
+  const path = stepPath(r);
   const intervals = (r.travelAdvisory?.speedReadingIntervals ?? []).map((i) => ({
     start: i.startPolylinePointIndex ?? 0,
     end: i.endPolylinePointIndex ?? 0,
@@ -493,7 +498,7 @@ function parseRoad(res: RoadResponse): RoadInfo | null {
     durationSec: seconds(r.duration),
     distanceKm: (r.distanceMeters ?? 0) / 1000,
     path,
-    traffic: trafficLevel(intervals, segmentsKm(path)),
+    traffic: trafficLevel(intervals, segmentsKm(overview)),
   };
 }
 
@@ -612,6 +617,8 @@ export function createGoogleRoutingService(deps: {
           travelMode,
           routingPreference: 'TRAFFIC_AWARE',
           extraComputations: ['TRAFFIC_ON_POLYLINE'],
+          // Follows the streets when zoomed in (overview quality cuts corners).
+          polylineQuality: 'HIGH_QUALITY',
           // Predicted traffic for a later departure (the API rejects past times).
           ...(at.getTime() > Date.now() + 60_000 ? { departureTime: at.toISOString() } : {}),
         },
@@ -625,6 +632,8 @@ export function createGoogleRoutingService(deps: {
           ...ends,
           travelMode: 'TRANSIT',
           computeAlternativeRoutes: true,
+          // Step polylines (walks included) follow the streets instead of cutting blocks.
+          polylineQuality: 'HIGH_QUALITY',
           departureTime: at.toISOString(),
         },
         TRANSIT_MASK,

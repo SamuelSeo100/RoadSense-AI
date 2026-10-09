@@ -40,6 +40,12 @@ function bookingFor(leg: Leg, route: Route): { kind: BookingKind; label: string 
 }
 
 function legTitle(leg: Leg): string {
+  // "~": the path is an estimate (real directions loading or unavailable).
+  const title = baseTitle(leg);
+  return leg.approximate ? `~ ${title}` : title;
+}
+
+function baseTitle(leg: Leg): string {
   const isTransit = leg.mode === 'metro' || leg.mode === 'bus' || leg.mode === 'train';
   if (isTransit && leg.stops)
     return `${leg.label} · ${leg.stops} stop${leg.stops === 1 ? '' : 's'}`;
@@ -129,11 +135,11 @@ export function RouteSteps({
       )}
 
       {route.legs.some((l) => l.approximate) && (
-        <RText variant="small">~ Estimated: straight-line distance, not live directions.</RText>
+        <RText variant="small">~ Estimated path: exact directions aren’t available yet.</RText>
       )}
 
       <PrimaryButton
-        label={isWalkOnly ? 'Start walking' : 'Start'}
+        label="I’m taking this"
         trailingIcon="arrow-right"
         height={48}
         onPress={onStart}

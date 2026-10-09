@@ -4,9 +4,9 @@ import { PixelRatio, Platform, StyleSheet } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, Polyline, type LatLng } from 'react-native-maps';
 
 import { fallbackOrigin } from '@/services';
-import { modeColors } from '@/theme/routly';
+import { colors, modeColors } from '@/theme/routly';
 
-import { DestinationPin, ModeBadge, TransferDot } from './MapMarkers';
+import { DestinationPin, LegBadge, StartMarker } from './MapMarkers';
 import { mapStyle, tint } from './mapStyle';
 import type { MapContent } from './mapStore';
 
@@ -31,21 +31,29 @@ const googleMapsConfigured = Constants.expoConfig?.extra?.googleMapsConfigured =
 const inExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
 const useGoogle = Platform.OS === 'android' || (googleMapsConfigured && !inExpoGo);
 
-/**
- * Routes are solid (opaque) but faint, so the live traffic lines stay legible
- * on top: the selected route is the mode colour lightened 35%, alternatives 75%.
- */
-const ROUTE_TINT = 0.35;
+/** Unselected alternatives (when several are drawn) are the mode colour lightened 75%. */
 const FADED_TINT = 0.75;
-const EDGE = 40;
+/** Rides: a solid mode-colour line over a slightly wider white outline (dp). */
+const LINE_WIDTH = 5.5;
+const OUTLINE_WIDTH = 8.5;
+/** Side padding when framing a route: room for the destination label chip. */
+const EDGE = 72;
+/** Below the top bar: the live pill and the legend chip. */
+const TOP_CHIPS = 112;
 /** Half-span (degrees) of the box kept around the user when centring on them. */
 const USER_SPAN = 0.006;
 
 /**
- * Walk legs are dotted. Android turns pattern items into true dots when the
- * cap is round (gap in px); iOS gets short dashes with round caps (points).
+ * Walk legs: small, tightly spaced dots that follow the path. Android turns
+ * pattern items into true dots when the cap is round (lengths in px); iOS
+ * gets short dashes with round caps (points).
  */
-const WALK_PATTERN = Platform.OS === 'android' ? [1, 9 * PixelRatio.get()] : [1, 9];
+const px = (dp: number) => (Platform.OS === 'android' ? dp * PixelRatio.get() : dp);
+const WALK_WIDTH = 4.5;
+const WALK_PATTERN = [1, px(6)];
+/** Estimated legs (real geometry loading or unavailable): thin gray dashes. */
+const ESTIMATE_WIDTH = 2.5;
+const ESTIMATE_PATTERN = [px(7), px(5)];
 
 const userBox = (p: LatLng): LatLng[] => [
   { latitude: p.latitude + USER_SPAN, longitude: p.longitude + USER_SPAN },
@@ -84,7 +92,14 @@ export function LiveMap({
     () => (selection === 'none' ? [] : (content?.routes ?? [])),
     [content, selection],
   );
-  const tracks = useTracksViewChanges(`${selection}|${routes.map((r) => r.id).join()}`);
+  // Re-snapshot markers when the selection or its geometry changes (estimates resolving).
+  const tracks = useTracksViewChanges(
+    `${selection}|${routes
+      .map(
+        (r) => `${r.id}:${r.legs.map((l) => (l.approximate ? '~' : l.polyline?.length)).join('.')}`,
+      )
+      .join()}`,
+  );
 
   // Selected route drawn last, so it sits on top of the faded alternatives.
   const ordered = useMemo(
@@ -102,13 +117,19 @@ export function LiveMap({
     const map = mapRef.current;
     if (!ready || !map) return;
     const edgePadding = {
-      top: insets.top + 72,
+      top: insets.top + TOP_CHIPS,
       bottom: insets.bottom + 24,
       left: EDGE,
       right: EDGE,
     };
     const picked = selection === 'all' ? routes : routes.filter((r) => r.id === selection);
-    const coords = focused ? picked.flatMap((r) => r.legs.flatMap((l) => l.polyline ?? [])) : [];
+    // The whole route plus the destination pin (its label hangs above it).
+    const coords = focused
+      ? [
+          ...picked.flatMap((r) => r.legs.flatMap((l) => l.polyline ?? [])),
+          ...(content?.destination ? [content.destination.location] : []),
+        ]
+      : [];
     const first = coords[0];
     const last = coords[coords.length - 1];
     const frame = `${insets.top}:${insets.bottom}`;
@@ -130,7 +151,7 @@ export function LiveMap({
   useEffect(() => {
     if (!ready || recenterKey === 0 || !mapRef.current) return;
     mapRef.current.fitToCoordinates(userBox(origin), {
-      edgePadding: { top: insets.top + 72, bottom: insets.bottom + 24, left: EDGE, right: EDGE },
+      edgePadding: { top: insets.top + 72, bottom: insets.bottom + 24, left: 40, right: 40 },
       animated: true,
     });
     // Only on button presses.
@@ -158,63 +179,95 @@ export function LiveMap({
     >
       {ordered.map((route) => {
         const highlighted = selection === 'all' || route.id === selection;
-        const lighten = highlighted ? ROUTE_TINT : FADED_TINT;
         return route.legs.map((leg, i) => {
           if (!leg.polyline || leg.polyline.length < 2) return null;
-          const walk = leg.mode === 'walk';
-          return (
+          const key = `${route.id}-${i}`;
+          const z = highlighted ? 2 : 1;
+          if (leg.approximate) {
+            return (
+              <Polyline
+                // Pattern changes don't always re-apply natively: remount per style.
+                key={`${key}-estimate`}
+                coordinates={leg.polyline}
+                strokeColor={colors.toggleOff}
+                strokeWidth={ESTIMATE_WIDTH}
+                lineCap="butt"
+                lineDashPattern={ESTIMATE_PATTERN}
+                zIndex={z}
+              />
+            );
+          }
+          if (leg.mode === 'walk') {
+            return (
+              <Polyline
+                key={`${key}-dots`}
+                coordinates={leg.polyline}
+                strokeColor={tint(modeColors.walk.line, highlighted ? 0 : FADED_TINT)}
+                strokeWidth={WALK_WIDTH}
+                lineCap="round"
+                lineJoin="round"
+                lineDashPattern={WALK_PATTERN}
+                zIndex={z + 1}
+              />
+            );
+          }
+          const color = tint(modeColors[leg.mode].line, highlighted ? 0 : FADED_TINT);
+          return [
             <Polyline
-              // Pattern changes don't always re-apply natively: remount per style.
-              key={`${route.id}-${i}-${walk ? 'dot' : 'solid'}`}
+              key={`${key}-outline`}
               coordinates={leg.polyline}
-              strokeColor={tint(modeColors[leg.mode].line, walk ? 0 : lighten)}
-              strokeWidth={6}
-              // Butt caps: solid legs meet end to end without darker overlap dots.
-              lineCap={walk ? 'round' : 'butt'}
+              strokeColor={colors.surface}
+              strokeWidth={OUTLINE_WIDTH}
+              lineCap="round"
               lineJoin="round"
-              lineDashPattern={walk ? WALK_PATTERN : undefined}
-              zIndex={highlighted ? 2 : 1}
-            />
-          );
+              zIndex={z}
+            />,
+            <Polyline
+              key={`${key}-solid`}
+              coordinates={leg.polyline}
+              strokeColor={color}
+              strokeWidth={LINE_WIDTH}
+              lineCap="round"
+              lineJoin="round"
+              zIndex={z}
+            />,
+          ];
         });
       })}
 
       {ordered
+        .filter((r) => selection === 'all' || r.id === selection)
+        .map((route) => {
+          const start = route.legs[0]?.polyline?.[0];
+          return start ? (
+            <Marker
+              key={`start-${route.id}`}
+              coordinate={start}
+              anchor={{ x: 0.5, y: 0.5 }}
+              tracksViewChanges={tracks}
+              zIndex={4}
+              accessibilityLabel="Start"
+            >
+              <StartMarker />
+            </Marker>
+          ) : null;
+        })}
+
+      {ordered
         .filter((r) => !content?.plain && (selection === 'all' || r.id === selection))
         .flatMap((route) =>
-          // Transfer points: where one leg hands over to the next.
+          // Leg changes: a badge with the next leg's mode.
           route.legs.slice(1).map((leg, i) => {
             const at = leg.polyline?.[0];
             return at ? (
               <Marker
-                key={`transfer-${route.id}-${i}`}
+                key={`change-${route.id}-${i}`}
                 coordinate={at}
                 anchor={{ x: 0.5, y: 0.5 }}
                 tracksViewChanges={tracks}
                 zIndex={3}
               >
-                <TransferDot mode={leg.mode} />
-              </Marker>
-            ) : null;
-          }),
-        )}
-
-      {ordered
-        .filter((r) => !content?.plain && (selection === 'all' || r.id === selection))
-        .flatMap((route) =>
-          route.legs.map((leg, i) => {
-            // Walk legs are recognisable by their dots; badges only for rides.
-            if (leg.mode === 'walk') return null;
-            const mid = leg.polyline?.[Math.floor(leg.polyline.length / 2)];
-            return mid ? (
-              <Marker
-                key={`badge-${route.id}-${i}`}
-                coordinate={mid}
-                anchor={{ x: 0.5, y: 0.5 }}
-                tracksViewChanges={tracks}
-                zIndex={3}
-              >
-                <ModeBadge mode={leg.mode} />
+                <LegBadge mode={leg.mode} />
               </Marker>
             ) : null;
           }),

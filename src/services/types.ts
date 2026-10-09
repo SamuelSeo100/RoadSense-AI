@@ -336,6 +336,11 @@ export interface DirectionsService {
     to: LatLng,
     opts?: { signal?: AbortSignal; at?: Date },
   ): Promise<WalkingRoute>;
+  /**
+   * Road geometry for an estimated auto leg (step-level, high quality).
+   * Rejects when no route is found.
+   */
+  driving(from: LatLng, to: LatLng, opts?: { signal?: AbortSignal }): Promise<LatLng[]>;
 }
 
 /** An area to route around: crime reports, unlit stretches, closures… */

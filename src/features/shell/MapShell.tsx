@@ -1,9 +1,14 @@
 import BottomSheet, { useBottomSheetTimingConfigs } from '@gorhom/bottom-sheet';
 import { router, usePathname } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { StyleSheet, useWindowDimensions, View } from 'react-native';
+import { StyleSheet, useWindowDimensions } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Easing } from 'react-native-reanimated';
+import Animated, {
+  Easing,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LiveMap } from '@/features/map/LiveMap';
@@ -89,6 +94,27 @@ export function MapShell({ children }: { children: ReactNode }) {
     [sheetIndex, setSheetIndex, tab],
   );
 
+  /** Modes on the map's selected route, in order of travel (legend chip). */
+  const legend = useMemo(() => {
+    const shown = mapContent?.routes.find((r) => r.id === mapContent.selection);
+    return shown ? [...new Set(shown.legs.map((l) => l.mode))] : [];
+  }, [mapContent]);
+
+  /**
+   * At the collapsed snap point only the handle may show: the content fades
+   * out (and stops taking touches) so it never sits under the nav pill or the
+   * gesture bar.
+   */
+  const animatedIndex = useSharedValue<number>(sheetIndex);
+  const contentStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(
+      animatedIndex.value,
+      [SHEET_COLLAPSED, SHEET_COLLAPSED + 0.4],
+      [0, 1],
+      'clamp',
+    ),
+  }));
+
   const [satellite, setSatellite] = useState(false);
   // Traffic lines: Profile › Travel preferences (persisted).
   const traffic = useRoutlyPrefs((s) => s.prefs?.showTraffic ?? true);
@@ -132,12 +158,14 @@ export function MapShell({ children }: { children: ReactNode }) {
         }}
         satellite={satellite}
         traffic={traffic}
+        legend={legend}
       />
 
       {measured && (
         <BottomSheet
           ref={sheetRef}
           index={sheetIndex}
+          animatedIndex={animatedIndex}
           snapPoints={snapPoints}
           enableDynamicSizing={false}
           enablePanDownToClose={false}
@@ -152,7 +180,12 @@ export function MapShell({ children }: { children: ReactNode }) {
             if (isSheetIndex(index)) setSheetIndex(tab, index);
           }}
         >
-          <View style={styles.sheetContent}>{children}</View>
+          <Animated.View
+            style={[styles.sheetContent, contentStyle]}
+            pointerEvents={sheetIndex === SHEET_COLLAPSED ? 'none' : 'auto'}
+          >
+            {children}
+          </Animated.View>
         </BottomSheet>
       )}
 

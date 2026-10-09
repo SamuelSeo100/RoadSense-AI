@@ -4,18 +4,27 @@ import { Icon, modeIcon } from '@/components/routly/Icon';
 import { RText } from '@/components/routly/RText';
 import { colors, fonts, modeColors, shadows, type Mode } from '@/theme/routly';
 
-/** 36px mode-coloured circle with a white icon and a 3px white ring. */
-export function ModeBadge({ mode }: { mode: Mode }) {
+/**
+ * At each leg change: a small circle in the next leg's colour with its mode
+ * icon. Fixed-size box (Android snapshots markers at their root size).
+ */
+export function LegBadge({ mode }: { mode: Mode }) {
   return (
-    <View style={[styles.badge, { backgroundColor: modeColors[mode].line }]}>
-      <Icon name={modeIcon[mode]} size={16} color={colors.textOnPrimary} strokeWidth={2.2} />
+    <View style={styles.legBox} collapsable={false}>
+      <View style={[styles.legBadge, { backgroundColor: modeColors[mode].line }]}>
+        <Icon name={modeIcon[mode]} size={12} color={colors.textOnPrimary} strokeWidth={2.4} />
+      </View>
     </View>
   );
 }
 
-/** Small white dot ringed in the next leg's colour, at a transfer point. */
-export function TransferDot({ mode }: { mode: Mode }) {
-  return <View style={[styles.transfer, { borderColor: modeColors[mode].line }]} />;
+/** Where the trip starts: a green ring. */
+export function StartMarker() {
+  return (
+    <View style={styles.legBox} collapsable={false}>
+      <View style={styles.startRing} />
+    </View>
+  );
 }
 
 /** Red destination pin with the place-name chip above it. */
@@ -38,7 +47,9 @@ export function DestinationPin({ name }: { name: string }) {
  * give label + pin markers a fixed box (content bottom-centred) or the lower
  * part gets clipped.
  */
-export const MARKER_BOX = { width: 200, height: 84 };
+export const MARKER_BOX = { width: 160, height: 84 };
+/** Leg badges and the start ring. */
+const SMALL_BOX = 30;
 
 const styles = StyleSheet.create({
   markerBox: { ...MARKER_BOX, alignItems: 'center', justifyContent: 'flex-end' },
@@ -51,20 +62,22 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     ...shadows.mapControl,
   },
-  badge: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    borderWidth: 3,
+  legBox: { width: SMALL_BOX, height: SMALL_BOX, alignItems: 'center', justifyContent: 'center' },
+  legBadge: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
     borderColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  transfer: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    borderWidth: 3,
+  startRing: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 5,
+    borderColor: modeColors.metro.line,
     backgroundColor: colors.surface,
   },
   pinHead: {

@@ -24,5 +24,10 @@ export function createMockDirectionsService(): DirectionsService {
         safety: { night: isNight(opts?.at ?? new Date()), extraSec: 0, notes: [] },
       };
     },
+
+    async driving() {
+      // No road data offline: the leg stays an estimate (dashed on the map).
+      throw new Error('Offline: no road geometry.');
+    },
   };
 }

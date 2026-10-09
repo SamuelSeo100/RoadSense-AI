@@ -5,13 +5,30 @@ import { isNight, pickSafest } from '../walkSafety';
 import { googleRequest } from './googleClient';
 import { decodePolyline } from './polyline';
 
+interface DriveResponse {
+  routes?: {
+    polyline?: { encodedPolyline?: string };
+    legs?: { steps?: { polyline?: { encodedPolyline?: string } }[] }[];
+  }[];
+}
+
+/** Concatenated step polylines (fall back to the overview when steps are missing). */
+export function stepPath(route: NonNullable<DriveResponse['routes']>[number] | undefined) {
+  const steps = (route?.legs ?? []).flatMap((l) => l.steps ?? []);
+  const path = steps.flatMap((st) =>
+    st.polyline?.encodedPolyline ? decodePolyline(st.polyline.encodedPolyline) : [],
+  );
+  if (path.length > 1) return path;
+  return route?.polyline?.encodedPolyline ? decodePolyline(route.polyline.encodedPolyline) : [];
+}
+
 interface ComputeRoutesResponse {
   routes?: {
     distanceMeters?: number;
     duration?: string;
     description?: string;
     warnings?: string[];
-    legs?: { steps?: unknown[] }[];
+    legs?: { steps?: { distanceMeters?: number; polyline?: { encodedPolyline?: string } }[] }[];
     polyline?: { encodedPolyline?: string };
   }[];
 }
@@ -27,6 +44,7 @@ const waypoint = (p: LatLng) => ({ location: { latLng: p } });
  */
 export function createGoogleDirectionsService(safety: SafetyService): DirectionsService {
   const cache = new LruCache<string, WalkingRoute>(30);
+  const driveCache = new LruCache<string, LatLng[]>(30);
   /** Concurrent requests for the same walk (Routes screen + routing service) share one call. */
   const pending = new Map<string, Promise<WalkingRoute>>();
 
@@ -44,6 +62,31 @@ export function createGoogleDirectionsService(safety: SafetyService): Directions
       pending.set(key, request);
       return request;
     },
+
+    async driving(from, to, opts) {
+      const key = `${keyOf(from)}>${keyOf(to)}`;
+      const cached = driveCache.get(key);
+      if (cached) return cached;
+      const res = await googleRequest<DriveResponse>(
+        'https://routes.googleapis.com/directions/v2:computeRoutes',
+        {
+          signal: opts?.signal,
+          fieldMask: 'routes.polyline.encodedPolyline,routes.legs.steps.polyline.encodedPolyline',
+          body: {
+            origin: waypoint(from),
+            destination: waypoint(to),
+            travelMode: 'DRIVE',
+            polylineQuality: 'HIGH_QUALITY',
+            languageCode: 'en-IN',
+            units: 'METRIC',
+          },
+        },
+      );
+      const path = stepPath(res.routes?.[0]);
+      if (path.length < 2) throw new Error('No road route found.');
+      driveCache.set(key, path);
+      return path;
+    },
   };
 
   async function fetchWalking(
@@ -59,7 +102,7 @@ export function createGoogleDirectionsService(safety: SafetyService): Directions
         {
           signal,
           fieldMask:
-            'routes.distanceMeters,routes.duration,routes.description,routes.warnings,routes.legs.steps.distanceMeters,routes.polyline.encodedPolyline',
+            'routes.distanceMeters,routes.duration,routes.description,routes.warnings,routes.legs.steps.distanceMeters,routes.legs.steps.polyline.encodedPolyline,routes.polyline.encodedPolyline',
           body: {
             origin: waypoint(from),
             destination: waypoint(to),
@@ -89,6 +132,7 @@ export function createGoogleDirectionsService(safety: SafetyService): Directions
           steps: (r.legs ?? []).reduce((n, l) => n + (l.steps?.length ?? 0), 0),
           via: r.description,
           path: zones.length ? decodePolyline(encoded) : undefined,
+          route: r,
         },
       ];
     });
@@ -98,7 +142,8 @@ export function createGoogleDirectionsService(safety: SafetyService): Directions
     const route: WalkingRoute = {
       distanceMeters: best.distanceMeters,
       durationSec: best.durationSec,
-      path: best.path ?? decodePolyline(best.encoded),
+      // Step-level geometry (follows footpaths); the overview is only a fallback.
+      path: stepPath(best.route),
       via: best.via,
       warnings: best.warnings,
       safety: { night, extraSec, notes },
