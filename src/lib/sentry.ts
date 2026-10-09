@@ -36,7 +36,8 @@ const beforeBreadcrumb: Sentry.ReactNativeOptions['beforeBreadcrumb'] = (crumb) 
     case 'fetch':
     case 'xhr': {
       const data = { ...crumb.data };
-      if (typeof data.url === 'string') data.url = stripQuery(data.url);
+      // Coordinates can be in the path too (Geocoding: /geocode/location/{lat},{lng}).
+      if (typeof data.url === 'string') data.url = scrub(stripQuery(data.url));
       return { ...crumb, data };
     }
     case 'navigation': {
@@ -58,7 +59,7 @@ const beforeSend: Sentry.ReactNativeOptions['beforeSend'] = (event) => {
   for (const ex of event.exception?.values ?? []) {
     if (ex.value) ex.value = scrub(ex.value);
   }
-  if (event.request?.url) event.request.url = stripQuery(event.request.url);
+  if (event.request?.url) event.request.url = scrub(stripQuery(event.request.url));
   if (event.user) event.user = { id: event.user.id };
   return event;
 };

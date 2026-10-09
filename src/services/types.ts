@@ -280,8 +280,30 @@ export interface PreferencesService {
 
 export type LocationPermission = 'granted' | 'denied';
 
+/** Why a fresh fix failed: no permission (`canAskAgain` false → only Settings helps), or no fix in time. */
+export class LocationFixError extends Error {
+  constructor(
+    readonly reason: 'denied' | 'timeout' | 'unavailable',
+    readonly canAskAgain = true,
+  ) {
+    super(reason);
+    this.name = 'LocationFixError';
+  }
+}
+
+export interface LocationFix {
+  position: LatLng;
+  /** Radius of uncertainty in metres, when the OS reports it. */
+  accuracyM: number | null;
+}
+
 export interface LocationService {
   requestPermission(): Promise<LocationPermission>;
+  /**
+   * A fresh, high-accuracy fix (never the cached last position). Asks for
+   * permission if needed. Rejects with LocationFixError.
+   */
+  currentFix(opts: { timeoutMs: number }): Promise<LocationFix>;
   /** Returns an unsubscribe function. */
   watch(cb: (pos: LatLng) => void): () => void;
   /** Neighbourhood name for "You · {area}", or null when unknown. */
@@ -308,6 +330,18 @@ export interface PlacesService {
   ): Promise<PlaceSuggestion[]>;
   /** Coordinates and name for a picked suggestion (ends the session). */
   details(placeId: string, opts: { sessionToken: string; signal?: AbortSignal }): Promise<Place>;
+  /**
+   * Readable name for a point ("Vishwananda Apartment, Nehru Nagar"): a
+   * building or street plus the neighbourhood, never a nearby business.
+   * `placeId` is the geocode result's id, when there is one.
+   */
+  reverseGeocode(at: LatLng, opts?: { signal?: AbortSignal }): Promise<ReverseGeocodeResult>;
+}
+
+export interface ReverseGeocodeResult {
+  /** Building / street + neighbourhood; falls back to the neighbourhood, then "Pinned location". */
+  name: string;
+  placeId: string | null;
 }
 
 export interface WalkingRoute {

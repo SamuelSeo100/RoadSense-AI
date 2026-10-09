@@ -1,6 +1,6 @@
 import * as Location from 'expo-location';
 
-import type { LocationService } from './types';
+import { LocationFixError, type LocationService } from './types';
 
 /** Device location via expo-location (foreground only). */
 export function createLocationService(): LocationService {
@@ -8,6 +8,36 @@ export function createLocationService(): LocationService {
     async requestPermission() {
       const { status } = await Location.requestForegroundPermissionsAsync();
       return status === Location.PermissionStatus.GRANTED ? 'granted' : 'denied';
+    },
+
+    async currentFix({ timeoutMs }) {
+      let permission = await Location.getForegroundPermissionsAsync();
+      if (!permission.granted && permission.canAskAgain) {
+        permission = await Location.requestForegroundPermissionsAsync();
+      }
+      if (!permission.granted) throw new LocationFixError('denied', permission.canAskAgain);
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      const timeout = new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new LocationFixError('timeout')), timeoutMs);
+      });
+      try {
+        // A fresh fix (not getLastKnownPositionAsync): the cached one can be far off indoors.
+        const { coords } = await Promise.race([
+          Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Highest,
+            mayShowUserSettingsDialog: true,
+          }),
+          timeout,
+        ]);
+        return {
+          position: { latitude: coords.latitude, longitude: coords.longitude },
+          accuracyM: coords.accuracy ?? null,
+        };
+      } catch (e) {
+        throw e instanceof LocationFixError ? e : new LocationFixError('unavailable');
+      } finally {
+        clearTimeout(timer);
+      }
     },
 
     watch(cb) {

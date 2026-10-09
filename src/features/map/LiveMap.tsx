@@ -8,7 +8,7 @@ import { colors, modeColors } from '@/theme/routly';
 
 import { DestinationPin, LegBadge, StartMarker } from './MapMarkers';
 import { mapStyle, tint } from './mapStyle';
-import type { MapContent } from './mapStore';
+import { useMapStore, type MapContent } from './mapStore';
 
 export interface LiveMapProps {
   content: MapContent | undefined;
@@ -29,7 +29,7 @@ export interface LiveMapProps {
  */
 const googleMapsConfigured = Constants.expoConfig?.extra?.googleMapsConfigured === true;
 const inExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
-const useGoogle = Platform.OS === 'android' || (googleMapsConfigured && !inExpoGo);
+export const googleMaps = Platform.OS === 'android' || (googleMapsConfigured && !inExpoGo);
 
 /** Unselected alternatives (when several are drawn) are the mode colour lightened 75%. */
 const FADED_TINT = 0.75;
@@ -162,8 +162,8 @@ export function LiveMap({
     <MapView
       ref={mapRef}
       style={StyleSheet.absoluteFill}
-      provider={useGoogle ? PROVIDER_GOOGLE : undefined}
-      customMapStyle={useGoogle && !satellite ? mapStyle : undefined}
+      provider={googleMaps ? PROVIDER_GOOGLE : undefined}
+      customMapStyle={googleMaps && !satellite ? mapStyle : undefined}
       mapType={satellite ? 'hybrid' : 'standard'}
       showsTraffic={traffic}
       // Native location dot: drawn by the map engine (no marker snapshots,
@@ -174,6 +174,9 @@ export function LiveMap({
       showsPointsOfInterests={false}
       toolbarEnabled={false}
       onMapReady={() => setReady(true)}
+      onRegionChangeComplete={(r) =>
+        useMapStore.getState().setMapCenter({ latitude: r.latitude, longitude: r.longitude })
+      }
       initialRegion={{ ...origin, latitudeDelta: 0.12, longitudeDelta: 0.12 }}
       accessibilityLabel="Live map"
     >

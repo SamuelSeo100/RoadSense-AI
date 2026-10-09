@@ -34,6 +34,9 @@ interface MapState {
   userLocation: LatLng | null;
   area: string | null;
   locationStatus: LocationStatus;
+  /** Centre of the main map after the last pan/zoom ("Choose on map" starts here). */
+  mapCenter: LatLng | null;
+  setMapCenter: (center: LatLng) => void;
   setContent: (tab: TabName, content: MapContent) => void;
   setUserLocation: (pos: LatLng) => void;
   setArea: (area: string | null) => void;
@@ -45,6 +48,8 @@ export const useMapStore = create<MapState>()((set) => ({
   userLocation: null,
   area: null,
   locationStatus: 'unknown',
+  mapCenter: null,
+  setMapCenter: (mapCenter) => set({ mapCenter }),
   setContent: (tab, content) => set((s) => ({ content: { ...s.content, [tab]: content } })),
   setUserLocation: (userLocation) => set({ userLocation }),
   setArea: (area) => set({ area }),

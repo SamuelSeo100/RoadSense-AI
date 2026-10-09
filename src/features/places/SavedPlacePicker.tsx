@@ -3,6 +3,7 @@ import { useState } from 'react';
 import {
   ActivityIndicator,
   Keyboard,
+  Linking,
   Modal,
   Pressable,
   ScrollView,
@@ -16,11 +17,21 @@ import { Icon } from '@/components/routly/Icon';
 import { PressableBox } from '@/components/routly/PressableBox';
 import { RText } from '@/components/routly/RText';
 import { confirm } from '@/lib/confirm';
-import { placesService, type Place, type PlaceSuggestion, type SavedPlace } from '@/services';
+import {
+  fallbackOrigin,
+  locationService,
+  LocationFixError,
+  placesService,
+  type Place,
+  type PlaceSuggestion,
+  type SavedPlace,
+} from '@/services';
 import { colors, fonts, radius } from '@/theme/routly';
 
 import { useMapStore } from '../map/mapStore';
 import { usePlaceAutocomplete } from '../trip/usePlaceAutocomplete';
+
+import { PinConfirm, type PinStart } from './PinConfirm';
 
 import {
   isFixedLabel,
@@ -39,6 +50,12 @@ interface SavedPlacePickerProps {
   /** After a successful save (e.g. Home chips plan the trip right away). */
   onSaved?: (label: string, place: Place) => void;
 }
+
+/** A fresh GPS fix; then the confirm step lets the user nudge the pin. */
+const FIX_TIMEOUT_MS = 15_000;
+
+type LocateState =
+  { status: 'idle' } | { status: 'locating' } | { status: 'denied' } | { status: 'failed' };
 
 const errorMessage = (e: unknown) =>
   e instanceof Error && /limit/i.test(e.message)
@@ -79,6 +96,9 @@ function PickerBody({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sessionToken, setSessionToken] = useState(() => Crypto.randomUUID());
+  const [locate, setLocate] = useState<LocateState>({ status: 'idle' });
+  /** Set → the confirm step (map with a fixed pin) replaces the search. */
+  const [pin, setPin] = useState<PinStart | null>(null);
   const { suggestions, loading, failed } = usePlaceAutocomplete(query, {
     enabled: !busy,
     sessionToken,
@@ -111,6 +131,37 @@ function PickerBody({
     } finally {
       setBusy(false);
     }
+  };
+
+  const useMyLocation = async () => {
+    Keyboard.dismiss();
+    setError(null);
+    setLocate({ status: 'locating' });
+    try {
+      const { position, accuracyM } = await locationService.currentFix({
+        timeoutMs: FIX_TIMEOUT_MS,
+      });
+      const geo = await placesService
+        .reverseGeocode(position)
+        .catch(() => ({ name: 'Pinned location', placeId: null }));
+      setLocate({ status: 'idle' });
+      setPin({ center: position, accuracyM, name: geo.name, placeId: geo.placeId });
+    } catch (e) {
+      setLocate({
+        status: e instanceof LocationFixError && e.reason === 'denied' ? 'denied' : 'failed',
+      });
+    }
+  };
+
+  const chooseOnMap = () => {
+    Keyboard.dismiss();
+    setError(null);
+    setLocate({ status: 'idle' });
+    const map = useMapStore.getState();
+    setPin({
+      center: map.mapCenter ?? map.userLocation ?? fallbackOrigin.location,
+      accuracyM: null,
+    });
   };
 
   const pick = async (s: PlaceSuggestion) => {
@@ -165,6 +216,8 @@ function PickerBody({
       : `Set ${entry.label}`
     : 'Add a place';
   const renamed = entry?.place !== undefined && !fixed && trimmedLabel !== entry.label;
+  const slot = fixed && entry ? entry.label : trimmedLabel;
+  const saveLabel = slot ? `Save as ${slot}` : 'Save place';
 
   return (
     <View style={[styles.screen, { paddingTop: insets.top + 8, paddingBottom: insets.bottom }]}>
@@ -204,105 +257,182 @@ function PickerBody({
           </View>
         )}
 
-        {entry?.place && (
-          <View style={styles.current}>
-            <Icon name="pin" size={18} color={colors.primary} />
-            <View style={styles.flex}>
-              <RText variant="caption">Current address</RText>
-              <RText variant="body" family={fonts.bold} numberOfLines={2}>
-                {entry.place.name}
-              </RText>
-            </View>
-          </View>
-        )}
-
-        <View style={styles.field}>
-          <RText variant="fieldLabel">{entry?.place ? 'New address' : 'Address'}</RText>
-          <TextInput
-            value={query}
-            onChangeText={(text) => {
-              setQuery(text);
+        {pin ? (
+          <PinConfirm
+            start={pin}
+            saveLabel={saveLabel}
+            busy={busy}
+            error={error}
+            onSave={(place) => void save(place)}
+            onBack={() => {
+              setPin(null);
               setError(null);
             }}
-            placeholder="Search for a place or address"
-            placeholderTextColor={colors.textSecondary}
-            autoFocus={fixed}
-            accessibilityLabel="Search address"
-            returnKeyType="search"
-            style={styles.input}
           />
-        </View>
+        ) : (
+          <>
+            {entry?.place && (
+              <View style={styles.current}>
+                <Icon name="pin" size={18} color={colors.primary} />
+                <View style={styles.flex}>
+                  <RText variant="caption">Current address</RText>
+                  <RText variant="body" family={fonts.bold} numberOfLines={2}>
+                    {entry.place.name}
+                  </RText>
+                </View>
+              </View>
+            )}
 
-        {query.trim().length > 0 && (
-          <View style={styles.suggestions} accessibilityRole="list">
-            {suggestions.map((s) => (
+            <View style={styles.suggestions}>
               <PressableBox
-                key={s.placeId}
-                onPress={() => pick(s)}
-                disabled={busy}
+                onPress={useMyLocation}
+                disabled={busy || locate.status === 'locating'}
                 accessibilityRole="button"
-                accessibilityLabel={[s.primary, s.secondary].filter(Boolean).join(', ')}
-                style={styles.suggestion}
+                accessibilityLabel="Use my current location"
+                style={[styles.suggestion, styles.optionRow]}
                 pressedStyle={styles.pressed}
               >
-                <RText variant="body" numberOfLines={1}>
-                  {s.primary}
+                <RText variant="body" family={fonts.bold}>
+                  📍 Use my current location
                 </RText>
-                {!!s.secondary && (
-                  <RText variant="caption" numberOfLines={1}>
-                    {s.secondary}
-                  </RText>
-                )}
               </PressableBox>
-            ))}
-            {loading && suggestions.length === 0 && (
-              <View style={styles.suggestion}>
-                <ActivityIndicator color={colors.primary} />
-              </View>
-            )}
-            {!loading && suggestions.length === 0 && (
-              <View style={styles.suggestion}>
-                <RText variant="caption">
-                  {failed ? 'Search isn’t available right now.' : 'No places found.'}
+              {locate.status === 'locating' && (
+                <View
+                  style={[styles.suggestion, styles.optionRow]}
+                  accessibilityLiveRegion="polite"
+                >
+                  <ActivityIndicator color={colors.primary} />
+                  <RText variant="caption">Getting your location…</RText>
+                </View>
+              )}
+              {locate.status === 'failed' && (
+                <View style={styles.suggestion} accessibilityLiveRegion="polite">
+                  <RText variant="caption" color={colors.danger}>
+                    Couldn’t get your location. Try again outside or near a window.
+                  </RText>
+                </View>
+              )}
+              {locate.status === 'denied' && (
+                <View
+                  style={[styles.suggestion, styles.deniedRow]}
+                  accessibilityLiveRegion="polite"
+                >
+                  <RText variant="caption" style={styles.flex}>
+                    Location is off for Routly. Allow it to use where you are.
+                  </RText>
+                  <Pressable
+                    onPress={() => void Linking.openSettings()}
+                    accessibilityRole="button"
+                    hitSlop={8}
+                  >
+                    <RText variant="body" size={13} family={fonts.extrabold} color={colors.primary}>
+                      Open settings
+                    </RText>
+                  </Pressable>
+                </View>
+              )}
+              <PressableBox
+                onPress={chooseOnMap}
+                disabled={busy}
+                accessibilityRole="button"
+                accessibilityLabel="Choose on map"
+                style={[styles.suggestion, styles.optionRow]}
+                pressedStyle={styles.pressed}
+              >
+                <RText variant="body" family={fonts.bold}>
+                  🗺️ Choose on map
                 </RText>
+              </PressableBox>
+            </View>
+
+            <View style={styles.field}>
+              <RText variant="fieldLabel">{entry?.place ? 'New address' : 'Address'}</RText>
+              <TextInput
+                value={query}
+                onChangeText={(text) => {
+                  setQuery(text);
+                  setError(null);
+                }}
+                placeholder="Search for a place or address"
+                placeholderTextColor={colors.textSecondary}
+                accessibilityLabel="Search address"
+                returnKeyType="search"
+                style={styles.input}
+              />
+            </View>
+
+            {query.trim().length > 0 && (
+              <View style={styles.suggestions} accessibilityRole="list">
+                {suggestions.map((s) => (
+                  <PressableBox
+                    key={s.placeId}
+                    onPress={() => pick(s)}
+                    disabled={busy}
+                    accessibilityRole="button"
+                    accessibilityLabel={[s.primary, s.secondary].filter(Boolean).join(', ')}
+                    style={styles.suggestion}
+                    pressedStyle={styles.pressed}
+                  >
+                    <RText variant="body" numberOfLines={1}>
+                      {s.primary}
+                    </RText>
+                    {!!s.secondary && (
+                      <RText variant="caption" numberOfLines={1}>
+                        {s.secondary}
+                      </RText>
+                    )}
+                  </PressableBox>
+                ))}
+                {loading && suggestions.length === 0 && (
+                  <View style={styles.suggestion}>
+                    <ActivityIndicator color={colors.primary} />
+                  </View>
+                )}
+                {!loading && suggestions.length === 0 && (
+                  <View style={styles.suggestion}>
+                    <RText variant="caption">
+                      {failed ? 'Search isn’t available right now.' : 'No places found.'}
+                    </RText>
+                  </View>
+                )}
               </View>
             )}
-          </View>
-        )}
 
-        {error && (
-          <RText variant="body" color={colors.danger} accessibilityLiveRegion="polite">
-            {error}
-          </RText>
-        )}
-        {busy && <ActivityIndicator color={colors.primary} />}
+            {error && (
+              <RText variant="body" color={colors.danger} accessibilityLiveRegion="polite">
+                {error}
+              </RText>
+            )}
+            {busy && <ActivityIndicator color={colors.primary} />}
 
-        {renamed && (
-          <PressableBox
-            onPress={rename}
-            disabled={busy}
-            accessibilityRole="button"
-            style={styles.primary}
-            pressedStyle={styles.primaryPressed}
-          >
-            <RText variant="body" family={fonts.extrabold} color={colors.textOnPrimary}>
-              Save name
-            </RText>
-          </PressableBox>
-        )}
+            {renamed && (
+              <PressableBox
+                onPress={rename}
+                disabled={busy}
+                accessibilityRole="button"
+                style={styles.primary}
+                pressedStyle={styles.primaryPressed}
+              >
+                <RText variant="body" family={fonts.extrabold} color={colors.textOnPrimary}>
+                  Save name
+                </RText>
+              </PressableBox>
+            )}
 
-        {entry?.place && (
-          <Pressable
-            onPress={remove}
-            disabled={busy}
-            accessibilityRole="button"
-            hitSlop={6}
-            style={styles.delete}
-          >
-            <RText variant="body" family={fonts.extrabold} color={colors.danger}>
-              {fixed ? `Clear ${entry.label}` : `Delete ${entry.label}`}
-            </RText>
-          </Pressable>
+            {entry?.place && (
+              <Pressable
+                onPress={remove}
+                disabled={busy}
+                accessibilityRole="button"
+                hitSlop={6}
+                style={styles.delete}
+              >
+                <RText variant="body" family={fonts.extrabold} color={colors.danger}>
+                  {fixed ? `Clear ${entry.label}` : `Delete ${entry.label}`}
+                </RText>
+              </Pressable>
+            )}
+          </>
         )}
       </ScrollView>
     </View>
@@ -367,6 +497,8 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.divider,
   },
   pressed: { backgroundColor: colors.background },
+  optionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: 10 },
+  deniedRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   primary: {
     minHeight: 48,
     borderRadius: radius.tileSm,

@@ -16,5 +16,8 @@ export function createMockPlacesService(): PlacesService {
       if (!place) throw new Error('Place not found.');
       return place;
     },
+    async reverseGeocode() {
+      return { name: 'Pinned location', placeId: null };
+    },
   };
 }
