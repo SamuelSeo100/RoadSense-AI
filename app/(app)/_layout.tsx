@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router';
 
+import { useSavedPlacesSync } from '@/features/places/savedPlaces';
 import { MapShell } from '@/features/shell/MapShell';
 import { TABS } from '@/features/shell/tabs';
 import { colors } from '@/theme/routly';
@@ -10,6 +11,7 @@ import { colors } from '@/theme/routly';
  * instance persists across tabs.
  */
 export default function AppLayout() {
+  useSavedPlacesSync();
   return (
     <MapShell>
       <Tabs

@@ -17,6 +17,7 @@ export const iconPaths = {
   metro:
     'M9 3h6a4 4 0 0 1 4 4v8a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V7a4 4 0 0 1 4-4Z M5 11h14M8 21l2-3M16 21l-2-3',
   mic: 'M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3Z M5 11a7 7 0 0 0 14 0 M12 18v3',
+  pin: 'M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Z M12 7a2.5 2.5 0 1 0 0 5 2.5 2.5 0 1 0 0-5Z',
   plus: 'M12 5v14M5 12h14',
   profile: 'M12 4a4 4 0 1 0 0 8 4 4 0 1 0 0-8Z M4 21c0-4 4-6 8-6s8 2 8 6',
   'quick-launch':
@@ -28,6 +29,7 @@ export const iconPaths = {
     'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8Z',
   swap: 'M7 4v16M7 20l-3-3M7 20l3-3M17 20V4M17 4l-3 3M17 4l3 3',
   walk: 'M13 3.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 1 0 0-3Z M10 21l2-6 3 3v3 M12 15l-1-5 3-1 2 4 3 1 M11 10l-3 2v3',
+  work: 'M4 7h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Z M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2 M3 13h18',
 } as const;
 
 export type IconName = keyof typeof iconPaths;

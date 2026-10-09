@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import type { Priority } from '@/services/types';
 
 import { SHEET_FULL, SHEET_PEEK, showToast, useShellStore } from '../shell/shellStore';
-import { useTripStore } from '../trip/tripStore';
+import { useTripStore, type PlanResult } from '../trip/tripStore';
 
 export interface RoutesParams {
   /** Omit for the current location. */
@@ -22,12 +22,16 @@ export function goToRoutes() {
 /** Plans a trip from free text (AI Mode, History "Repeat") and shows Routes. */
 export async function openRoutes({ from, to, priority }: RoutesParams) {
   if (priority) useTripStore.getState().setPriority(priority);
-  const found = await useTripStore
+  const result = await useTripStore
     .getState()
     .plan(to, from)
-    .catch(() => false);
-  if (!found) {
-    showToast(`Couldn’t find “${to}”`);
+    .catch((): PlanResult => ({ ok: false, reason: 'notFound', text: to }));
+  if (!result.ok) {
+    showToast(
+      result.reason === 'unsetSaved'
+        ? `Set your ${result.label} address in Profile › Saved places`
+        : `Couldn’t find “${result.text}”`,
+    );
     return false;
   }
   goToRoutes();

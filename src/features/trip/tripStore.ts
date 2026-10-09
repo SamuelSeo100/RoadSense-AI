@@ -17,6 +17,7 @@ import {
 import { useRoutlyPrefs } from '@/store/routlyPrefsStore';
 
 import { useMapStore } from '../map/mapStore';
+import { savedPlaceFor } from '../places/savedPlaces';
 
 import { logRequest } from './tripLog';
 
@@ -75,6 +76,14 @@ function firstUserLocation(timeoutMs: number): Promise<LatLng | null> {
 }
 const newSessionToken = () => Crypto.randomUUID();
 
+/** Why free text couldn't be planned. */
+export type PlanResult =
+  | { ok: true }
+  /** Nothing matched `text`. */
+  | { ok: false; reason: 'notFound'; text: string }
+  /** `text` means a saved place ("home", "ghar") the user hasn't set yet. */
+  | { ok: false; reason: 'unsetSaved'; label: string };
+
 interface TripState {
   from: Endpoint;
   to: Place | null;
@@ -97,8 +106,11 @@ interface TripState {
   swap: () => void;
   clear: () => void;
   retry: () => void;
-  /** Free text → best match (AI Mode, History "Repeat"). Resolves false if nothing matched. */
-  plan: (to: string, from?: string) => Promise<boolean>;
+  /**
+   * Free text → place (AI Mode, History "Repeat"): saved places first ("home",
+   * "ghar", "college", "office"), then the best Places match.
+   */
+  plan: (to: string, from?: string) => Promise<PlanResult>;
 }
 
 /** Only the latest route request wins; older ones are aborted. */
@@ -192,6 +204,20 @@ export const useTripStore = create<TripState>()((set, get) => {
     return best ? get().resolve(best.placeId) : null;
   };
 
+  /** A saved place (set or not) or the best Places match. */
+  const placeFor = async (
+    text: string,
+  ): Promise<{ place: Place } | Exclude<PlanResult, { ok: true }>> => {
+    const saved = savedPlaceFor(text);
+    if (saved) {
+      return saved.place
+        ? { place: saved.place }
+        : { ok: false, reason: 'unsetSaved', label: saved.label };
+    }
+    const place = await bestMatch(text);
+    return place ? { place } : { ok: false, reason: 'notFound', text };
+  };
+
   return {
     from: CURRENT,
     to: null,
@@ -242,13 +268,14 @@ export const useTripStore = create<TripState>()((set, get) => {
     retry: () => compute(get().from, get().to),
 
     plan: async (toText, fromText) => {
-      const to = await bestMatch(toText);
-      if (!to) return false;
-      const fromPlace = fromText ? await bestMatch(fromText) : null;
-      const from: Endpoint = fromPlace ? { kind: 'place', place: fromPlace } : CURRENT;
-      set({ from, to, fromDraft: null, toDraft: null });
-      compute(from, to);
-      return true;
+      const to = await placeFor(toText);
+      if (!('place' in to)) return to;
+      const fromFound = fromText ? await placeFor(fromText) : null;
+      if (fromFound && !('place' in fromFound)) return fromFound;
+      const from: Endpoint = fromFound ? { kind: 'place', place: fromFound.place } : CURRENT;
+      set({ from, to: to.place, fromDraft: null, toDraft: null });
+      compute(from, to.place);
+      return { ok: true };
     },
   };
 });

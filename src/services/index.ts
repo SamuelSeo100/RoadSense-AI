@@ -13,6 +13,7 @@ import { createMockHistoryService } from './mock/mockHistoryService';
 import { createLocalPreferencesService } from './mock/mockPreferencesService';
 import { createMockRoutingService } from './mock/mockRoutingService';
 import { createSupabaseHistoryService } from './supabase/supabaseHistoryService';
+import { createSupabaseSavedPlacesService } from './supabase/supabaseSavedPlacesService';
 import {
   createNoopTripLogService,
   createSupabaseTripLogService,
@@ -26,6 +27,7 @@ import type {
   PreferencesService,
   RoutingService,
   SafetyService,
+  SavedPlacesService,
   TripLogService,
 } from './types';
 
@@ -50,6 +52,10 @@ export const historyService: HistoryService = supabase
 export const tripLogService: TripLogService = supabase
   ? createSupabaseTripLogService(supabase)
   : createNoopTripLogService();
+/** Saved places on the server; null in mock-auth mode (they stay on the device). */
+export const savedPlacesService: SavedPlacesService | null = supabase
+  ? createSupabaseSavedPlacesService(supabase)
+  : null;
 export const aiService: AiService = createMockAiService();
 export const preferencesService: PreferencesService = createLocalPreferencesService();
 export const locationService: LocationService = createLocationService();

@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useRoutlyPrefs } from '@/store/routlyPrefsStore';
 
 import { useMapStore, type MapContent } from '../map/mapStore';
+import { SavedPlaceChips } from '../places/SavedPlaceChips';
 import { goToRoutes, openRoutes } from '../routes/openRoutes';
 import { SheetScrollView } from '../shell/SheetScrollView';
 import { SHEET_FULL, showToast, useShellStore } from '../shell/shellStore';
@@ -71,6 +72,13 @@ export function HomeScreen() {
   return (
     <SheetScrollView>
       <DirectionsCard toInputRef={toInputRef} onPicked={goToRoutes} onError={showToast} />
+
+      <SavedPlaceChips
+        onGo={(place) => {
+          useTripStore.getState().pickTo(place);
+          goToRoutes();
+        }}
+      />
 
       <AiModeCard
         enabled={prefs?.aiModeEnabled ?? true}

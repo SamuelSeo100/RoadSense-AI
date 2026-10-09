@@ -117,7 +117,13 @@ export interface Preferences {
   /** "power+volume_up" (UI only for now). */
   quickLaunchCombo: string;
   vehicles: Record<Vehicle, boolean>;
+  /**
+   * Places the user has set (Profile › Saved places). A device mirror of the
+   * server copy when signed in to Supabase; the only copy in mock-auth mode.
+   */
   savedPlaces: SavedPlace[];
+  /** User id the `savedPlaces` mirror belongs to (another account → not used). */
+  savedPlacesOwner?: string | null;
   /** Booking providers the user has linked (Profile › Linked apps). */
   linkedApps: string[];
   /** Google's live traffic lines on the map (Profile › Travel preferences). */
@@ -221,6 +227,15 @@ export interface TripLogService {
 
 export interface AiService {
   parseQuery(text: string): Promise<AiQuery | null>;
+}
+
+/** Server copy of the saved places (Supabase `saved_places`). */
+export interface SavedPlacesService {
+  /** The signed-in user's places. Throws when offline or signed out. */
+  list(): Promise<SavedPlace[]>;
+  /** Insert or replace the place for `label`. */
+  save(label: string, place: Place): Promise<void>;
+  remove(label: string): Promise<void>;
 }
 
 export interface PreferencesService {

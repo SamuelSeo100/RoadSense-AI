@@ -1,19 +1,22 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Alert, Pressable, StyleSheet, View } from 'react-native';
 
-import { Icon, type IconName } from '@/components/routly/Icon';
+import { Icon } from '@/components/routly/Icon';
 import { RText } from '@/components/routly/RText';
 import { SectionHeader } from '@/components/routly/SectionHeader';
 import { cityInfo } from '@/constants/cities';
 import { authService } from '@/features/auth/auth.service';
 import { choose, confirm } from '@/lib/confirm';
 import { bookingProviderNames, type BookingProvider } from '@/services/bookings';
-import { historyService, tripLogService, type SavedPlace } from '@/services';
+import { historyService, tripLogService } from '@/services';
 import { useAuthStore } from '@/store/authStore';
 import { usePreferencesStore } from '@/store/preferencesStore';
 import { useRoutlyPrefs } from '@/store/routlyPrefsStore';
-import { colors, fonts, modeColors, radius } from '@/theme/routly';
+import { colors, fonts, radius } from '@/theme/routly';
 
+import { placeIcon } from '../places/placeIcon';
+import { SavedPlacePicker, type PickerTarget } from '../places/SavedPlacePicker';
+import { isFixedLabel, MAX_CUSTOM_PLACES, useSavedPlaces } from '../places/savedPlaces';
 import { openHomeSearch } from '../routes/openRoutes';
 import { SheetScrollView } from '../shell/SheetScrollView';
 import { showToast } from '../shell/shellStore';
@@ -26,11 +29,6 @@ import { QUICK_LAUNCH_COMBOS, QuickLaunchCard } from './components/QuickLaunchCa
 
 const LINKED_APPS: BookingProvider[] = ['uber', 'ola', 'puneMetro'];
 
-const placeIcon = (label: string): { icon: IconName; bg: string; fg: string } =>
-  label === 'College'
-    ? { icon: 'college', bg: modeColors.bus.pillBg, fg: modeColors.bus.pillText }
-    : { icon: 'home', bg: colors.primaryTint, fg: colors.primary };
-
 /** Profile shows no routes on the map, only the location dot. */
 const NO_ROUTES = { routes: [], selection: 'none', focused: false };
 
@@ -39,6 +37,9 @@ export function ProfileScreen() {
   const city = usePreferencesStore((s) => s.city);
   const prefs = useRoutlyPrefs((s) => s.prefs);
   const update = useRoutlyPrefs((s) => s.update);
+  const savedPlaces = useSavedPlaces();
+  const [picker, setPicker] = useState<PickerTarget | null>(null);
+  const customCount = savedPlaces.filter((p) => !isFixedLabel(p.label)).length;
 
   useTopBar('profile', {
     title: 'Profile',
@@ -153,14 +154,15 @@ export function ProfileScreen() {
       <View style={styles.section}>
         <SectionHeader title="Saved places" size={16} />
         <GroupedList>
-          {(prefs?.savedPlaces ?? []).map((sp: SavedPlace) => {
+          {savedPlaces.map((sp) => {
             const { icon, bg, fg } = placeIcon(sp.label);
             return (
               <ListRow
-                key={sp.id}
-                // TODO(saved-places): address picker.
-                onPress={comingSoon('Setting an address')}
-                accessibilityLabel={`${sp.label}, ${sp.place?.name ?? 'set address'}`}
+                key={sp.label}
+                onPress={() => setPicker({ kind: 'edit', entry: sp })}
+                accessibilityLabel={
+                  sp.place ? `${sp.label}, ${sp.place.name}. Edit` : `Set ${sp.label} address`
+                }
               >
                 <View style={[styles.placeIcon, { backgroundColor: bg }]}>
                   <Icon name={icon} size={18} color={fg} />
@@ -169,16 +171,30 @@ export function ProfileScreen() {
                   <RText variant="body" family={fonts.extrabold}>
                     {sp.label}
                   </RText>
-                  <RText variant="caption">{sp.place?.name ?? 'Set address'}</RText>
+                  <RText
+                    variant="caption"
+                    numberOfLines={1}
+                    color={sp.place ? undefined : colors.primary}
+                  >
+                    {sp.place?.name ?? 'Set address'}
+                  </RText>
                 </View>
               </ListRow>
             );
           })}
-          <ListRow onPress={comingSoon('Adding places')} accessibilityLabel="Add a place">
-            <RText variant="body" family={fonts.extrabold} color={colors.primary}>
-              + Add a place
-            </RText>
-          </ListRow>
+          {customCount < MAX_CUSTOM_PLACES ? (
+            <ListRow onPress={() => setPicker({ kind: 'new' })} accessibilityLabel="Add a place">
+              <RText variant="body" family={fonts.extrabold} color={colors.primary}>
+                + Add a place
+              </RText>
+            </ListRow>
+          ) : (
+            <ListRow minHeight={48}>
+              <RText variant="caption">
+                You’ve saved {MAX_CUSTOM_PLACES} custom places. Delete one to add another.
+              </RText>
+            </ListRow>
+          )}
         </GroupedList>
       </View>
 
@@ -255,6 +271,8 @@ export function ProfileScreen() {
           </ListRow>
         </GroupedList>
       </View>
+
+      <SavedPlacePicker target={picker} onClose={() => setPicker(null)} />
     </SheetScrollView>
   );
 }

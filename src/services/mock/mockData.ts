@@ -393,16 +393,8 @@ export const mockData: MockData = {
       bike: false,
       cycle: false,
     },
-    savedPlaces: [
-      {
-        id: 'home',
-        label: 'Home',
-      },
-      {
-        id: 'college',
-        label: 'College',
-      },
-    ],
+    // Home / College / Work are always listed; only places that are set are stored.
+    savedPlaces: [],
     linkedApps: [],
     showTraffic: true,
   },

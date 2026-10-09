@@ -9,14 +9,17 @@ import {
   type TextInput,
 } from 'react-native';
 
+import { Icon } from '@/components/routly/Icon';
 import { IconButton } from '@/components/routly/IconButton';
 import { PressableBox } from '@/components/routly/PressableBox';
 import { RouteRail } from '@/components/routly/RouteRail';
 import { RText } from '@/components/routly/RText';
-import type { PlaceSuggestion } from '@/services';
+import type { Place, PlaceSuggestion } from '@/services';
 import { colors, fonts, radius, shadows } from '@/theme/routly';
 
 import { useMapStore } from '../map/mapStore';
+import { placeIcon } from '../places/placeIcon';
+import { isSet, useSavedPlaces } from '../places/savedPlaces';
 
 import { useTripStore } from './tripStore';
 import { usePlaceAutocomplete } from './usePlaceAutocomplete';
@@ -37,6 +40,7 @@ export function DirectionsCard({ toInputRef, onPicked, onError }: DirectionsCard
   const trip = useTripStore();
   const area = useMapStore((s) => s.area);
   const near = useMapStore((s) => s.userLocation);
+  const saved = useSavedPlaces().filter(isSet);
   const [active, setActive] = useState<Field | null>(null);
   /** The field holding keyboard focus (drives the text scroll position). */
   const [focused, setFocused] = useState<Field | null>(null);
@@ -69,6 +73,14 @@ export function DirectionsCard({ toInputRef, onPicked, onError }: DirectionsCard
     }
   };
 
+  const pickSaved = (field: Field, place: Place) => {
+    Keyboard.dismiss();
+    setActive(null);
+    if (field === 'from') trip.pickFrom({ kind: 'place', place });
+    else trip.pickTo(place);
+    afterPick();
+  };
+
   const useMyLocation = () => {
     Keyboard.dismiss();
     setActive(null);
@@ -77,6 +89,8 @@ export function DirectionsCard({ toInputRef, onPicked, onError }: DirectionsCard
   };
 
   const showList = active !== null && draft !== null && draft.trim().length > 0;
+  // Nothing typed yet: saved places first (the field may still show the current pick).
+  const showSaved = focused !== null && focused === active && !showList && saved.length > 0;
 
   return (
     <View style={[styles.card, shadows.selectedCard]}>
@@ -141,6 +155,34 @@ export function DirectionsCard({ toInputRef, onPicked, onError }: DirectionsCard
             ◎ Use my location
           </RText>
         </Pressable>
+      )}
+
+      {showSaved && (
+        <View style={styles.suggestions} accessibilityRole="list">
+          {saved.map((sp) => {
+            const { icon, fg } = placeIcon(sp.label);
+            return (
+              <PressableBox
+                key={sp.label}
+                onPress={() => pickSaved(focused, sp.place)}
+                accessibilityRole="button"
+                accessibilityLabel={`${sp.label}, ${sp.place.name}`}
+                style={[styles.suggestion, styles.savedRow]}
+                pressedStyle={styles.pressed}
+              >
+                <Icon name={icon} size={18} color={fg} />
+                <View style={styles.savedText}>
+                  <RText variant="body" numberOfLines={1}>
+                    {sp.label}
+                  </RText>
+                  <RText variant="caption" numberOfLines={1}>
+                    {sp.place.name}
+                  </RText>
+                </View>
+              </PressableBox>
+            );
+          })}
+        </View>
       )}
 
       {showList && (
@@ -221,4 +263,6 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.divider,
   },
   pressed: { backgroundColor: colors.background },
+  savedRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: 10 },
+  savedText: { flex: 1, minWidth: 0 },
 });
