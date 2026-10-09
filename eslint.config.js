@@ -7,6 +7,7 @@ module.exports = defineConfig([
   expoConfig,
   prettierRecommended,
   {
-    ignores: ['dist/*', 'design/*', '.expo/*', 'ios/*', 'android/*'],
+    // supabase/functions is Deno code (npm: imports), not part of the app bundle.
+    ignores: ['dist/*', 'design/*', '.expo/*', 'ios/*', 'android/*', 'supabase/functions/*'],
   },
 ]);

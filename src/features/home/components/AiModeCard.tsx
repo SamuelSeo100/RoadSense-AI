@@ -1,6 +1,6 @@
 import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
 import { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 
 import { Chip } from '@/components/routly/Chip';
 import { Icon } from '@/components/routly/Icon';
@@ -20,14 +20,28 @@ interface AiModeCardProps {
   showMic: boolean;
   onMic: () => void;
   onSubmit: (text: string) => void;
+  /** Parsing the request (the LLM call). */
+  busy?: boolean;
+  /** A follow-up question when the destination wasn't clear. */
+  clarify?: { question: string; options: string[] } | null;
+  onClarifyPick?: (option: string) => void;
 }
 
 /** Dark card: free-text trip request, mic, suggestion chips. Collapses to its header when off. */
-export function AiModeCard({ enabled, onToggle, showMic, onMic, onSubmit }: AiModeCardProps) {
+export function AiModeCard({
+  enabled,
+  onToggle,
+  showMic,
+  onMic,
+  onSubmit,
+  busy = false,
+  clarify,
+  onClarifyPick,
+}: AiModeCardProps) {
   const [text, setText] = useState('');
 
   const submit = (value: string) => {
-    if (value.trim()) onSubmit(value.trim());
+    if (value.trim() && !busy) onSubmit(value.trim());
   };
 
   return (
@@ -60,6 +74,12 @@ export function AiModeCard({ enabled, onToggle, showMic, onMic, onSubmit }: AiMo
               onSubmitEditing={() => submit(text)}
               style={styles.input}
             />
+            {busy && (
+              <ActivityIndicator
+                color={colors.accent}
+                accessibilityLabel="Understanding your request"
+              />
+            )}
             {showMic && (
               <Pressable
                 onPress={onMic}
@@ -71,6 +91,26 @@ export function AiModeCard({ enabled, onToggle, showMic, onMic, onSubmit }: AiMo
               </Pressable>
             )}
           </View>
+          {clarify && (
+            <View style={styles.clarify} accessibilityLiveRegion="polite">
+              <RText variant="body" family={fonts.bold} color={colors.textOnPrimary}>
+                {clarify.question}
+              </RText>
+              {clarify.options.length > 0 && (
+                <View style={styles.chips}>
+                  {clarify.options.map((o) => (
+                    <Chip
+                      key={o}
+                      label={o}
+                      height={36}
+                      surface="dark"
+                      onPress={() => onClarifyPick?.(o)}
+                    />
+                  ))}
+                </View>
+              )}
+            </View>
+          )}
           <View style={styles.chips}>
             {AI_SUGGESTIONS.map((s) => (
               <Chip
@@ -123,4 +163,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  clarify: {
+    gap: 10,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.accent,
+    paddingLeft: 10,
+  },
 });

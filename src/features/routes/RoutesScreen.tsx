@@ -15,6 +15,7 @@ import { SheetScrollView } from '../shell/SheetScrollView';
 import { SHEET_FULL, SHEET_PEEK, showToast } from '../shell/shellStore';
 import { useMapContent, useSheet, useTopBar } from '../shell/useScreenChrome';
 import { DirectionsCard } from '../trip/DirectionsCard';
+import { modeFilterLabel } from '../trip/modeFilter';
 import { logChoice, startTrip } from '../trip/tripLog';
 import { shownRoutes, useTripStore } from '../trip/tripStore';
 
@@ -36,6 +37,9 @@ export function RoutesScreen() {
   const retry = useTripStore((s) => s.retry);
   const priority = useTripStore((s) => s.priority);
   const setPriority = useTripStore((s) => s.setPriority);
+  const modeFilter = useTripStore((s) => s.modeFilter);
+  const clearModeFilter = useTripStore((s) => s.clearModeFilter);
+  const departAt = useTripStore((s) => s.departAt);
   const vehicles = useRoutlyPrefs((s) => s.prefs?.vehicles) ?? NO_VEHICLES;
   const area = useMapStore((s) => s.area);
   const sheet = useSheet('routes');
@@ -54,8 +58,8 @@ export function RoutesScreen() {
 
   const ready = state.status === 'ready' ? state : null;
   const ranked = useMemo(
-    () => (ready ? shownRoutes(ready.routes, priority, vehicles) : []),
-    [ready, priority, vehicles],
+    () => (ready ? shownRoutes(ready.routes, priority, vehicles, modeFilter) : []),
+    [ready, priority, vehicles, modeFilter],
   );
 
   // The user's pick, valid for the result it was made on. Until they tap, the
@@ -140,6 +144,17 @@ export function RoutesScreen() {
               />
             ))}
           </View>
+          {modeFilter && (
+            <View style={styles.chips}>
+              <Chip
+                label={`${modeFilterLabel(modeFilter)} ✕`}
+                height={36}
+                selected
+                accessibilityLabel={`Filter: ${modeFilterLabel(modeFilter)}. Remove filter`}
+                onPress={clearModeFilter}
+              />
+            </View>
+          )}
         </View>
       )}
 
@@ -161,12 +176,14 @@ export function RoutesScreen() {
           {ranked.length === 0 ? (
             <Notice
               text={
-                ready.notices.some((n) => n.kind === 'partialFailure')
-                  ? 'Couldn’t load routes. Check your connection and try again.'
-                  : 'No routes found for this trip.'
+                modeFilter && ready.routes.length > 0
+                  ? `No routes match “${modeFilterLabel(modeFilter)}”.`
+                  : ready.notices.some((n) => n.kind === 'partialFailure')
+                    ? 'Couldn’t load routes. Check your connection and try again.'
+                    : 'No routes found for this trip.'
               }
-              actionLabel="Retry"
-              onAction={retry}
+              actionLabel={modeFilter && ready.routes.length > 0 ? 'Show all routes' : 'Retry'}
+              onAction={modeFilter && ready.routes.length > 0 ? clearModeFilter : retry}
             />
           ) : (
             <>
@@ -174,7 +191,10 @@ export function RoutesScreen() {
                 <RText variant="sectionTitle" size={18} accessibilityRole="header">
                   {ranked.length === 1 ? '1 route found' : `${ranked.length} routes found`}
                 </RText>
-                <RText variant="caption">Ranked for {priorityLabel}</RText>
+                <RText variant="caption">
+                  Ranked for {priorityLabel}
+                  {departAt ? ` · leaving ${leaveLabel(departAt)}` : ''}
+                </RText>
               </View>
               <View style={styles.list}>
                 {ranked.map((route) => {
@@ -211,6 +231,13 @@ export function RoutesScreen() {
       )}
     </SheetScrollView>
   );
+}
+
+/** "6:30 PM", or "Sat 8:00 AM" when not today (device time zone). */
+function leaveLabel(at: Date): string {
+  const time = at.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' });
+  const today = new Date().toDateString() === at.toDateString();
+  return today ? time : `${at.toLocaleDateString('en-IN', { weekday: 'short' })} ${time}`;
 }
 
 function Notice({

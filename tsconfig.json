@@ -7,5 +7,7 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts", "nativewind-env.d.ts"]
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts", "nativewind-env.d.ts"],
+  // Edge functions run on Deno (npm: imports, Deno globals): checked by `supabase functions deploy`.
+  "exclude": ["supabase/functions"]
 }

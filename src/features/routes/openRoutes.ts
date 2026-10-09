@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 
-import type { Priority } from '@/services/types';
+import type { ModeFilter, Priority } from '@/services/types';
 
 import { SHEET_FULL, SHEET_PEEK, showToast, useShellStore } from '../shell/shellStore';
 import { useTripStore, type PlanResult } from '../trip/tripStore';
@@ -11,6 +11,10 @@ export interface RoutesParams {
   to: string;
   /** Ranking to show (AI Mode: "cheapest to college"). */
   priority?: Priority;
+  /** Leave at this time instead of now (AI Mode: "at 6 pm"). */
+  departAt?: Date;
+  /** Only / never these modes (AI Mode: "metro se", "no bus"). */
+  modeFilter?: ModeFilter;
 }
 
 /** Shows the Routes tab for the trip already in the trip store. */
@@ -20,11 +24,11 @@ export function goToRoutes() {
 }
 
 /** Plans a trip from free text (AI Mode, History "Repeat") and shows Routes. */
-export async function openRoutes({ from, to, priority }: RoutesParams) {
+export async function openRoutes({ from, to, priority, departAt, modeFilter }: RoutesParams) {
   if (priority) useTripStore.getState().setPriority(priority);
   const result = await useTripStore
     .getState()
-    .plan(to, from)
+    .plan(to, from, { departAt, modeFilter })
     .catch((): PlanResult => ({ ok: false, reason: 'notFound', text: to }));
   if (!result.ok) {
     showToast(

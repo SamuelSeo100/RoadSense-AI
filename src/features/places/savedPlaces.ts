@@ -58,6 +58,9 @@ function storedPlaces(): SavedPlace[] {
   return prefs.savedPlaces;
 }
 
+/** Saved places in display order, outside React. */
+export const currentSavedPlaces = () => savedPlacesList(storedPlaces());
+
 /** Saved places in display order (fixed labels first). */
 export function useSavedPlaces(): SavedPlace[] {
   const prefs = useRoutlyPrefs((s) => s.prefs);

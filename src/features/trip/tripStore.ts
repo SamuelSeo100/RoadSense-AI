@@ -7,6 +7,7 @@ import {
   rankRoutes,
   routingService,
   type LatLng,
+  type ModeFilter,
   type Place,
   type Priority,
   type RankedRoute,
@@ -19,6 +20,7 @@ import { useRoutlyPrefs } from '@/store/routlyPrefsStore';
 import { useMapStore } from '../map/mapStore';
 import { savedPlaceFor } from '../places/savedPlaces';
 
+import { matchesModes } from './modeFilter';
 import { logRequest } from './tripLog';
 
 /** From is either the live GPS position or a searched place. */
@@ -47,12 +49,18 @@ const NO_VEHICLES: Record<Vehicle, boolean> = { car: false, bike: false, cycle: 
 /** Route cards shown on Routes (and logged as the request's options). */
 export const MAX_SHOWN_ROUTES = 8;
 
-/** What Routes displays: ranked for `priority`, own vehicles filtered, capped. */
+/** What Routes displays: ranked for `priority`, own vehicles + AI mode filter applied, capped. */
 export const shownRoutes = (
   routes: RankedRoute[],
   priority: Priority,
   vehicles: Record<Vehicle, boolean>,
-) => rankRoutes(routes, priority, vehicles).slice(0, MAX_SHOWN_ROUTES);
+  modeFilter: ModeFilter | null = null,
+) =>
+  rankRoutes(
+    routes.filter((r) => matchesModes(r, modeFilter)),
+    priority,
+    vehicles,
+  ).slice(0, MAX_SHOWN_ROUTES);
 
 const CURRENT: Endpoint = { kind: 'current' };
 const LOCATION_WAIT_MS = 15000;
@@ -96,6 +104,11 @@ interface TripState {
   setPriority: (priority: Priority) => void;
   /** One Places session per search: keystrokes + the final details call. */
   sessionToken: string;
+  /** Requested departure (AI Mode "at 6 pm"); null = now. */
+  departAt: Date | null;
+  /** AI Mode "metro se", "no bus": filters the shown routes (removable chip on Routes). */
+  modeFilter: ModeFilter | null;
+  clearModeFilter: () => void;
 
   setFromDraft: (text: string | null) => void;
   setToDraft: (text: string | null) => void;
@@ -110,7 +123,11 @@ interface TripState {
    * Free text → place (AI Mode, History "Repeat"): saved places first ("home",
    * "ghar", "college", "office"), then the best Places match.
    */
-  plan: (to: string, from?: string) => Promise<PlanResult>;
+  plan: (
+    to: string,
+    from?: string,
+    opts?: { departAt?: Date | null; modeFilter?: ModeFilter | null },
+  ) => Promise<PlanResult>;
 }
 
 /** Only the latest route request wins; older ones are aborted. */
@@ -124,6 +141,7 @@ let priorityChosen = false;
  */
 export const useTripStore = create<TripState>()((set, get) => {
   const compute = async (origin: Endpoint, destination: Place | null) => {
+    const departAt = get().departAt ?? undefined;
     inflight?.abort();
     if (!destination) {
       set({ routes: { status: 'idle' } });
@@ -154,9 +172,12 @@ export const useTripStore = create<TripState>()((set, get) => {
         routingService.getRoutes(start, destination, {
           priority: get().priority,
           vehicles,
+          departAt,
           signal,
         }),
-        directionsService.walking(start, destination.location, { signal }).catch(() => null),
+        directionsService
+          .walking(start, destination.location, { signal, at: departAt })
+          .catch(() => null),
       ]);
       if (signal.aborted) return;
       const requestId = Crypto.randomUUID();
@@ -172,7 +193,7 @@ export const useTripStore = create<TripState>()((set, get) => {
         to: { name: destination.name, location: destination.location },
         priority: get().priority,
         // Exactly what the user is shown, so ranks match the cards.
-        routes: shownRoutes(result.routes, get().priority, vehicles),
+        routes: shownRoutes(result.routes, get().priority, vehicles, get().modeFilter),
       });
       set({
         routes: {
@@ -231,6 +252,9 @@ export const useTripStore = create<TripState>()((set, get) => {
       set({ priority });
     },
     sessionToken: newSessionToken(),
+    departAt: null,
+    modeFilter: null,
+    clearModeFilter: () => set({ modeFilter: null }),
 
     setFromDraft: (fromDraft) => set({ fromDraft }),
     setToDraft: (toDraft) => set({ toDraft }),
@@ -247,7 +271,8 @@ export const useTripStore = create<TripState>()((set, get) => {
     },
 
     pickTo: (to) => {
-      set({ to, toDraft: null });
+      // A new destination picked by hand: AI Mode's time and mode filter no longer apply.
+      set({ to, toDraft: null, departAt: null, modeFilter: null });
       compute(get().from, to);
     },
 
@@ -262,18 +287,33 @@ export const useTripStore = create<TripState>()((set, get) => {
 
     clear: () => {
       inflight?.abort();
-      set({ from: CURRENT, to: null, fromDraft: null, toDraft: null, routes: { status: 'idle' } });
+      set({
+        from: CURRENT,
+        to: null,
+        fromDraft: null,
+        toDraft: null,
+        departAt: null,
+        modeFilter: null,
+        routes: { status: 'idle' },
+      });
     },
 
     retry: () => compute(get().from, get().to),
 
-    plan: async (toText, fromText) => {
+    plan: async (toText, fromText, opts) => {
       const to = await placeFor(toText);
       if (!('place' in to)) return to;
       const fromFound = fromText ? await placeFor(fromText) : null;
       if (fromFound && !('place' in fromFound)) return fromFound;
       const from: Endpoint = fromFound ? { kind: 'place', place: fromFound.place } : CURRENT;
-      set({ from, to: to.place, fromDraft: null, toDraft: null });
+      set({
+        from,
+        to: to.place,
+        fromDraft: null,
+        toDraft: null,
+        departAt: opts?.departAt ?? null,
+        modeFilter: opts?.modeFilter ?? null,
+      });
       compute(from, to.place);
       return { ok: true };
     },

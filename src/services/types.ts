@@ -130,10 +130,38 @@ export interface Preferences {
   showTraffic: boolean;
 }
 
+/** Modes the rider asked for ("metro se") or ruled out ("no bus"). */
+export interface ModeFilter {
+  include?: Mode[];
+  exclude?: Mode[];
+}
+
+/** A parsed AI Mode request. Has `to`, or `clarify` when the destination is unclear. */
 export interface AiQuery {
   from?: string;
-  to: string;
+  to?: string;
   priority?: Priority;
+  modes?: ModeFilter;
+  /** ISO 8601 (IST offset). */
+  departAt?: string;
+  /** ISO 8601 (IST offset). TODO(routing): not applied yet, see tripStore. */
+  arriveBy?: string;
+  /** A short question when the destination is missing or ambiguous. */
+  clarify?: string;
+  /** 2–3 likely destinations to offer with `clarify`. */
+  clarifyOptions?: string[];
+  /** Which parser produced it ('keywords' = the offline fallback). */
+  source: 'llm' | 'keywords';
+}
+
+/** What the parser may know besides the text. */
+export interface AiContext {
+  /** Saved place labels and names ("Home", "Kothrud"); no coordinates. */
+  savedPlaces: { label: string; name?: string }[];
+  /** Neighbourhood the user is in, if known. */
+  area?: string;
+  /** "Learn from my trips": off → the server keeps only token counts. */
+  learnFromTrips: boolean;
 }
 
 /** A routing mode group that can fail on its own. */
@@ -163,7 +191,13 @@ export interface RoutingService {
   getRoutes(
     from: Place | LatLng,
     to: Place,
-    opts: { priority: Priority; vehicles: Record<Vehicle, boolean>; signal?: AbortSignal },
+    opts: {
+      priority: Priority;
+      vehicles: Record<Vehicle, boolean>;
+      /** Departure time (default: now). */
+      departAt?: Date;
+      signal?: AbortSignal;
+    },
   ): Promise<RoutesResult>;
   /** The 3 cards on Home: top pick, cheapest, fastest. */
   getPreview(from: Place | LatLng, to: Place): Promise<Route[]>;
@@ -226,7 +260,8 @@ export interface TripLogService {
 }
 
 export interface AiService {
-  parseQuery(text: string): Promise<AiQuery | null>;
+  /** Null when nothing usable was understood. */
+  parseQuery(text: string, context: AiContext): Promise<AiQuery | null>;
 }
 
 /** Server copy of the saved places (Supabase `saved_places`). */
@@ -316,6 +351,28 @@ export interface UnsafeZone {
 export interface SafetyService {
   unsafeZones(near: LatLng): Promise<UnsafeZone[]>;
 }
+
+export const MODES: readonly Mode[] = [
+  'walk',
+  'metro',
+  'bus',
+  'auto',
+  'cab',
+  'bike',
+  'cycle',
+  'train',
+];
+
+export const modeNames: Record<Mode, string> = {
+  walk: 'Walk',
+  metro: 'Metro',
+  bus: 'Bus',
+  auto: 'Auto',
+  cab: 'Cab',
+  bike: 'Bike',
+  cycle: 'Cycle',
+  train: 'Train',
+};
 
 export const PRIORITIES: readonly Priority[] = ['fastest', 'cheapest', 'walking', 'transfers'];
 

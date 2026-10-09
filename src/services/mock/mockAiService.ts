@@ -23,7 +23,7 @@ export function createMockAiService(): AiService {
       const homeMatch = /\b(?:take me|go|head)\s+home\b/i.test(text);
       const to = toMatch?.[1]?.trim() ?? (homeMatch ? 'home' : '');
       if (!to) return null;
-      return { to: titleCase(to), priority };
+      return { to: titleCase(to), priority, source: 'keywords' };
     },
   };
 }

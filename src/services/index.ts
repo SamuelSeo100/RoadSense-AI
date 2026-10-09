@@ -12,6 +12,7 @@ import { createMockAiService } from './mock/mockAiService';
 import { createMockHistoryService } from './mock/mockHistoryService';
 import { createLocalPreferencesService } from './mock/mockPreferencesService';
 import { createMockRoutingService } from './mock/mockRoutingService';
+import { createSupabaseAiService } from './supabase/supabaseAiService';
 import { createSupabaseHistoryService } from './supabase/supabaseHistoryService';
 import { createSupabaseSavedPlacesService } from './supabase/supabaseSavedPlacesService';
 import {
@@ -56,7 +57,10 @@ export const tripLogService: TripLogService = supabase
 export const savedPlacesService: SavedPlacesService | null = supabase
   ? createSupabaseSavedPlacesService(supabase)
   : null;
-export const aiService: AiService = createMockAiService();
+/** Claude via the parse-trip edge function (keyword fallback); keywords only in mock-auth mode. */
+export const aiService: AiService = supabase
+  ? createSupabaseAiService(supabase, createMockAiService())
+  : createMockAiService();
 export const preferencesService: PreferencesService = createLocalPreferencesService();
 export const locationService: LocationService = createLocationService();
 

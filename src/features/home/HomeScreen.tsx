@@ -1,13 +1,12 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { type TextInput } from 'react-native';
 
-import { aiService } from '@/services';
 import { useAuthStore } from '@/store/authStore';
 import { useRoutlyPrefs } from '@/store/routlyPrefsStore';
 
 import { useMapStore, type MapContent } from '../map/mapStore';
 import { SavedPlaceChips } from '../places/SavedPlaceChips';
-import { goToRoutes, openRoutes } from '../routes/openRoutes';
+import { goToRoutes } from '../routes/openRoutes';
 import { SheetScrollView } from '../shell/SheetScrollView';
 import { SHEET_FULL, showToast, useShellStore } from '../shell/shellStore';
 import { useMapContent, useSheet, useTopBar } from '../shell/useScreenChrome';
@@ -15,6 +14,7 @@ import { book } from '../trip/booking';
 import { DirectionsCard } from '../trip/DirectionsCard';
 import { useTripStore } from '../trip/tripStore';
 
+import { applyAiQuery, runAiQuery, type AiClarify } from './aiMode';
 import { AiModeCard } from './components/AiModeCard';
 import { TicketsGrid, type TicketTile } from './components/TicketsGrid';
 import { firstName, timeOfDay } from './greeting';
@@ -29,6 +29,8 @@ export function HomeScreen() {
   const searchRequest = useShellStore((s) => s.homeSearchRequest);
   const sheet = useSheet('home');
   const toInputRef = useRef<TextInput>(null);
+  const [aiBusy, setAiBusy] = useState(false);
+  const [clarify, setClarify] = useState<AiClarify | null>(null);
 
   // Search button on History / Profile lands here.
   useEffect(() => {
@@ -54,12 +56,20 @@ export function HomeScreen() {
   );
 
   const submitAi = async (text: string) => {
-    const parsed = await aiService.parseQuery(text);
-    if (!parsed) {
-      showToast('Try “Quickest way to Pune Station”');
-      return;
+    setClarify(null);
+    setAiBusy(true);
+    try {
+      setClarify(await runAiQuery(text));
+    } finally {
+      setAiBusy(false);
     }
-    await openRoutes({ to: parsed.to, priority: parsed.priority });
+  };
+
+  const pickClarify = async (option: string) => {
+    if (!clarify) return;
+    const { base } = clarify;
+    setClarify(null);
+    await applyAiQuery({ ...base, to: option, clarify: undefined });
   };
 
   const openTicket = async (tile: TicketTile) => {
@@ -87,6 +97,9 @@ export function HomeScreen() {
         // TODO(voice): speech-to-text (needs a native speech module + dev build).
         onMic={() => showToast('Voice coming soon')}
         onSubmit={submitAi}
+        busy={aiBusy}
+        clarify={clarify}
+        onClarifyPick={pickClarify}
       />
 
       <TicketsGrid onPress={openTicket} />

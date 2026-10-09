@@ -593,10 +593,12 @@ export function createGoogleRoutingService(deps: {
     toP: Place,
     vehicles: Record<Vehicle, boolean>,
     signal?: AbortSignal,
+    departAt?: Date,
   ): Promise<Candidates> {
     const from = toLatLng(fromP);
     const to = toP.location;
-    const at = new Date();
+    // A requested departure ("at 6 pm"); past times mean now.
+    const at = departAt && departAt.getTime() > Date.now() ? departAt : new Date();
     const bucket = Math.floor(at.getTime() / (routingConfig.cacheBucketMin * 60_000));
     const key = `${keyOf(from)}>${keyOf(to)}|${bucket}|b${vehicles.bike ? 1 : 0}c${vehicles.car ? 1 : 0}`;
     const cached = cache.get(key);
@@ -610,6 +612,8 @@ export function createGoogleRoutingService(deps: {
           travelMode,
           routingPreference: 'TRAFFIC_AWARE',
           extraComputations: ['TRAFFIC_ON_POLYLINE'],
+          // Predicted traffic for a later departure (the API rejects past times).
+          ...(at.getTime() > Date.now() + 60_000 ? { departureTime: at.toISOString() } : {}),
         },
         ROAD_MASK,
         signal,
@@ -693,9 +697,9 @@ export function createGoogleRoutingService(deps: {
       .catch((): Priority => 'fastest');
 
   return {
-    async getRoutes(from, to, { priority, vehicles, signal }) {
+    async getRoutes(from, to, { priority, vehicles, departAt, signal }) {
       const [{ routes, notices }, aiPriority] = await Promise.all([
-        candidates(from, to, vehicles, signal),
+        candidates(from, to, vehicles, signal, departAt),
         defaultPriority(),
       ]);
       // Keep every route that is in the top N for some priority, so callers can
