@@ -1,6 +1,6 @@
 import '../global.css';
 // Initialises Sentry before anything else renders.
-import { navigationIntegration, Sentry, setSentryUser } from '@/lib/sentry';
+import { navigationIntegration, Sentry, sentryEnabled, setSentryUser } from '@/lib/sentry';
 
 import {
   Inter_400Regular,
@@ -51,7 +51,9 @@ function RootLayout() {
   const navigationRef = useNavigationContainerRef();
 
   useEffect(() => {
-    if (navigationRef) navigationIntegration.registerNavigationContainer(navigationRef);
+    if (sentryEnabled && navigationRef) {
+      navigationIntegration.registerNavigationContainer(navigationRef);
+    }
   }, [navigationRef]);
 
   // Hashed id only (src/lib/sentry.ts).
@@ -90,4 +92,5 @@ function RootLayout() {
   );
 }
 
-export default Sentry.wrap(RootLayout);
+// Wrapped only when Sentry is initialised (wrapping without init warns and does nothing).
+export default sentryEnabled ? Sentry.wrap(RootLayout) : RootLayout;
