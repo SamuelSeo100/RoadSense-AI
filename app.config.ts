@@ -56,6 +56,15 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           ],
         },
       ],
+      // Crash reporting. Source maps upload on EAS builds with SENTRY_AUTH_TOKEN (EAS secret).
+      [
+        '@sentry/react-native/expo',
+        {
+          url: 'https://sentry.io/',
+          organization: 'danny-seo',
+          project: 'routly-app',
+        },
+      ],
       // react-native-maps 1.27 needs its own plugin entry: it writes the Android
       // manifest key, and on iOS adds the Google Maps pod + GMSServices init.
       [
@@ -69,6 +78,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       ...config.extra,
       /** True when the native Google Maps SDK is configured (LiveMap picks the provider from it). */
       googleMapsConfigured: googleMapsApiKey !== '',
+      /** SENTRY_DEBUG=true: report to Sentry from dev builds too (src/lib/sentry.ts). */
+      sentryDebug: process.env.SENTRY_DEBUG === 'true',
+      /** EAS build profile ("preview"), set by EAS Build; unset for local builds. */
+      buildProfile: process.env.EAS_BUILD_PROFILE ?? null,
     },
   };
 };

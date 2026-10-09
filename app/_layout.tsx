@@ -1,4 +1,6 @@
 import '../global.css';
+// Initialises Sentry before anything else renders.
+import { navigationIntegration, Sentry, setSentryUser } from '@/lib/sentry';
 
 import {
   Inter_400Regular,
@@ -14,7 +16,7 @@ import {
   PlusJakartaSans_700Bold,
   PlusJakartaSans_800ExtraBold,
 } from '@expo-google-fonts/plus-jakarta-sans';
-import { Stack } from 'expo-router';
+import { Stack, useNavigationContainerRef } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import * as WebBrowser from 'expo-web-browser';
@@ -30,7 +32,7 @@ SplashScreen.preventAutoHideAsync();
 // redirect URL back to the opener window and close. No-op on native.
 WebBrowser.maybeCompleteAuthSession();
 
-export default function RootLayout() {
+function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
@@ -45,6 +47,17 @@ export default function RootLayout() {
   });
   useAuthListener();
   const authStatus = useAuthStore((s) => s.status);
+  const userId = useAuthStore((s) => s.user?.id ?? null);
+  const navigationRef = useNavigationContainerRef();
+
+  useEffect(() => {
+    if (navigationRef) navigationIntegration.registerNavigationContainer(navigationRef);
+  }, [navigationRef]);
+
+  // Hashed id only (src/lib/sentry.ts).
+  useEffect(() => {
+    void setSentryUser(userId);
+  }, [userId]);
 
   const ready = (fontsLoaded || fontError !== null) && authStatus !== 'loading';
 
@@ -76,3 +89,5 @@ export default function RootLayout() {
     </>
   );
 }
+
+export default Sentry.wrap(RootLayout);

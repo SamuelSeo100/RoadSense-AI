@@ -23,6 +23,7 @@ interface ListRowProps {
   children: ReactNode;
   minHeight?: number;
   onPress?: () => void;
+  onLongPress?: () => void;
   accessibilityLabel?: string;
   accessibilityRole?: 'button' | 'link';
 }
@@ -31,14 +32,16 @@ export function ListRow({
   children,
   minHeight = 60,
   onPress,
+  onLongPress,
   accessibilityLabel,
   accessibilityRole = 'button',
 }: ListRowProps) {
   const style = [styles.row, { minHeight }];
-  if (!onPress) return <View style={style}>{children}</View>;
+  if (!onPress && !onLongPress) return <View style={style}>{children}</View>;
   return (
     <PressableBox
       onPress={onPress}
+      onLongPress={onLongPress}
       accessibilityRole={accessibilityRole}
       accessibilityLabel={accessibilityLabel}
       style={style}

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import Constants from 'expo-constants';
 import { Alert, Pressable, StyleSheet, View } from 'react-native';
 
 import { Icon } from '@/components/routly/Icon';
@@ -7,6 +8,7 @@ import { SectionHeader } from '@/components/routly/SectionHeader';
 import { cityInfo } from '@/constants/cities';
 import { authService } from '@/features/auth/auth.service';
 import { choose, confirm } from '@/lib/confirm';
+import { appVersion, sendTestError } from '@/lib/sentry';
 import { bookingProviderNames, type BookingProvider } from '@/services/bookings';
 import { historyService, tripLogService } from '@/services';
 import { useAuthStore } from '@/store/authStore';
@@ -26,6 +28,11 @@ import { useHistoryVersion } from '../trip/tripLog';
 import { GroupedList, ListRow } from './components/GroupedList';
 import { PreferencesCard } from './components/PreferencesCard';
 import { QUICK_LAUNCH_COMBOS, QuickLaunchCard } from './components/QuickLaunchCard';
+
+/** EAS preview builds only: the hidden Sentry test on the version row. */
+const isPreviewBuild =
+  (Constants.expoConfig?.extra as { buildProfile?: string } | undefined)?.buildProfile ===
+  'preview';
 
 const LINKED_APPS: BookingProvider[] = ['uber', 'ola', 'puneMetro'];
 
@@ -108,6 +115,11 @@ export function ProfileScreen() {
   };
 
   const comingSoon = (what: string) => () => showToast(`${what} is coming soon`);
+
+  const sentryTest = () => {
+    const id = sendTestError();
+    showToast(id ? `Test error sent to Sentry (${id.slice(0, 8)})` : 'Sentry is off in this build');
+  };
 
   return (
     <SheetScrollView gap={18}>
@@ -268,6 +280,18 @@ export function ProfileScreen() {
             <RText variant="body" family={fonts.extrabold} color={colors.danger}>
               Log out
             </RText>
+          </ListRow>
+          <ListRow
+            minHeight={52}
+            onLongPress={isPreviewBuild ? sentryTest : undefined}
+            accessibilityRole="button"
+            accessibilityLabel={`App version ${appVersion}`}
+          >
+            <View style={styles.flex}>
+              <RText variant="caption" size={13}>
+                Version {appVersion}
+              </RText>
+            </View>
           </ListRow>
         </GroupedList>
       </View>
