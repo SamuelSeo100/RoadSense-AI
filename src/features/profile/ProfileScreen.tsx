@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import Constants from 'expo-constants';
 import { Alert, Pressable, StyleSheet, View } from 'react-native';
 
 import { Icon } from '@/components/routly/Icon';
@@ -8,7 +7,8 @@ import { SectionHeader } from '@/components/routly/SectionHeader';
 import { cityInfo } from '@/constants/cities';
 import { authService } from '@/features/auth/auth.service';
 import { choose, confirm } from '@/lib/confirm';
-import { appVersion, sendTestError } from '@/lib/sentry';
+import { appVersion, isPreviewBuild, updateLabel } from '@/lib/appInfo';
+import { sendTestError } from '@/lib/sentry';
 import { bookingProviderNames, type BookingProvider } from '@/services/bookings';
 import { historyService, tripLogService } from '@/services';
 import { useAuthStore } from '@/store/authStore';
@@ -29,10 +29,8 @@ import { GroupedList, ListRow } from './components/GroupedList';
 import { PreferencesCard } from './components/PreferencesCard';
 import { QUICK_LAUNCH_COMBOS, QuickLaunchCard } from './components/QuickLaunchCard';
 
-/** EAS preview builds only: the hidden Sentry test on the version row. */
-const isPreviewBuild =
-  (Constants.expoConfig?.extra as { buildProfile?: string } | undefined)?.buildProfile ===
-  'preview';
+/** Under the version: OTA update id + runtime, so testers can say what they run. */
+const UPDATE_LABEL = updateLabel();
 
 const LINKED_APPS: BookingProvider[] = ['uber', 'ola', 'puneMetro'];
 
@@ -285,12 +283,19 @@ export function ProfileScreen() {
             minHeight={52}
             onLongPress={isPreviewBuild ? sentryTest : undefined}
             accessibilityRole="button"
-            accessibilityLabel={`App version ${appVersion}`}
+            accessibilityLabel={[`App version ${appVersion}`, UPDATE_LABEL]
+              .filter(Boolean)
+              .join(', ')}
           >
-            <View style={styles.flex}>
+            <View style={[styles.flex, styles.version]}>
               <RText variant="caption" size={13}>
                 Version {appVersion}
               </RText>
+              {UPDATE_LABEL && (
+                <RText variant="caption" size={12} selectable>
+                  {UPDATE_LABEL}
+                </RText>
+              )}
             </View>
           </ListRow>
         </GroupedList>
@@ -325,6 +330,7 @@ const styles = StyleSheet.create({
   },
   section: { gap: 10 },
   flex: { flex: 1 },
+  version: { paddingVertical: 10, gap: 2 },
   placeIcon: {
     width: 36,
     height: 36,

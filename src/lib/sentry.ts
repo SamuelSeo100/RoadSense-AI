@@ -2,6 +2,8 @@ import * as Sentry from '@sentry/react-native';
 import Constants from 'expo-constants';
 import * as Crypto from 'expo-crypto';
 
+import { appVersion, updateChannel, updateInfo } from './appInfo';
+
 /**
  * Crash reporting. Privacy rules: no PII (no email, no IP), a hashed user id
  * only, no coordinates or place names in breadcrumbs or events, no Session
@@ -12,8 +14,6 @@ const dsn = process.env.EXPO_PUBLIC_SENTRY_DSN ?? '';
 const extra = (Constants.expoConfig?.extra ?? {}) as { sentryDebug?: boolean };
 /** Off without a DSN, and in dev unless SENTRY_DEBUG=true at build/start time. */
 export const sentryEnabled = dsn !== '' && (!__DEV__ || extra.sentryDebug === true);
-
-export const appVersion = Constants.expoConfig?.version ?? 'unknown';
 
 /** "18.5204,73.8567", "lat 18.52 lng 73.85": anything that looks like a coordinate. */
 const COORD = /-?\d{1,3}\.\d{3,}/g;
@@ -66,7 +66,7 @@ const beforeSend: Sentry.ReactNativeOptions['beforeSend'] = (event) => {
 if (sentryEnabled) {
   Sentry.init({
     dsn,
-    environment: __DEV__ ? 'development' : 'release',
+    environment: __DEV__ ? 'development' : (updateChannel ?? 'release'),
     sendDefaultPii: false,
     tracesSampleRate: 0.1,
     // Session Replay off; no screenshots / view hierarchy (they show places).
@@ -79,6 +79,9 @@ if (sentryEnabled) {
     beforeSend,
   });
   Sentry.setTag('app_version', appVersion);
+  // Which OTA update produced the event (source maps differ per update).
+  Sentry.setTag('update_id', updateInfo.embedded ? 'embedded' : (updateInfo.updateId ?? 'none'));
+  if (updateInfo.runtimeVersion) Sentry.setTag('runtime_version', updateInfo.runtimeVersion);
 }
 
 /** Tags events with SHA-256(user id): stable per user, never the id or email itself. */
