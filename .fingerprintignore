@@ -1,0 +1,7 @@
+# Runtime version uses the "fingerprint" policy, and EAS rejects a build whose
+# fingerprint differs from the one eas-cli computed on this machine.
+# A local `expo run:android` lets React Native's Gradle plugin strip the
+# deprecated package="…" attribute from library manifests in node_modules
+# (in place); EAS hashes a clean install. Keep those manifests out of the hash
+# (a package upgrade still changes the fingerprint via its other files).
+**/node_modules/**/android/src/main/AndroidManifest.xml

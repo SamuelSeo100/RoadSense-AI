@@ -7,11 +7,8 @@ export const appVersion = Constants.expoConfig?.version ?? 'unknown';
 /** EAS Update channel baked into the build ("preview"); null in dev builds. */
 export const updateChannel: string | null = Updates.isEnabled ? (Updates.channel ?? null) : null;
 
-/** EAS preview builds (also after an OTA update, unlike the build-time profile). */
-export const isPreviewBuild =
-  updateChannel === 'preview' ||
-  (Constants.expoConfig?.extra as { buildProfile?: string } | undefined)?.buildProfile ===
-    'preview';
+/** EAS preview builds: the update channel is baked into the build (and survives OTA updates). */
+export const isPreviewBuild = updateChannel === 'preview';
 
 /** "Update 3f2a9c1e · runtime 4b1d…" or "Built-in bundle · runtime …"; null in dev. */
 export function updateLabel(): string | null {

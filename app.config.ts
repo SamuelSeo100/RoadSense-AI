@@ -80,8 +80,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       googleMapsConfigured: googleMapsApiKey !== '',
       /** SENTRY_DEBUG=true: report to Sentry from dev builds too (src/lib/sentry.ts). */
       sentryDebug: process.env.SENTRY_DEBUG === 'true',
-      /** EAS build profile ("preview"), set by EAS Build; unset for local builds. */
-      buildProfile: process.env.EAS_BUILD_PROFILE ?? null,
     },
   };
 };
