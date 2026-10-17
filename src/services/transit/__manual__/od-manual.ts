@@ -5,7 +5,7 @@
  *   npm run test:od
  *
  * Prints every ranked option (rank, source, time, fare, legs) and the Google
- * calls per request.
+ * calls per request. ROUTLY_OD_ONLY="Kothrud → Lonavala" runs only matching pairs.
  */
 import { describe, it, jest } from '@jest/globals';
 
@@ -42,6 +42,8 @@ const ODS: [Place, Place, Date][] = [
   [P.kothrud, P.pimpri, at('08:30')],
   [P.akurdi, P.puneJn, at('08:30')],
   [P.kothrud, P.lonavala, at('08:30')],
+  // 08:30 has no local within the 45-min wait at Shivaji Nagar; 07:20 catches UP-06.
+  [P.kothrud, P.lonavala, at('07:20')],
   [P.pimpri, P.swargate, at('22:30')],
   [P.puneJn, P.lonavala, at('23:55')],
 ];
@@ -83,7 +85,9 @@ run('manual OD', () => {
     const info = jest.spyOn(console, 'info').mockImplementation((msg: unknown) => {
       lines.push(`  ${String(msg)}`);
     });
+    const only = process.env.ROUTLY_OD_ONLY;
     for (const [from, to, departAt] of ODS) {
+      if (only && !`${from.name} → ${to.name}`.includes(only)) continue;
       lines.push(
         `\n## ${from.name} → ${to.name} @ ${departAt.toISOString()} (IST ${departAt.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' })})`,
       );
