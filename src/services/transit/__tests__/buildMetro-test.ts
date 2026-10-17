@@ -2,7 +2,7 @@ import { describe, expect, it } from '@jest/globals';
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { buildMetroNetwork, estimateSegmentMinutes } from '../buildMetro';
+import { buildMetroNetwork, estimateSegmentMinutes, lineSegmentMinutes } from '../buildMetro';
 
 const DATA = path.join(__dirname, '../../../../data/transit');
 const stationsCsv = fs.readFileSync(path.join(DATA, 'pune_metro_stations.csv'), 'utf8');
@@ -54,6 +54,31 @@ describe('buildMetroNetwork', () => {
       lat: 18.6,
       geocoded: true,
     });
+  });
+});
+
+describe('lineSegmentMinutes', () => {
+  const stations = ['P1', 'P2', 'P3'].map((code, i) => ({
+    code,
+    name: code,
+    lat: 18.5 + i * 0.02,
+    lng: 73.8,
+    geocoded: true,
+  }));
+
+  it('scales a calibrated line so runs + dwell equal the end-to-end target', () => {
+    // 'purple' carries a 34 min calibration; 1 intermediate dwell of 0.5 min.
+    const segs = lineSegmentMinutes({ id: 'purple', stations: ['P1', 'P2', 'P3'] }, stations);
+    const total = segs.reduce((s, e) => s + (e.value ?? 0), 0) + 0.5;
+    expect(total).toBeCloseTo(34, 1);
+    expect(segs[0]).toMatchObject({ estimated: true, calibratedTo: 'google-transit-2026-10-19' });
+  });
+
+  it('leaves uncalibrated lines and lines with unknown segments unscaled', () => {
+    const plain = lineSegmentMinutes({ id: 'other', stations: ['P1', 'P2', 'P3'] }, stations);
+    expect(plain).toEqual(estimateSegmentMinutes({ stations: ['P1', 'P2', 'P3'] }, stations));
+    const gap = lineSegmentMinutes({ id: 'purple', stations: ['P1', 'NOPE'] }, stations);
+    expect(gap[0]?.value).toBeNull();
   });
 });
 

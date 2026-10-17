@@ -16,7 +16,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { estimateSegmentMinutes } from '../src/services/transit/buildMetro.ts';
+import { lineSegmentMinutes } from '../src/services/transit/buildMetro.ts';
 import type { Geocoded, MetroNetwork } from '../src/services/transit/types.ts';
 
 type Station = Geocoded & { code: string; name: string };
@@ -134,7 +134,9 @@ function flagDuplicates(rows: Row[]) {
 
 async function main() {
   if (!key) {
-    console.error('Set GOOGLE_MAPS_API_KEY or EXPO_PUBLIC_GOOGLE_MAPS_API_KEY (e.g. --env-file=.env).');
+    console.error(
+      'Set GOOGLE_MAPS_API_KEY or EXPO_PUBLIC_GOOGLE_MAPS_API_KEY (e.g. --env-file=.env).',
+    );
     process.exit(1);
   }
   const metroPath = path.join(DATA, 'metro.json');
@@ -149,7 +151,7 @@ async function main() {
 
   // Segment run times follow the coordinates (verified values are kept).
   for (const line of metro.lines) {
-    const estimates = estimateSegmentMinutes(line, metro.stations);
+    const estimates = lineSegmentMinutes(line, metro.stations);
     line.segmentMinutes = estimates.map((e, i) =>
       line.segmentMinutes[i]?.verified ? line.segmentMinutes[i]! : e,
     );
@@ -160,9 +162,13 @@ async function main() {
   for (const { file, station: s, match, flag } of rows) {
     const coords = s.lat == null ? '—' : `${s.lat}, ${s.lng}`;
     const matched = match.match(/→ "(.*)"/)?.[1] ?? match;
-    console.log(`| ${file} | ${s.code} | ${s.name} | ${coords} | ${matched} | ${s.formattedAddress ?? ''} | ${flag} |`);
+    console.log(
+      `| ${file} | ${s.code} | ${s.name} | ${coords} | ${matched} | ${s.formattedAddress ?? ''} | ${flag} |`,
+    );
   }
-  console.log(`\n${m.requests + r.requests} Places requests${dryRun ? ' (dry run, nothing written)' : ''}.`);
+  console.log(
+    `\n${m.requests + r.requests} Places requests${dryRun ? ' (dry run, nothing written)' : ''}.`,
+  );
   if (!dryRun) {
     fs.writeFileSync(metroPath, JSON.stringify(metro, null, 2) + '\n');
     fs.writeFileSync(subPath, JSON.stringify(sub, null, 2) + '\n');

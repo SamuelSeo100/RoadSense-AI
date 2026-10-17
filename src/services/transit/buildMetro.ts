@@ -20,6 +20,8 @@ export const LINE_DEFS = [
     csvLine: 'Purple',
     // Google Transit's colour for the line (the existing map legend).
     color: '#903373',
+    /** Google Transit PCMC → Swargate ride, 2026-10-19 (manual OD run). */
+    calibration: { endToEndMin: 34, calibratedTo: 'google-transit-2026-10-19' },
     stations: [
       'PIM',
       'STG',
@@ -41,6 +43,8 @@ export const LINE_DEFS = [
     name: 'Aqua Line',
     csvLine: 'Aqua',
     color: '#039BE5',
+    /** Google Transit Vanaz → Ramwadi ride, 2026-10-19 (manual OD run). */
+    calibration: { endToEndMin: 36, calibratedTo: 'google-transit-2026-10-19' },
     stations: [
       'VNZ',
       'AND',
@@ -148,6 +152,34 @@ export function estimateSegmentMinutes(
   });
 }
 
+/** Dwell at each station (s), as in metro.json. */
+export const DWELL_SECONDS = 30;
+
+/**
+ * Segment run times for a line: straight-line estimates, then (for lines with
+ * a `calibration` in LINE_DEFS) all scaled by one factor so that the
+ * end-to-end ride (runs + dwell at every intermediate station) matches the
+ * reference. Still `estimated: true`; stays unscaled while any segment is unknown.
+ */
+export function lineSegmentMinutes(
+  line: Pick<MetroLine, 'id' | 'stations'>,
+  stations: MetroStation[],
+  dwellSeconds = DWELL_SECONDS,
+): Sourced<number>[] {
+  const estimates = estimateSegmentMinutes(line, stations);
+  const cal = LINE_DEFS.find((d) => d.id === line.id)?.calibration;
+  const run = estimates.reduce((s, e) => s + (e.value ?? NaN), 0);
+  if (!cal || !Number.isFinite(run) || run <= 0) return estimates;
+  const dwellMin = (Math.max(0, line.stations.length - 2) * dwellSeconds) / 60;
+  const k = (cal.endToEndMin - dwellMin) / run;
+  return estimates.map((e) => ({
+    ...e,
+    value: Math.round((e.value ?? 0) * k * 100) / 100,
+    calibratedTo: cal.calibratedTo,
+    source: `${e.source}; scaled ×${k.toFixed(3)} so the end-to-end ride is ${cal.endToEndMin} min (Google Transit)`,
+  }));
+}
+
 export interface BuildResult {
   network: MetroNetwork;
   /** Problems that make the data unusable; empty = valid. */
@@ -247,13 +279,17 @@ export function buildMetroNetwork(
     };
     const prevSegs = prevLine.get(def.id)?.segmentMinutes;
     // Keep segment times someone has verified; re-estimate the rest.
-    const estimates = estimateSegmentMinutes(line, stations);
+    const estimates = lineSegmentMinutes(line, stations);
     return {
       ...line,
       segmentMinutes: estimates.map((e, i) => (prevSegs?.[i]?.verified ? prevSegs[i]! : e)),
       dwellSeconds: sourced(30),
       firstTrain: sourced('06:00'),
-      lastTrain: sourced('22:00'),
+      // Extended Jan 2025 (Maha-Metro press release); verify on punemetrorail.org.
+      lastTrain: sourced(
+        '23:00',
+        'Maha-Metro press release, extended Jan 2025 (TODO_VERIFY on punemetrorail.org)',
+      ),
       headways: [
         { band: 'peak_am', from: '08:00', to: '11:00', headwayMin: sourced(10) },
         { band: 'peak_pm', from: '17:00', to: '20:00', headwayMin: sourced(10) },

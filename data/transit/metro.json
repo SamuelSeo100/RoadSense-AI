@@ -327,76 +327,88 @@
       ],
       "segmentMinutes": [
         {
-          "value": 3.8,
+          "value": 3.77,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 2.14 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 2.14 km straight line at 34 km/h; scaled ×0.993 so the end-to-end ride is 34 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         },
         {
-          "value": 1.3,
+          "value": 1.29,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 0.73 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 0.73 km straight line at 34 km/h; scaled ×0.993 so the end-to-end ride is 34 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         },
         {
-          "value": 2.3,
+          "value": 2.28,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 1.32 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 1.32 km straight line at 34 km/h; scaled ×0.993 so the end-to-end ride is 34 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         },
         {
-          "value": 1.8,
+          "value": 1.79,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 1.03 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 1.03 km straight line at 34 km/h; scaled ×0.993 so the end-to-end ride is 34 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         },
         {
-          "value": 1.5,
+          "value": 1.49,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 0.87 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 0.87 km straight line at 34 km/h; scaled ×0.993 so the end-to-end ride is 34 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         },
         {
-          "value": 2.9,
+          "value": 2.88,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 1.62 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 1.62 km straight line at 34 km/h; scaled ×0.993 so the end-to-end ride is 34 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         },
         {
-          "value": 1.6,
+          "value": 1.59,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 0.91 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 0.91 km straight line at 34 km/h; scaled ×0.993 so the end-to-end ride is 34 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         },
         {
-          "value": 6,
+          "value": 5.96,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 3.41 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 3.41 km straight line at 34 km/h; scaled ×0.993 so the end-to-end ride is 34 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         },
         {
-          "value": 2,
+          "value": 1.99,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 1.12 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 1.12 km straight line at 34 km/h; scaled ×0.993 so the end-to-end ride is 34 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         },
         {
-          "value": 1.1,
+          "value": 1.09,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 0.61 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 0.61 km straight line at 34 km/h; scaled ×0.993 so the end-to-end ride is 34 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         },
         {
-          "value": 1.8,
+          "value": 1.79,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 1.01 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 1.01 km straight line at 34 km/h; scaled ×0.993 so the end-to-end ride is 34 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         },
         {
-          "value": 2.6,
+          "value": 2.58,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 1.45 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 1.45 km straight line at 34 km/h; scaled ×0.993 so the end-to-end ride is 34 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         }
       ],
       "dwellSeconds": {
@@ -410,9 +422,9 @@
         "source": "secondary summary, 2026-10-17"
       },
       "lastTrain": {
-        "value": "22:00",
+        "value": "23:00",
         "verified": false,
-        "source": "secondary summary, 2026-10-17"
+        "source": "Maha-Metro press release, extended Jan 2025 (TODO_VERIFY on punemetrorail.org)"
       },
       "headways": [
         {
@@ -467,94 +479,109 @@
       ],
       "segmentMinutes": [
         {
-          "value": 1.7,
+          "value": 2.04,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 0.96 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 0.96 km straight line at 34 km/h; scaled ×1.198 so the end-to-end ride is 36 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         },
         {
-          "value": 1.5,
+          "value": 1.8,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 0.83 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 0.83 km straight line at 34 km/h; scaled ×1.198 so the end-to-end ride is 36 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         },
         {
-          "value": 1.3,
+          "value": 1.56,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 0.75 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 0.75 km straight line at 34 km/h; scaled ×1.198 so the end-to-end ride is 36 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         },
         {
-          "value": 1.9,
+          "value": 2.28,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 1.07 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 1.07 km straight line at 34 km/h; scaled ×1.198 so the end-to-end ride is 36 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         },
         {
-          "value": 1.5,
+          "value": 1.8,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 0.85 km straight line at 34 km/h"
-        },
-        {
-          "value": 1,
-          "verified": false,
-          "estimated": true,
-          "source": "TODO_VERIFY: estimated from 0.56 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 0.85 km straight line at 34 km/h; scaled ×1.198 so the end-to-end ride is 36 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         },
         {
           "value": 1.2,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 0.69 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 0.56 km straight line at 34 km/h; scaled ×1.198 so the end-to-end ride is 36 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         },
         {
-          "value": 1.1,
+          "value": 1.44,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 0.64 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 0.69 km straight line at 34 km/h; scaled ×1.198 so the end-to-end ride is 36 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         },
         {
-          "value": 1.5,
+          "value": 1.32,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 0.86 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 0.64 km straight line at 34 km/h; scaled ×1.198 so the end-to-end ride is 36 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         },
         {
-          "value": 1.4,
+          "value": 1.8,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 0.77 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 0.86 km straight line at 34 km/h; scaled ×1.198 so the end-to-end ride is 36 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         },
         {
-          "value": 1.1,
+          "value": 1.68,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 0.65 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 0.77 km straight line at 34 km/h; scaled ×1.198 so the end-to-end ride is 36 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         },
         {
-          "value": 1.9,
+          "value": 1.32,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 1.08 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 0.65 km straight line at 34 km/h; scaled ×1.198 so the end-to-end ride is 36 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         },
         {
-          "value": 1.1,
+          "value": 2.28,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 0.60 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 1.08 km straight line at 34 km/h; scaled ×1.198 so the end-to-end ride is 36 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         },
         {
-          "value": 3.6,
+          "value": 1.32,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 2.02 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 0.60 km straight line at 34 km/h; scaled ×1.198 so the end-to-end ride is 36 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         },
         {
-          "value": 2.4,
+          "value": 4.31,
           "verified": false,
           "estimated": true,
-          "source": "TODO_VERIFY: estimated from 1.37 km straight line at 34 km/h"
+          "source": "TODO_VERIFY: estimated from 2.02 km straight line at 34 km/h; scaled ×1.198 so the end-to-end ride is 36 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
+        },
+        {
+          "value": 2.88,
+          "verified": false,
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 1.37 km straight line at 34 km/h; scaled ×1.198 so the end-to-end ride is 36 min (Google Transit)",
+          "calibratedTo": "google-transit-2026-10-19"
         }
       ],
       "dwellSeconds": {
@@ -568,9 +595,9 @@
         "source": "secondary summary, 2026-10-17"
       },
       "lastTrain": {
-        "value": "22:00",
+        "value": "23:00",
         "verified": false,
-        "source": "secondary summary, 2026-10-17"
+        "source": "Maha-Metro press release, extended Jan 2025 (TODO_VERIFY on punemetrorail.org)"
       },
       "headways": [
         {

@@ -117,11 +117,18 @@ describe('bundled Pune Metro data', () => {
     expect(ride?.fare?.fare).toBe(metroFare('VNZ', 'PIM')?.fare);
   });
 
-  it('has no metro after the 22:00 last train', () => {
-    expect(metroRide('PIM', 'SGT', t('21:50'))).not.toBeNull();
-    expect(metroRide('PIM', 'SGT', t('22:30'))).toBeNull();
-    expect(metroInService(t('22:30'))).toBe(false);
-    expect(metroInService(t('08:00'))).toBe(true);
+  it('runs until the 23:00 last train', () => {
+    expect(metroRide('PIM', 'SGT', t('22:30'))).not.toBeNull();
+    expect(metroRide('PIM', 'SGT', t('23:01'))).toBeNull();
+    expect(metroInService(t('22:30'))).toBe(true);
+    expect(metroInService(t('23:30'))).toBe(false);
+  });
+
+  it('rides end to end in Google Transit time (34 / 36 min, calibrated)', () => {
+    expect(metroRide('PIM', 'SGT', t('12:00'))?.rideMin).toBeCloseTo(34, 1);
+    expect(metroRide('VNZ', 'RAW', t('12:00'))?.rideMin).toBeCloseTo(36, 1);
+    const seg = metroNetwork.lines[0]!.segmentMinutes[0]!;
+    expect(seg).toMatchObject({ estimated: true, calibratedTo: 'google-transit-2026-10-19' });
   });
 
   it('keeps Line 3 off until it is confirmed', () => {

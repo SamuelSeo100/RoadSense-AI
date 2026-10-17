@@ -11,6 +11,8 @@ export interface Sourced<T> {
   verified: boolean;
   source: string;
   estimated?: boolean;
+  /** Estimate scaled to match this reference (e.g. Google Transit end-to-end times on a date). */
+  calibratedTo?: string;
 }
 
 /** Coordinates written by scripts/geocode-stations.ts. */

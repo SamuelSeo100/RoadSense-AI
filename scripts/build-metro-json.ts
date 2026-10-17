@@ -36,10 +36,16 @@ if (errors.length) {
   process.exit(1);
 }
 
-const pairs = Object.values(network.fares.matrix).reduce((n, row) => n + Object.keys(row).length, 0);
+const pairs = Object.values(network.fares.matrix).reduce(
+  (n, row) => n + Object.keys(row).length,
+  0,
+);
 console.log(`✓ ${network.stations.length} stations, ${pairs} fare pairs (symmetric), lines:`);
-for (const l of network.lines) console.log(`  ${l.id}: ${l.stations.length} stations${l.active ? '' : ' (inactive)'}`);
-console.log(`  ${network.fares.adjusted.length} pairs use the higher of an asymmetric official fare:`);
+for (const l of network.lines)
+  console.log(`  ${l.id}: ${l.stations.length} stations${l.active ? '' : ' (inactive)'}`);
+console.log(
+  `  ${network.fares.adjusted.length} pairs use the higher of an asymmetric official fare:`,
+);
 for (const a of network.fares.adjusted) {
   console.log(`    ${a.from}↔${a.to} ₹${network.fares.matrix[a.from]?.[a.to]}: ${a.note}`);
 }
