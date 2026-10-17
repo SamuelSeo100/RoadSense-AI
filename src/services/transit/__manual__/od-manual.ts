@@ -5,9 +5,7 @@
  *   npm run test:od
  *
  * Prints every ranked option (rank, source, time, fare, legs) and the Google
- * calls per request. ROUTLY_OD_SYNTHETIC_TRAINS=1 swaps in a made-up hourly
- * local-train timetable (clearly fake) to exercise the train path before the
- * real timetable is imported.
+ * calls per request.
  */
 import { describe, it, jest } from '@jest/globals';
 
@@ -19,35 +17,6 @@ jest.mock('expo-constants', () => ({
   default: { expoConfig: { android: { package: 'in.routly.app' } } },
 }));
 
-const SYNTHETIC = process.env.ROUTLY_OD_SYNTHETIC_TRAINS === '1';
-if (SYNTHETIC) {
-  // doMock (not hoisted): the routing service is imported after this runs.
-  jest.doMock('../../../../data/transit/suburban_rail.json', () => {
-    const real = jest.requireActual('../../../../data/transit/suburban_rail.json') as {
-      stations: unknown[];
-    };
-    const n = real.stations.length;
-    const hhmm = (m: number) =>
-      `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
-    // FAKE: every hour 05:00–22:00 each way, 4 min between stations.
-    const trips = Array.from({ length: 18 }, (_, h) => [
-      {
-        trainNo: `FAKE-U${h}`,
-        direction: 'UP',
-        days: [0, 1, 2, 3, 4, 5, 6],
-        times: Array.from({ length: n }, (_, i) => hhmm((5 + h) * 60 + i * 4)),
-      },
-      {
-        trainNo: `FAKE-D${h}`,
-        direction: 'DOWN',
-        days: [0, 1, 2, 3, 4, 5, 6],
-        times: Array.from({ length: n }, (_, i) => hhmm((5 + h) * 60 + 30 + (n - 1 - i) * 4)),
-      },
-    ]).flat();
-    return { ...real, trips };
-  });
-}
-
 const place = (name: string, latitude: number, longitude: number): Place => ({
   id: name,
   name,
@@ -57,11 +26,8 @@ const place = (name: string, latitude: number, longitude: number): Place => ({
 const P = {
   pimpri: place('Pimpri', 18.6279, 73.8009),
   swargate: place('Swargate', 18.5018, 73.8636),
-  vanaz: place('Vanaz', 18.5072, 73.8052),
-  ramwadi: place('Ramwadi', 18.5571, 73.9087),
   kothrud: place('Kothrud', 18.5039, 73.8128),
-  hinjewadi: place('Hinjewadi Ph1', 18.5913, 73.7389),
-  shivajinagar: place('Shivajinagar', 18.5308, 73.8475),
+  kalyaniNagar: place('Kalyani Nagar', 18.5463, 73.9033),
   akurdi: place('Akurdi', 18.6486, 73.7647),
   puneJn: place('Pune Jn', 18.5289, 73.8742),
   lonavala: place('Lonavala', 18.7537, 73.4086),
@@ -70,20 +36,15 @@ const P = {
 /** Monday 2026-10-19 (IST). */
 const at = (hhmm: string) => new Date(`2026-10-19T${hhmm}:00+05:30`);
 
-const ODS: [Place, Place, Date][] = SYNTHETIC
-  ? [
-      [P.akurdi, P.puneJn, at('08:30')],
-      [P.kothrud, P.lonavala, at('08:30')],
-    ]
-  : [
-      [P.pimpri, P.swargate, at('08:30')],
-      [P.vanaz, P.ramwadi, at('08:30')],
-      [P.kothrud, P.pimpri, at('08:30')],
-      [P.hinjewadi, P.shivajinagar, at('08:30')],
-      [P.akurdi, P.puneJn, at('08:30')],
-      [P.kothrud, P.lonavala, at('08:30')],
-      [P.pimpri, P.swargate, at('23:45')],
-    ];
+const ODS: [Place, Place, Date][] = [
+  [P.pimpri, P.swargate, at('08:30')],
+  [P.kothrud, P.kalyaniNagar, at('08:30')],
+  [P.kothrud, P.pimpri, at('08:30')],
+  [P.akurdi, P.puneJn, at('08:30')],
+  [P.kothrud, P.lonavala, at('08:30')],
+  [P.pimpri, P.swargate, at('22:30')],
+  [P.puneJn, P.lonavala, at('23:55')],
+];
 
 function describeRoute(r: RankedRoute): string {
   const legs = r.legs
@@ -99,9 +60,9 @@ function describeRoute(r: RankedRoute): string {
 
 const run = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ? describe : describe.skip;
 
-run(`manual OD${SYNTHETIC ? ' (SYNTHETIC TRAINS — NOT REAL)' : ''}`, () => {
+run('manual OD', () => {
   it('prints ranked options per OD', async () => {
-    // require, not import(): runs after the doMock above (Jest has no ESM dynamic import here).
+    // require, not import(): after the mocks above (no ESM dynamic import under Jest here).
     /* eslint-disable @typescript-eslint/no-require-imports */
     const { createGoogleRoutingService } =
       require('../../google/googleRoutingService') as typeof import('../../google/googleRoutingService');
