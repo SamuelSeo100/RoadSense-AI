@@ -10,7 +10,7 @@ import { choose, confirm } from '@/lib/confirm';
 import { appVersion, isPreviewBuild, updateLabel } from '@/lib/appInfo';
 import { sendTestError } from '@/lib/sentry';
 import { bookingProviderNames, type BookingProvider } from '@/services/bookings';
-import { historyService, tripLogService } from '@/services';
+import { historyService, transitDataCredits, tripLogService } from '@/services';
 import { useAuthStore } from '@/store/authStore';
 import { usePreferencesStore } from '@/store/preferencesStore';
 import { useRoutlyPrefs } from '@/store/routlyPrefsStore';
@@ -278,6 +278,19 @@ export function ProfileScreen() {
             <RText variant="body" family={fonts.extrabold} color={colors.danger}>
               Log out
             </RText>
+          </ListRow>
+          <ListRow
+            minHeight={52}
+            accessibilityLabel={`Data sources: ${transitDataCredits.join('. ')}`}
+          >
+            <View style={[styles.flex, styles.version]}>
+              <RText variant="body">Data sources</RText>
+              {transitDataCredits.map((credit) => (
+                <RText key={credit} variant="caption" size={12}>
+                  {credit}
+                </RText>
+              ))}
+            </View>
           </ListRow>
           <ListRow
             minHeight={52}

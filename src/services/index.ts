@@ -34,6 +34,7 @@ import type {
 
 export * from './types';
 export { rankRoutes } from './ranking';
+export { transitDataCredits } from './transit/network';
 /** Origin used until the user's location is known (TODO(api): city centre from the backend). */
 export { fallbackOrigin } from './mock/geometry';
 
