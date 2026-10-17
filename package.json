@@ -69,7 +69,8 @@
     "lint": "expo lint",
     "format": "prettier --write .",
     "check": "npm run typecheck && npm run lint",
-    "test": "jest"
+    "test": "jest",
+    "test:od": "node --env-file=.env node_modules/.bin/jest --config src/services/transit/__manual__/jest.config.js --runInBand"
   },
   "private": true,
   "jest": {

@@ -1,0 +1,144 @@
+/**
+ * Manual OD check against the live Google Routes API (costs API calls; not
+ * part of `npm test`):
+ *
+ *   npm run test:od
+ *
+ * Prints every ranked option (rank, source, time, fare, legs) and the Google
+ * calls per request. ROUTLY_OD_SYNTHETIC_TRAINS=1 swaps in a made-up hourly
+ * local-train timetable (clearly fake) to exercise the train path before the
+ * real timetable is imported.
+ */
+import { describe, it, jest } from '@jest/globals';
+
+import type { Place, RankedRoute } from '../../types';
+
+jest.mock('react-native', () => ({ Platform: { OS: 'android' } }));
+jest.mock('expo-constants', () => ({
+  __esModule: true,
+  default: { expoConfig: { android: { package: 'in.routly.app' } } },
+}));
+
+const SYNTHETIC = process.env.ROUTLY_OD_SYNTHETIC_TRAINS === '1';
+if (SYNTHETIC) {
+  // doMock (not hoisted): the routing service is imported after this runs.
+  jest.doMock('../../../../data/transit/suburban_rail.json', () => {
+    const real = jest.requireActual('../../../../data/transit/suburban_rail.json') as {
+      stations: unknown[];
+    };
+    const n = real.stations.length;
+    const hhmm = (m: number) =>
+      `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+    // FAKE: every hour 05:00–22:00 each way, 4 min between stations.
+    const trips = Array.from({ length: 18 }, (_, h) => [
+      {
+        trainNo: `FAKE-U${h}`,
+        direction: 'UP',
+        days: [0, 1, 2, 3, 4, 5, 6],
+        times: Array.from({ length: n }, (_, i) => hhmm((5 + h) * 60 + i * 4)),
+      },
+      {
+        trainNo: `FAKE-D${h}`,
+        direction: 'DOWN',
+        days: [0, 1, 2, 3, 4, 5, 6],
+        times: Array.from({ length: n }, (_, i) => hhmm((5 + h) * 60 + 30 + (n - 1 - i) * 4)),
+      },
+    ]).flat();
+    return { ...real, trips };
+  });
+}
+
+const place = (name: string, latitude: number, longitude: number): Place => ({
+  id: name,
+  name,
+  location: { latitude, longitude },
+});
+
+const P = {
+  pimpri: place('Pimpri', 18.6279, 73.8009),
+  swargate: place('Swargate', 18.5018, 73.8636),
+  vanaz: place('Vanaz', 18.5072, 73.8052),
+  ramwadi: place('Ramwadi', 18.5571, 73.9087),
+  kothrud: place('Kothrud', 18.5039, 73.8128),
+  hinjewadi: place('Hinjewadi Ph1', 18.5913, 73.7389),
+  shivajinagar: place('Shivajinagar', 18.5308, 73.8475),
+  akurdi: place('Akurdi', 18.6486, 73.7647),
+  puneJn: place('Pune Jn', 18.5289, 73.8742),
+  lonavala: place('Lonavala', 18.7537, 73.4086),
+};
+
+/** Monday 2026-10-19 (IST). */
+const at = (hhmm: string) => new Date(`2026-10-19T${hhmm}:00+05:30`);
+
+const ODS: [Place, Place, Date][] = SYNTHETIC
+  ? [
+      [P.akurdi, P.puneJn, at('08:30')],
+      [P.kothrud, P.lonavala, at('08:30')],
+    ]
+  : [
+      [P.pimpri, P.swargate, at('08:30')],
+      [P.vanaz, P.ramwadi, at('08:30')],
+      [P.kothrud, P.pimpri, at('08:30')],
+      [P.hinjewadi, P.shivajinagar, at('08:30')],
+      [P.akurdi, P.puneJn, at('08:30')],
+      [P.kothrud, P.lonavala, at('08:30')],
+      [P.pimpri, P.swargate, at('23:45')],
+    ];
+
+function describeRoute(r: RankedRoute): string {
+  const legs = r.legs
+    .map((l) => {
+      const cost = l.costInr ? ` ${l.fareEstimated ? '~' : ''}₹${l.costInr}` : '';
+      const sched = l.realtime === false ? ` [Scheduled dep ${l.departure}]` : '';
+      const stops = l.from && l.to ? ` ${l.from}→${l.to}` : '';
+      return `${l.label}${stops} ${l.durationMin}m${cost}${sched}`;
+    })
+    .join(' › ');
+  return `#${r.rank} (heur ${r.heuristicRank}) ${r.source.padEnd(16)} ${String(r.durationMin).padStart(3)} min ₹${r.costInr} ${r.walkingKm} km walk ${r.transfers} tr | ${legs}`;
+}
+
+const run = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ? describe : describe.skip;
+
+run(`manual OD${SYNTHETIC ? ' (SYNTHETIC TRAINS — NOT REAL)' : ''}`, () => {
+  it('prints ranked options per OD', async () => {
+    // require, not import(): runs after the doMock above (Jest has no ESM dynamic import here).
+    /* eslint-disable @typescript-eslint/no-require-imports */
+    const { createGoogleRoutingService } =
+      require('../../google/googleRoutingService') as typeof import('../../google/googleRoutingService');
+    const { createGoogleDirectionsService } =
+      require('../../google/googleDirectionsService') as typeof import('../../google/googleDirectionsService');
+    const { createMockSafetyService } =
+      require('../../mock/mockSafetyService') as typeof import('../../mock/mockSafetyService');
+    /* eslint-enable @typescript-eslint/no-require-imports */
+    const service = createGoogleRoutingService({
+      directions: createGoogleDirectionsService(createMockSafetyService()),
+      preferences: {
+        get: async () => ({ defaultPriority: 'fastest' }) as never,
+        update: async () => ({}) as never,
+      },
+      places: { searchPlaces: async () => [], geocode: async () => null },
+    });
+    const lines: string[] = [];
+    const info = jest.spyOn(console, 'info').mockImplementation((msg: unknown) => {
+      lines.push(`  ${String(msg)}`);
+    });
+    for (const [from, to, departAt] of ODS) {
+      lines.push(
+        `\n## ${from.name} → ${to.name} @ ${departAt.toISOString()} (IST ${departAt.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' })})`,
+      );
+      try {
+        const res = await service.getRoutes(from, to, {
+          priority: 'fastest',
+          vehicles: { car: false, bike: false, cycle: false },
+          departAt,
+        });
+        if (res.notices.length) lines.push(`  notices: ${JSON.stringify(res.notices)}`);
+        for (const r of res.routes) lines.push(`  ${describeRoute(r)}`);
+      } catch (e) {
+        lines.push(`  ERROR ${String(e)}`);
+      }
+    }
+    info.mockRestore();
+    process.stdout.write(lines.join('\n') + '\n');
+  }, 120_000);
+});
