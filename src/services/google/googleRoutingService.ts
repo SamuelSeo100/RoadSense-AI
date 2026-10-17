@@ -786,7 +786,12 @@ export function createGoogleRoutingService(deps: {
     if (failed.length) notices.push({ kind: 'partialFailure', failed });
     if (transitRes.status === 'fulfilled' && drafts.length === 0 && injected.length === 0) {
       notices.push({ kind: 'transitUnavailable' });
-    } else if ((drafts.length > 0 || injected.length > 0) && !metroInService(istMinutes(at))) {
+    } else if (
+      (drafts.length > 0 || injected.length > 0) &&
+      !metroInService(istMinutes(at)) &&
+      // Google may still have a late metro after our (unverified) last train: don't contradict it.
+      !googleDrafts.some((d) => d.legs.some((l) => l.mode === 'metro'))
+    ) {
       notices.push({ kind: 'metroClosed' });
     }
     googleDrafts.forEach((d, i) =>
