@@ -6,6 +6,7 @@ import { metroFixture } from '../__fixtures__/networks';
 import {
   applyMetroTable,
   dropDominated,
+  mergeNearDuplicates,
   stationSignature,
   timetableDrafts,
   type FetchAccess,
@@ -200,6 +201,36 @@ const googleMetroDraft = (legs: Partial<DraftLeg>[]): Draft => ({
   googleFareInr: null,
   transitUnchanged: true,
   source: 'google',
+});
+
+describe('mergeNearDuplicates', () => {
+  const trip = (source: Draft['source'], minutes: number, from = 'PCMC'): Draft => ({
+    ...googleMetroDraft([
+      {},
+      { mode: 'metro', label: 'Metro Purple Line', fromStop: from, toStop: 'Swargate' },
+      {},
+    ]),
+    durationSec: minutes * 60,
+    source,
+  });
+
+  it('keeps only the faster of a Google and a timetable copy of the same trip', () => {
+    const google = trip('google', 60);
+    const ours = trip('routly_timetable', 54);
+    expect(mergeNearDuplicates([google], [ours])).toEqual({ google: [], timetable: [ours] });
+    const slow = trip('routly_timetable', 65);
+    expect(mergeNearDuplicates([google], [slow])).toEqual({ google: [google], timetable: [] });
+  });
+
+  it("keeps Google's on a tie and leaves different trips alone", () => {
+    const google = trip('google', 60);
+    expect(mergeNearDuplicates([google], [trip('routly_timetable', 60)]).timetable).toEqual([]);
+    const other = trip('routly_timetable', 70, 'Sant Tukaram Nagar');
+    expect(mergeNearDuplicates([google], [other])).toEqual({
+      google: [google],
+      timetable: [other],
+    });
+  });
 });
 
 describe('Google metro legs (bundled Pune data)', () => {

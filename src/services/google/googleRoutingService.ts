@@ -5,7 +5,7 @@ import { bestIndex, scoreRoutes, trafficLevel, type SpeedReading } from '../scor
 import {
   applyMetroTable,
   dropDominated,
-  stationSignature,
+  mergeNearDuplicates,
   timetableDrafts,
   type AccessLeg,
   type FetchAccess,
@@ -753,17 +753,20 @@ export function createGoogleRoutingService(deps: {
     const routes: Omit<Route, 'score'>[] = [];
 
     const drafts = transitRes.status === 'fulfilled' ? parseTransit(transitRes.value, at) : [];
-    const googleDrafts = dedupe(drafts.flatMap((d) => walkShortHops(d) ?? []))
-      .flatMap(withAutoVariants)
-      // Google's timing, our metro fare table and line colours.
-      .map((d) => applyMetroTable(d));
-    // Timetable options Google already has (same stations and modes) are dropped.
-    const googleSignatures = new Set(googleDrafts.map((d) => stationSignature(d)));
     const timetable = timetableRes.status === 'fulfilled' ? timetableRes.value : null;
+    // Same stations and modes from both sources: only the faster copy stays.
+    const merged = mergeNearDuplicates(
+      dedupe(drafts.flatMap((d) => walkShortHops(d) ?? []))
+        .flatMap(withAutoVariants)
+        // Google's timing, our metro fare table and line colours.
+        .map((d) => applyMetroTable(d)),
+      timetable?.drafts ?? [],
+    );
+    const googleDrafts = merged.google;
     const injected = dropDominated(
-      (timetable?.drafts ?? [])
-        .filter((d) => !googleSignatures.has(stationSignature(d)))
-        .map((d, i) => transitToRoute(`timetable-${i}`, d, at, drive?.traffic ?? 'Light')),
+      merged.timetable.map((d, i) =>
+        transitToRoute(`timetable-${i}`, d, at, drive?.traffic ?? 'Light'),
+      ),
     );
     if (__DEV__) {
       // Bounded: base 3–4 calls + at most 2 access + 2 egress per timetable system.

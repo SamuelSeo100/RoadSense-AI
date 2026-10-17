@@ -22,7 +22,7 @@ import type { MetroLine, MetroNetwork, SuburbanNetwork } from './types';
 /** Tunables for timetable (metro / local train) options. */
 export const injectionConfig = {
   /** Entry / exit stations are looked for within this straight-line distance, per system. */
-  maxStationKm: { metro: 3, train: 3 },
+  maxStationKm: { metro: 3, train: 6 },
   /** Per system: at most this many entry × exit stations (bounds Google calls to 2 + 2). */
   maxEntry: 2,
   maxExit: 2,
@@ -354,6 +354,44 @@ export function stationSignature(draft: Draft, network: MetroNetwork = metroNetw
     )
     .filter((s, i, all) => !(s === 'walk' && all[i - 1] === 'walk'))
     .join('|');
+}
+
+/**
+ * Google and timetable options with the same station and mode sequence are
+ * the same trip: keep only the faster one (door to door); a tie keeps Google's.
+ */
+export function mergeNearDuplicates(
+  google: Draft[],
+  timetable: Draft[],
+  network: MetroNetwork = metroNetwork,
+): { google: Draft[]; timetable: Draft[] } {
+  const fastestGoogle = new Map<string, number>();
+  for (const d of google) {
+    const sig = stationSignature(d, network);
+    fastestGoogle.set(sig, Math.min(fastestGoogle.get(sig) ?? Infinity, d.durationSec));
+  }
+  // Fastest timetable copy per signature (only one can beat Google's).
+  const fastestOurs = new Map<string, Draft>();
+  for (const d of timetable) {
+    const sig = stationSignature(d, network);
+    const kept = fastestOurs.get(sig);
+    if (!kept || d.durationSec < kept.durationSec) fastestOurs.set(sig, d);
+  }
+  const winners = new Set<string>();
+  const keptTimetable = timetable.filter((d) => {
+    const sig = stationSignature(d, network);
+    const theirs = fastestGoogle.get(sig);
+    if (theirs === undefined) return true;
+    if (fastestOurs.get(sig) === d && d.durationSec < theirs) {
+      winners.add(sig);
+      return true;
+    }
+    return false;
+  });
+  return {
+    google: google.filter((d) => !winners.has(stationSignature(d, network))),
+    timetable: keptTimetable,
+  };
 }
 
 type Comparable = Pick<Route, 'durationMin' | 'costInr' | 'walkingKm'>;
