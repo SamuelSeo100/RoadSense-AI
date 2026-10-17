@@ -2,7 +2,10 @@
  * Manual OD check against the live Google Routes API (costs API calls; not
  * part of `npm test`):
  *
- *   npm run test:od
+ *   node --env-file=.env node_modules/.bin/jest --config src/services/transit/__manual__/jest.config.js --runInBand
+ *
+ * (Not an npm script on purpose: package.json scripts are part of the Expo
+ * fingerprint, so adding one would make OTA updates miss installed builds.)
  *
  * Prints every ranked option (rank, source, time, fare, legs) and the Google
  * calls per request. ROUTLY_OD_ONLY="Kothrud → Lonavala" runs only matching pairs.
