@@ -17,7 +17,7 @@ function noticeText(n: RouteNotice): string {
     case 'transitUnavailable':
       return 'No buses or metro running now — showing road options';
     case 'metroClosed':
-      return 'Metro is closed now — showing buses and road options';
+      return 'Metro is closed now — showing other options';
     case 'partialFailure':
       return `Couldn’t load ${n.failed.map((s) => sourceNames[s]).join(', ')} options right now`;
   }

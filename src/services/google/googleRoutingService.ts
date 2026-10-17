@@ -3,6 +3,16 @@ import { LruCache } from '../lruCache';
 import { rankRoutes } from '../ranking';
 import { bestIndex, scoreRoutes, trafficLevel, type SpeedReading } from '../scoring';
 import {
+  applyMetroTable,
+  dropDominated,
+  stationSignature,
+  timetableDrafts,
+  type AccessLeg,
+  type FetchAccess,
+} from '../transit/injection';
+import { metroInService } from '../transit/metro';
+import { istMinutes } from '../transit/time';
+import {
   PRIORITIES,
   type DirectionsService,
   type LatLng,
@@ -12,6 +22,7 @@ import {
   type Priority,
   type RankedRoute,
   type Route,
+  type RouteDataSource,
   type RouteNotice,
   type RouteSource,
   type RoutingService,
@@ -20,7 +31,9 @@ import {
   type WalkingRoute,
 } from '../types';
 
-import { googleRequest } from './googleClient';
+import { isNight } from '../walkSafety';
+
+import { googleCallCount, googleRequest } from './googleClient';
 import { stepPath } from './googleDirectionsService';
 import { decodePolyline } from './polyline';
 
@@ -28,8 +41,6 @@ import { decodePolyline } from './polyline';
 export const routingConfig = {
   /** Kept per priority: a route stays if it's in the top 8 for any priority (local re-ranking). */
   maxResults: 8,
-  /** Pune Metro service hours, local time (verify against Maha-Metro's timetable). */
-  metroHours: { open: 6, close: 23 },
   /** The walk-only option is shown only up to this long. */
   maxWalkOnlyMin: 30,
   /**
@@ -72,6 +83,9 @@ const TRANSIT_MASK = [
 // the drawn path comes from the step polylines.
 const ROAD_MASK =
   'routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline,routes.legs.steps.polyline.encodedPolyline,routes.travelAdvisory.speedReadingIntervals';
+/** Auto to / from a timetable station: time, distance and street geometry only. */
+const ACCESS_MASK =
+  'routes.duration,routes.distanceMeters,routes.legs.steps.polyline.encodedPolyline';
 
 // ---- Routes API response shapes (only the masked fields) ----
 
@@ -119,11 +133,11 @@ interface RoadResponse {
   }[];
 }
 
-// ---- Internal draft of a transit option ----
+// ---- Internal draft of a transit option (Google's or from our timetables) ----
 
 type TransitMode = 'metro' | 'train' | 'bus';
 
-interface DraftLeg {
+export interface DraftLeg {
   mode: 'walk' | 'auto' | TransitMode;
   durationSec: number;
   distanceM: number;
@@ -134,9 +148,17 @@ interface DraftLeg {
   stops?: number;
   fromStop?: string;
   toStop?: string;
+  /** Fare from our tables (src/services/transit); undefined = fares.ts slabs. */
+  fareInr?: number;
+  fareEstimated?: boolean;
+  /** False: timed from a static timetable. */
+  realtime?: false;
+  lineColor?: string;
+  /** "08:14" IST, timetable legs. */
+  departure?: string;
 }
 
-interface Draft {
+export interface Draft {
   legs: DraftLeg[];
   /** Door to door from now, including the wait for the first vehicle. */
   durationSec: number;
@@ -145,6 +167,7 @@ interface Draft {
   googleFareInr: number | null;
   /** False once a transit leg was replaced (Google's fare no longer applies). */
   transitUnchanged: boolean;
+  source: RouteDataSource;
 }
 
 type ScoredRoute = Omit<Route, 'aiPick'>;
@@ -296,6 +319,7 @@ function parseTransit(res: TransitResponse, at: Date): Draft[] {
         rideSec: seconds(r.duration),
         googleFareInr: Number.isFinite(googleFareInr) ? googleFareInr : null,
         transitUnchanged: true,
+        source: 'google' as const,
       },
     ];
   });
@@ -428,18 +452,22 @@ function transitToRoute(
     distanceKm: l.distanceM / 1000,
     stops: l.stops,
   }));
-  const transitCost = transitRouteFare(transitLegs, draft.googleFareInr, draft.transitUnchanged);
-  // Google gives a route total (bus-only routes); otherwise every leg is costed here.
+  // Google gives a route total (bus-only routes); otherwise every leg is costed here:
+  // from our timetable fare tables when set, else the fares.ts slabs.
   const googleTotal =
     draft.googleFareInr !== null &&
     draft.transitUnchanged &&
     transitLegs.every((t) => t.mode === 'bus');
+  const legFare = (l: DraftLeg & { mode: TransitMode }) =>
+    l.fareInr ?? transitLegFare({ mode: l.mode, distanceKm: l.distanceM / 1000, stops: l.stops });
+  const transitCost = googleTotal
+    ? transitRouteFare(transitLegs, draft.googleFareInr, draft.transitUnchanged)
+    : draft.legs.filter(isTransit).reduce((sum, l) => sum + legFare(l), 0);
 
   const legs: Leg[] = draft.legs.map((l) => {
     let costInr: number | undefined;
     if (l.mode === 'auto') costInr = autoFare(l.distanceM / 1000, at);
-    else if (isTransit(l) && !googleTotal)
-      costInr = transitLegFare({ mode: l.mode, distanceKm: l.distanceM / 1000, stops: l.stops });
+    else if (isTransit(l) && !googleTotal) costInr = legFare(l);
     return {
       mode: l.mode,
       label: legLabel(l),
@@ -451,6 +479,14 @@ function transitToRoute(
       stops: l.stops,
       from: l.fromStop,
       to: l.toStop,
+      realtime: l.realtime,
+      departure: l.departure,
+      lineColor: l.lineColor,
+      // A timetable leg with no fare from our tables fell back to the fares.ts estimate.
+      fareEstimated:
+        isTransit(l) && (l.fareEstimated || (l.realtime === false && l.fareInr === undefined))
+          ? true
+          : undefined,
     };
   });
 
@@ -467,6 +503,7 @@ function transitToRoute(
   };
   return {
     id,
+    source: draft.source,
     name: modes.map(capitalise).join(' + '),
     mapKey: draft.legs.find(isTransit)?.mode ?? 'all',
     durationMin: minutes(draft.durationSec),
@@ -515,6 +552,7 @@ function roadRoute(
   const base = { walkingKm: 0, transfers: 0, traffic: road.traffic };
   return {
     id,
+    source: 'google',
     name,
     mapKey: mode,
     vehicle: kind === 'car' || kind === 'bike' ? kind : undefined,
@@ -545,6 +583,7 @@ function walkRoute(walk: WalkingRoute): Omit<Route, 'score'> {
   };
   return {
     id: 'walk',
+    source: 'google',
     name: 'Walk',
     mapKey: 'walk',
     durationMin,
@@ -585,6 +624,8 @@ export function createGoogleRoutingService(deps: {
   places: Pick<RoutingService, 'searchPlaces' | 'geocode'>;
 }): RoutingService {
   const cache = new LruCache<string, Candidates>(20);
+  /** Point ↔ station legs for timetable options, kept for the session. */
+  const accessCache = new LruCache<string, AccessLeg>(60);
 
   const computeRoutes = <T>(body: object, fieldMask: string, signal?: AbortSignal) =>
     googleRequest<T>(COMPUTE_ROUTES, {
@@ -592,6 +633,49 @@ export function createGoogleRoutingService(deps: {
       fieldMask,
       body: { languageCode: 'en-IN', units: 'METRIC', ...body },
     });
+
+  /** Walk (safe-walk service) or auto (DRIVE time + pickup) between a point and a station. */
+  const accessFetcher =
+    (at: Date, signal?: AbortSignal): FetchAccess =>
+    async (a, b, mode) => {
+      const key = `${mode}|${keyOf(a)}>${keyOf(b)}${mode === 'walk' && isNight(at) ? '|night' : ''}`;
+      const cached = accessCache.get(key);
+      if (cached) return cached;
+      let leg: AccessLeg | null = null;
+      if (mode === 'walk') {
+        const w = await deps.directions.walking(a, b, { signal, at });
+        leg = {
+          mode,
+          durationSec: w.durationSec,
+          distanceM: w.distanceMeters,
+          path: w.path,
+          approximate: false,
+        };
+      } else {
+        const res = await computeRoutes<RoadResponse>(
+          {
+            origin: waypoint(a),
+            destination: waypoint(b),
+            travelMode: 'DRIVE',
+            routingPreference: 'TRAFFIC_AWARE',
+            polylineQuality: 'HIGH_QUALITY',
+          },
+          ACCESS_MASK,
+          signal,
+        );
+        const road = parseRoad(res);
+        if (road)
+          leg = {
+            mode,
+            durationSec: road.durationSec + routingConfig.autoPickupMin * 60,
+            distanceM: road.distanceKm * 1000,
+            path: road.path,
+            approximate: false,
+          };
+      }
+      if (leg) accessCache.set(key, leg);
+      return leg;
+    };
 
   async function candidates(
     fromP: Place | LatLng,
@@ -626,7 +710,8 @@ export function createGoogleRoutingService(deps: {
         signal,
       );
 
-    const [transitRes, driveRes, bikeRes, walkRes] = await Promise.allSettled([
+    const callsBefore = googleCallCount();
+    const [transitRes, driveRes, bikeRes, walkRes, timetableRes] = await Promise.allSettled([
       computeRoutes<TransitResponse>(
         {
           ...ends,
@@ -642,6 +727,18 @@ export function createGoogleRoutingService(deps: {
       road('DRIVE'),
       vehicles.bike ? road('TWO_WHEELER') : Promise.resolve(null),
       deps.directions.walking(from, to, { signal, at }),
+      // Metro / local train from our timetables, alongside Google's calls.
+      (async () => {
+        const before = googleCallCount();
+        const drafts = await timetableDrafts({
+          from,
+          to,
+          at,
+          fetchAccess: accessFetcher(at, signal),
+          maxWaitMin: routingConfig.maxTransitWaitMin,
+        });
+        return { drafts, calls: googleCallCount() - before };
+      })(),
     ]);
     if (signal?.aborted) throw new Error('Route request aborted.');
 
@@ -656,6 +753,27 @@ export function createGoogleRoutingService(deps: {
     const routes: Omit<Route, 'score'>[] = [];
 
     const drafts = transitRes.status === 'fulfilled' ? parseTransit(transitRes.value, at) : [];
+    const googleDrafts = dedupe(drafts.flatMap((d) => walkShortHops(d) ?? []))
+      .flatMap(withAutoVariants)
+      // Google's timing, our metro fare table and line colours.
+      .map((d) => applyMetroTable(d));
+    // Timetable options Google already has (same stations and modes) are dropped.
+    const googleSignatures = new Set(googleDrafts.map((d) => stationSignature(d)));
+    const timetable = timetableRes.status === 'fulfilled' ? timetableRes.value : null;
+    const injected = dropDominated(
+      (timetable?.drafts ?? [])
+        .filter((d) => !googleSignatures.has(stationSignature(d)))
+        .map((d, i) => transitToRoute(`timetable-${i}`, d, at, drive?.traffic ?? 'Light')),
+    );
+    if (__DEV__) {
+      // Bounded: base 3–4 calls + at most 2 access + 2 egress per timetable system.
+      console.info(
+        `[routing] Google calls: ${googleCallCount() - callsBefore} (timetable access/egress: ${timetable?.calls ?? 0}); timetable options: ${injected.length}`,
+      );
+    }
+    if (timetableRes.status === 'rejected' && __DEV__) {
+      console.warn('[routing] timetable options failed', timetableRes.reason);
+    }
     const notices: RouteNotice[] = [];
     const failed = (
       [
@@ -666,18 +784,15 @@ export function createGoogleRoutingService(deps: {
       ] as const
     ).flatMap(([source, res]): RouteSource[] => (res.status === 'rejected' ? [source] : []));
     if (failed.length) notices.push({ kind: 'partialFailure', failed });
-    if (transitRes.status === 'fulfilled' && drafts.length === 0) {
+    if (transitRes.status === 'fulfilled' && drafts.length === 0 && injected.length === 0) {
       notices.push({ kind: 'transitUnavailable' });
-    } else if (drafts.length > 0) {
-      const { open, close } = routingConfig.metroHours;
-      const hour = at.getHours();
-      if (hour < open || hour >= close) notices.push({ kind: 'metroClosed' });
+    } else if ((drafts.length > 0 || injected.length > 0) && !metroInService(istMinutes(at))) {
+      notices.push({ kind: 'metroClosed' });
     }
-    dedupe(drafts.flatMap((d) => walkShortHops(d) ?? []))
-      .flatMap(withAutoVariants)
-      .forEach((d, i) =>
-        routes.push(transitToRoute(`transit-${i}`, d, at, drive?.traffic ?? 'Light')),
-      );
+    googleDrafts.forEach((d, i) =>
+      routes.push(transitToRoute(`transit-${i}`, d, at, drive?.traffic ?? 'Light')),
+    );
+    routes.push(...injected);
 
     if (drive) {
       routes.push(roadRoute('auto', 'auto', drive, autoFare(drive.distanceKm, at)));

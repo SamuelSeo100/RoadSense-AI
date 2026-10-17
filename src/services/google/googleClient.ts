@@ -43,11 +43,16 @@ interface GoogleRequest {
   signal?: AbortSignal;
 }
 
+let callCount = 0;
+/** Google requests sent since launch (diff it around a request to count its calls). */
+export const googleCallCount = () => callCount;
+
 /** JSON request to a Google Maps Platform REST API. */
 export async function googleRequest<T>(
   url: string,
   { method = 'POST', body, fieldMask, signal }: GoogleRequest,
 ): Promise<T> {
+  callCount++;
   const res = await fetch(url, {
     method,
     signal,

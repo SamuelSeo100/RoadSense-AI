@@ -66,6 +66,8 @@ export const mockData: MockData = {
   homePreview: [
     {
       id: 'p-metro',
+      // Sample data standing in for Google Routes results.
+      source: 'google',
       name: 'Metro',
       mapKey: 'metro',
       durationMin: 34,
@@ -101,6 +103,7 @@ export const mockData: MockData = {
     },
     {
       id: 'p-bus',
+      source: 'google',
       name: 'Bus + Walk',
       mapKey: 'bus',
       durationMin: 49,
@@ -130,6 +133,7 @@ export const mockData: MockData = {
     },
     {
       id: 'p-cab',
+      source: 'google',
       name: 'Cab',
       mapKey: 'cab',
       vehicle: 'car',
@@ -157,6 +161,7 @@ export const mockData: MockData = {
   routes: [
     {
       id: 'a',
+      source: 'google',
       name: 'Metro + Auto',
       mapKey: 'metro',
       durationMin: 38,
@@ -190,6 +195,7 @@ export const mockData: MockData = {
     },
     {
       id: 'b',
+      source: 'google',
       name: 'Bus',
       mapKey: 'bus',
       durationMin: 54,
@@ -228,6 +234,7 @@ export const mockData: MockData = {
     },
     {
       id: 'c',
+      source: 'google',
       name: 'Cab',
       mapKey: 'cab',
       vehicle: 'car',
@@ -252,6 +259,7 @@ export const mockData: MockData = {
     },
     {
       id: 'd',
+      source: 'google',
       name: 'Bike taxi',
       mapKey: 'all',
       vehicle: 'bike',
@@ -276,6 +284,7 @@ export const mockData: MockData = {
     },
     {
       id: 'e',
+      source: 'google',
       name: 'Cycle',
       mapKey: 'all',
       vehicle: 'cycle',

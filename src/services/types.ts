@@ -39,10 +39,23 @@ export interface Leg {
   stops?: number;
   from?: string;
   to?: string;
+  /** False for legs timed from Routly's static timetables (shown as "Scheduled"). */
+  realtime?: boolean;
+  /** Scheduled departure from `from`, "08:14" IST (timetable legs). */
+  departure?: string;
+  /** Line colour on the map (metro lines); `modeColors` otherwise. */
+  lineColor?: string;
+  /** `costInr` comes from a fare table not yet verified against the published chart ("~₹"). */
+  fareEstimated?: boolean;
 }
+
+/** Where a route's timing comes from (logged for the ranker study). */
+export type RouteDataSource = 'google' | 'routly_timetable';
 
 export interface Route {
   id: string;
+  /** Google Routes, or Routly's metro / local-train timetables. */
+  source: RouteDataSource;
   /** Short name for buttons: "Metro", "Bus + Walk", "Cab". */
   name: string;
   /** Which map highlight this route corresponds to ("metro", "bus", "cab", "all"). */
