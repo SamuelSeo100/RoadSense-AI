@@ -37,12 +37,14 @@ function routeSnapshot(route: Route) {
   return {
     id: route.id,
     name: route.name,
+    source: route.source,
     legs: route.legs.map((l) => ({
       mode: l.mode,
       label: l.label,
       minutes: l.durationMin,
       cost_inr: l.costInr ?? null,
       approximate: l.approximate ?? false,
+      realtime: l.realtime ?? true,
       polyline:
         l.polyline && l.polyline.length > 1 ? encodePolyline(l.polyline.map(round4Point)) : null,
     })),
@@ -101,6 +103,7 @@ export function createSupabaseTripLogService(supabase: SupabaseClient): TripLogS
         options: req.routes.map((r) => ({
           id: r.id,
           name: r.name,
+          source: r.source,
           modes: r.legs.map((l) => l.mode),
           duration_min: r.durationMin,
           cost_inr: r.costInr,
@@ -122,6 +125,7 @@ export function createSupabaseTripLogService(supabase: SupabaseClient): TripLogS
         chosen_route_id: route.id,
         chosen_rank: route.rank,
         heuristic_rank: route.heuristicRank,
+        source: route.source,
         priority: toDbPriority(priority),
         action,
         created_at: new Date().toISOString(),
