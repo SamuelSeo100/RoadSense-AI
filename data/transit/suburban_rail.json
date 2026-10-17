@@ -1,0 +1,309 @@
+{
+  "$comment": "Pune–Lonavala suburban (Central Railway). trips[] comes from scripts/import-suburban-csv.ts (official CR timetable only). Times IST; hours ≥ 24 = after midnight of the service day. days: 0 = Sunday.",
+  "line": {
+    "id": "pune-lonavala",
+    "name": "Pune–Lonavala Local",
+    "directions": {
+      "UP": "Pune Jn → Lonavala (towards Mumbai)",
+      "DOWN": "Lonavala → Pune Jn"
+    }
+  },
+  "stations": [
+    {
+      "id": "sub-pune-jn",
+      "name": "Pune Jn",
+      "lat": 18.529292,
+      "lng": 73.874247,
+      "geocoded": true,
+      "verified": false,
+      "source": "Google Places Text Search \"Pune Junction railway station, Maharashtra\" → \"PUNE JUNCTION\" (TODO_VERIFY: review match)",
+      "km": {
+        "value": null,
+        "verified": false,
+        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
+      },
+      "formattedAddress": "GVHF+PM9, Agarkar Nagar, Pune, Maharashtra 411001"
+    },
+    {
+      "id": "sub-shivajinagar",
+      "name": "Shivajinagar",
+      "lat": 18.532217,
+      "lng": 73.851663,
+      "geocoded": true,
+      "verified": false,
+      "source": "Google Places Text Search \"Shivajinagar railway station, Maharashtra\" → \"Chatrapati Shivaji Maharaj Nagar\" (TODO_VERIFY: review match)",
+      "km": {
+        "value": null,
+        "verified": false,
+        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
+      },
+      "formattedAddress": "Narveer Tanaji Wadi, Shivajinagar, Pune, Maharashtra 411005"
+    },
+    {
+      "id": "sub-khadki",
+      "name": "Khadki",
+      "lat": 18.563181,
+      "lng": 73.84062,
+      "geocoded": true,
+      "verified": false,
+      "source": "Google Places Text Search \"Khadki railway station, Maharashtra\" → \"Khadki Railway Station\" (TODO_VERIFY: review match)",
+      "km": {
+        "value": null,
+        "verified": false,
+        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
+      },
+      "formattedAddress": "Khadki, Maharashtra, India"
+    },
+    {
+      "id": "sub-dapodi",
+      "name": "Dapodi",
+      "lat": 18.580785,
+      "lng": 73.832795,
+      "geocoded": true,
+      "verified": false,
+      "source": "Google Places Text Search \"Dapodi railway station, Maharashtra\" → \"Dapodi\" (TODO_VERIFY: review match)",
+      "km": {
+        "value": null,
+        "verified": false,
+        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
+      },
+      "formattedAddress": "6, Old Mumbai - Pune Hwy, Dapodi, Pimpri-Chinchwad, Maharashtra 411012"
+    },
+    {
+      "id": "sub-kasarwadi",
+      "name": "Kasarwadi",
+      "lat": 18.607579,
+      "lng": 73.821098,
+      "geocoded": true,
+      "verified": false,
+      "source": "Google Places Text Search \"Kasarwadi railway station, Maharashtra\" → \"Kasarwadi\" (TODO_VERIFY: review match)",
+      "km": {
+        "value": null,
+        "verified": false,
+        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
+      },
+      "formattedAddress": "Old Mumbai - Pune Hwy, Kasarwadi, Pimpri-Chinchwad, Maharashtra 411034"
+    },
+    {
+      "id": "sub-pimpri",
+      "name": "Pimpri",
+      "lat": 18.623467,
+      "lng": 73.802038,
+      "geocoded": true,
+      "verified": false,
+      "source": "Google Places Text Search \"Pimpri railway station, Maharashtra\" → \"Pimpri\" (TODO_VERIFY: review match)",
+      "km": {
+        "value": null,
+        "verified": false,
+        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
+      },
+      "formattedAddress": "Shastri Nagar, Pimpri Colony, Pimpri-Chinchwad, Maharashtra 411018"
+    },
+    {
+      "id": "sub-chinchwad",
+      "name": "Chinchwad",
+      "lat": 18.639801,
+      "lng": 73.791743,
+      "geocoded": true,
+      "verified": false,
+      "source": "Google Places Text Search \"Chinchwad railway station, Maharashtra\" → \"Chinchwad Junction\" (TODO_VERIFY: review match)",
+      "km": {
+        "value": null,
+        "verified": false,
+        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
+      },
+      "formattedAddress": "44, Chinchwad Station Rd, Chinchwad, Pimpri-Chinchwad, Maharashtra 411033"
+    },
+    {
+      "id": "sub-akurdi",
+      "name": "Akurdi",
+      "lat": 18.64853,
+      "lng": 73.764669,
+      "geocoded": true,
+      "verified": false,
+      "source": "Google Places Text Search \"Akurdi railway station, Maharashtra\" → \"Akurdi\" (TODO_VERIFY: review match)",
+      "km": {
+        "value": null,
+        "verified": false,
+        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
+      },
+      "formattedAddress": "Ganga Nagar Rd, Pradhikaran, Nigdi, Pimpri-Chinchwad, Maharashtra 411044"
+    },
+    {
+      "id": "sub-dehu-road",
+      "name": "Dehu Road",
+      "lat": 18.680362,
+      "lng": 73.734416,
+      "geocoded": true,
+      "verified": false,
+      "source": "Google Places Text Search \"Dehu Road railway station, Maharashtra\" → \"Dehu Road\" (TODO_VERIFY: review match)",
+      "km": {
+        "value": null,
+        "verified": false,
+        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
+      },
+      "formattedAddress": "Dehu Road, Maharashtra 412101"
+    },
+    {
+      "id": "sub-begdewadi",
+      "name": "Begdewadi",
+      "lat": 18.700674,
+      "lng": 73.708775,
+      "geocoded": true,
+      "verified": false,
+      "source": "Google Places Text Search \"Begdewadi railway station, Maharashtra\" → \"Begdewadi\" (TODO_VERIFY: review match)",
+      "km": {
+        "value": null,
+        "verified": false,
+        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
+      },
+      "formattedAddress": "Talegaon Dabhade R, Maharashtra 412101"
+    },
+    {
+      "id": "sub-ghorawadi",
+      "name": "Ghorawadi",
+      "lat": 18.721061,
+      "lng": 73.696464,
+      "geocoded": true,
+      "verified": false,
+      "source": "Google Places Text Search \"Ghorawadi railway station, Maharashtra\" → \"Ghorawadi Railway Station\" (TODO_VERIFY: review match)",
+      "km": {
+        "value": null,
+        "verified": false,
+        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
+      },
+      "formattedAddress": "PMCW+CHG, Bhegade Aali, Talegaon Dabhade R, Maharashtra 410506"
+    },
+    {
+      "id": "sub-talegaon",
+      "name": "Talegaon",
+      "lat": 18.735067,
+      "lng": 73.672221,
+      "geocoded": true,
+      "verified": false,
+      "source": "Google Places Text Search \"Talegaon railway station, Maharashtra\" → \"Talegaon\" (TODO_VERIFY: review match)",
+      "km": {
+        "value": null,
+        "verified": false,
+        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
+      },
+      "formattedAddress": "Talegaon Dhabhade Road, Rajgurav Colony, Talegaon Dabhade, Talegaon Dabhade R, Maharashtra 410507"
+    },
+    {
+      "id": "sub-vadgaon",
+      "name": "Vadgaon",
+      "lat": 18.742392,
+      "lng": 73.636907,
+      "geocoded": true,
+      "verified": false,
+      "source": "Google Places Text Search \"Vadgaon railway station, Maharashtra\" → \"Vadgaon\" (TODO_VERIFY: review match)",
+      "km": {
+        "value": null,
+        "verified": false,
+        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
+      },
+      "formattedAddress": "Vijay Nagar Colony, Vadgaon, Maharashtra 412106"
+    },
+    {
+      "id": "sub-kanhe",
+      "name": "Kanhe",
+      "lat": 18.762135,
+      "lng": 73.594209,
+      "geocoded": true,
+      "verified": false,
+      "source": "Google Places Text Search \"Kanhe railway station, Maharashtra\" → \"Kanhe\" (TODO_VERIFY: review match)",
+      "km": {
+        "value": null,
+        "verified": false,
+        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
+      },
+      "formattedAddress": "Kanhe, Maharashtra 412106"
+    },
+    {
+      "id": "sub-kamshet",
+      "name": "Kamshet",
+      "lat": 18.766915,
+      "lng": 73.552264,
+      "geocoded": true,
+      "verified": false,
+      "source": "Google Places Text Search \"Kamshet railway station, Maharashtra\" → \"Kamshet\" (TODO_VERIFY: review match)",
+      "km": {
+        "value": null,
+        "verified": false,
+        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
+      },
+      "formattedAddress": "Kamshet, Khadkale, Maharashtra 410405"
+    },
+    {
+      "id": "sub-malavli",
+      "name": "Malavli",
+      "lat": 18.744275,
+      "lng": 73.481245,
+      "geocoded": true,
+      "verified": false,
+      "source": "Google Places Text Search \"Malavli railway station, Maharashtra\" → \"Malavli Railway Station\" (TODO_VERIFY: review match)",
+      "km": {
+        "value": null,
+        "verified": false,
+        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
+      },
+      "formattedAddress": "PFVJ+PF9, Ekvira Devi Rd, Malavli, Maharashtra 410405"
+    },
+    {
+      "id": "sub-lonavala",
+      "name": "Lonavala",
+      "lat": 18.749466,
+      "lng": 73.407574,
+      "geocoded": true,
+      "verified": false,
+      "source": "Google Places Text Search \"Lonavala railway station, Maharashtra\" → \"Lonavala railway station\" (TODO_VERIFY: review match)",
+      "km": {
+        "value": null,
+        "verified": false,
+        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
+      },
+      "formattedAddress": "Siddharth Nagar, Lonavala, Maharashtra 410401"
+    }
+  ],
+  "fares": {
+    "class": "second",
+    "basis": "km",
+    "$comment": "Second-class single journey by distance slab.",
+    "slabs": [
+      {
+        "upTo": 10,
+        "fare": {
+          "value": 5,
+          "verified": false,
+          "source": "TODO_VERIFY: placeholder, check Indian Railways suburban fare table"
+        }
+      },
+      {
+        "upTo": 20,
+        "fare": {
+          "value": 10,
+          "verified": false,
+          "source": "TODO_VERIFY: placeholder"
+        }
+      },
+      {
+        "upTo": 45,
+        "fare": {
+          "value": 15,
+          "verified": false,
+          "source": "TODO_VERIFY: placeholder"
+        }
+      },
+      {
+        "upTo": null,
+        "fare": {
+          "value": 20,
+          "verified": false,
+          "source": "TODO_VERIFY: placeholder"
+        }
+      }
+    ]
+  },
+  "trips": [],
+  "tripsSource": "TODO_VERIFY: fill data/transit/suburban_trips_template.csv from the official Central Railway timetable, then run scripts/import-suburban-csv.ts"
+}
