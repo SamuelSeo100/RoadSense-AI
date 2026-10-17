@@ -1,273 +1,428 @@
 {
-  "$comment": "Pune Metro static data. Every number is {value, verified, source}; value null = unknown. Values whose source starts with TODO_VERIFY are placeholders, NOT published data. Times are IST (HH:MM).",
+  "stations": [
+    {
+      "code": "PIM",
+      "name": "PCMC",
+      "aliases": [
+        "PCMC Metro Station",
+        "Pimpri Chinchwad"
+      ],
+      "lat": 18.629535,
+      "lng": 73.802972,
+      "geocoded": true,
+      "formattedAddress": "Morewadi, Pimpri Colony, Pimpri-Chinchwad, Maharashtra 411018, India",
+      "geocodeSource": "Places Text Search \"PCMC metro station Pune\" → \"PCMC Metro Station\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "STG",
+      "name": "Sant Tukaram Nagar",
+      "lat": 18.614505,
+      "lng": 73.815706,
+      "geocoded": true,
+      "formattedAddress": "MIDC, Pimpri Colony, Pimpri-Chinchwad, Maharashtra 411018, India",
+      "geocodeSource": "Places Text Search \"Sant Tukaram Nagar metro station Pune\" → \"Sant Tukaram Nagar\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "BHO",
+      "name": "Nashik Phata (Bhosari)",
+      "aliases": [
+        "Bhosari",
+        "Nashik Phata"
+      ],
+      "lat": 18.609422,
+      "lng": 73.820133,
+      "geocoded": true,
+      "formattedAddress": "Kasarwadi, Pimpri-Chinchwad, Maharashtra 411034, India",
+      "geocodeSource": "Places Text Search \"Nashik Phata (Bhosari) metro station Pune\" → \"Nashik Phata\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "KWA",
+      "name": "Kasarwadi",
+      "lat": 18.59968,
+      "lng": 73.827338,
+      "geocoded": true,
+      "formattedAddress": "Agrasen Nagar Society, Seva Nagar, Dapodi, Pimpri-Chinchwad, Maharashtra 411012, India",
+      "geocodeSource": "Places Text Search \"Kasarwadi metro station Pune\" → \"Kasarwadi\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "PGD",
+      "name": "Phugewadi",
+      "lat": 18.591109,
+      "lng": 73.83107,
+      "geocoded": true,
+      "formattedAddress": "Phugewadi, Dapodi, Pimpri-Chinchwad, Maharashtra 411012, India",
+      "geocodeSource": "Places Text Search \"Phugewadi metro station Pune\" → \"Phugewadi\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "DDI",
+      "name": "Dapodi",
+      "lat": 18.583763,
+      "lng": 73.833833,
+      "geocoded": true,
+      "formattedAddress": "Phugewadi, Dapodi, Pimpri-Chinchwad, Maharashtra 411012, India",
+      "geocodeSource": "Places Text Search \"Dapodi metro station Pune\" → \"Dapodi\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "BPI",
+      "name": "Bopodi",
+      "lat": 18.569744,
+      "lng": 73.838138,
+      "geocoded": true,
+      "formattedAddress": "Anupam Nagar, Khadki, Pune, Maharashtra 411003, India",
+      "geocodeSource": "Places Text Search \"Bopodi metro station Pune\" → \"Bopodi\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "KHK",
+      "name": "Khadki",
+      "lat": 18.562369,
+      "lng": 73.841986,
+      "geocoded": true,
+      "formattedAddress": "Railway Station, Khadki, Pune, Maharashtra 411003",
+      "geocodeSource": "Places Text Search \"Khadki metro station Pune\" → \"Khadki Metro Station\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "SJO",
+      "name": "Shivaji Nagar",
+      "aliases": [
+        "Shivajinagar"
+      ],
+      "lat": 18.532491,
+      "lng": 73.849151,
+      "geocoded": true,
+      "formattedAddress": "Narveer Tanaji Wadi, Shivajinagar, Pune, Maharashtra 411005",
+      "geocodeSource": "Places Text Search \"Shivaji Nagar metro station Pune\" → \"Shivaji Nagar Metro Station\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "CVC",
+      "name": "District Court",
+      "aliases": [
+        "Civil Court"
+      ],
+      "lat": 18.526776,
+      "lng": 73.857874,
+      "geocoded": true,
+      "formattedAddress": "Kamgar Putala Vasahat, Shivajinagar, Pune, Maharashtra 411005, India",
+      "geocodeSource": "Places Text Search \"District Court metro station Pune\" → \"District Court\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "BPD",
+      "name": "Kasba Peth",
+      "aliases": [
+        "Budhwar Peth"
+      ],
+      "lat": 18.521558,
+      "lng": 73.859672,
+      "geocoded": true,
+      "formattedAddress": "Kasba Peth, Pune, Maharashtra 411011",
+      "geocodeSource": "Places Text Search \"Kasba Peth metro station Pune\" → \"Kasba Peth\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "MNA",
+      "name": "Mahatma Phule Mandai",
+      "aliases": [
+        "Mandai"
+      ],
+      "lat": 18.512722,
+      "lng": 73.857433,
+      "geocoded": true,
+      "formattedAddress": "Mandai, Shukrawar Peth, Pune, Maharashtra 411002, India",
+      "geocodeSource": "Places Text Search \"Mahatma Phule Mandai metro station Pune\" → \"Mahatma Phule Mandai\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "SGT",
+      "name": "Swargate",
+      "lat": 18.499672,
+      "lng": 73.857525,
+      "geocoded": true,
+      "formattedAddress": "Dadawadi, Pune, Maharashtra 411002, India",
+      "geocodeSource": "Places Text Search \"Swargate metro station Pune\" → \"Swargate\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "VNZ",
+      "name": "Vanaz",
+      "lat": 18.507168,
+      "lng": 73.80523,
+      "geocoded": true,
+      "formattedAddress": "Lokmanya Colony, Kothrud, Pune, Maharashtra 411038, India",
+      "geocodeSource": "Places Text Search \"Vanaz metro station Pune\" → \"Vanaz\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "AND",
+      "name": "Anand Nagar",
+      "lat": 18.509535,
+      "lng": 73.814015,
+      "geocoded": true,
+      "formattedAddress": "Behede Complex, पौड रस्ता, सर्वत्र सोसायटी, आनंद नगर, कोथरूड, पुणे, महाराष्ट्र 411038",
+      "geocodeSource": "Places Text Search \"Anand Nagar metro station Pune\" → \"Anand Nagar Metro Statian , Kothrud , Pune , Maharashtra\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "ICY",
+      "name": "Paud Phata",
+      "aliases": [
+        "Ideal Colony"
+      ],
+      "lat": 18.509091,
+      "lng": 73.821892,
+      "geocoded": true,
+      "formattedAddress": "Mahaganesh Colony, Kothrud, Pune, Maharashtra 411038, India",
+      "geocodeSource": "Places Text Search \"Paud Phata metro station Pune\" → \"Paud Phata\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "NST",
+      "name": "S. N. D. T. College",
+      "aliases": [
+        "Nal Stop",
+        "SNDT College"
+      ],
+      "lat": 18.507327,
+      "lng": 73.82874,
+      "geocoded": true,
+      "formattedAddress": "Pandurang Colony, Erandwane, Pune, Maharashtra 411038, India",
+      "geocodeSource": "Places Text Search \"S. N. D. T. College metro station Pune\" → \"S.N.D.T.College\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "GWC",
+      "name": "Garware College",
+      "lat": 18.511777,
+      "lng": 73.837714,
+      "geocoded": true,
+      "formattedAddress": "GR6Q+P38, opposite Garware College, Khilarewadi, Erandwane, Pune, Maharashtra 411004",
+      "geocodeSource": "Places Text Search \"Garware College metro station Pune\" → \"Garware College Metro Station\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "DGK",
+      "name": "Deccan Gymkhana",
+      "aliases": [
+        "Deccan"
+      ],
+      "lat": 18.516181,
+      "lng": 73.844305,
+      "geocoded": true,
+      "formattedAddress": "GR8V+FPF, Pulachi Wadi, Narayan Peth, Pune, Maharashtra 411004",
+      "geocodeSource": "Places Text Search \"Deccan Gymkhana metro station Pune\" → \"Deccan Metro Station\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "SAN",
+      "name": "Chhatrapati Sambhaji Udyan",
+      "aliases": [
+        "Chhatrapati Sambhaji Garden",
+        "Sambhaji Udyan",
+        "Sambhaji Park"
+      ],
+      "lat": 18.520115,
+      "lng": 73.847593,
+      "geocoded": true,
+      "formattedAddress": "Shivajinagar, Pune, Maharashtra 411004, India",
+      "geocodeSource": "Places Text Search \"Chhatrapati Sambhaji Udyan metro station Pune\" → \"Chhatrapati Sambhaji Garden\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "PMC",
+      "name": "PMC",
+      "lat": 18.522746,
+      "lng": 73.853493,
+      "geocoded": true,
+      "formattedAddress": "Shivajinagar, Pune, Maharashtra 411005, India",
+      "geocodeSource": "Places Text Search \"PMC metro station Pune\" → \"PMC Metro Station\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "MGA",
+      "name": "R.T.O., Pune",
+      "aliases": [
+        "Mangalwar Peth",
+        "RTO"
+      ],
+      "lat": 18.530039,
+      "lng": 73.865251,
+      "geocoded": true,
+      "formattedAddress": "Sangamvadi, Pune, Maharashtra 411001, India",
+      "geocodeSource": "Places Text Search \"R.T.O., Pune metro station Pune\" → \"R.T.O. Pune\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "PRS",
+      "name": "Pune Railway Station",
+      "aliases": [
+        "Pune Station"
+      ],
+      "lat": 18.529659,
+      "lng": 73.872576,
+      "geocoded": true,
+      "formattedAddress": "Sangamvadi, Pune, Maharashtra 411001",
+      "geocodeSource": "Places Text Search \"Pune Railway Station metro station Pune\" → \"Pune Railway Metro Station\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "RUC",
+      "name": "Ruby Hall Clinic",
+      "aliases": [
+        "Ruby Hall"
+      ],
+      "lat": 18.532694,
+      "lng": 73.877848,
+      "geocoded": true,
+      "formattedAddress": "Sangamvadi, Pune, Maharashtra 411001, India",
+      "geocodeSource": "Places Text Search \"Ruby Hall Clinic metro station Pune\" → \"Ruby Hall Clinic\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "BUN",
+      "name": "Bund Garden",
+      "lat": 18.540793,
+      "lng": 73.883577,
+      "geocoded": true,
+      "formattedAddress": "Bund Garden, Sangamvadi, Pune, Maharashtra 411001, India",
+      "geocodeSource": "Places Text Search \"Bund Garden metro station Pune\" → \"Bund Garden\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "YER",
+      "name": "Yerwada",
+      "aliases": [
+        "Yerawada"
+      ],
+      "lat": 18.545326,
+      "lng": 73.886673,
+      "geocoded": true,
+      "formattedAddress": "Yerwada Village, Yerawada, Pune, Maharashtra 411006, India",
+      "geocodeSource": "Places Text Search \"Yerwada metro station Pune\" → \"Yerawada\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "KNA",
+      "name": "Kalyani Nagar",
+      "lat": 18.545147,
+      "lng": 73.905844,
+      "geocoded": true,
+      "formattedAddress": "Kalyani Nagar, Pune, Maharashtra 411006, India",
+      "geocodeSource": "Places Text Search \"Kalyani Nagar metro station Pune\" → \"Kalyani Nagar\" (TODO_VERIFY: review)"
+    },
+    {
+      "code": "RAW",
+      "name": "Ramwadi",
+      "aliases": [
+        "Ramwadi Metro"
+      ],
+      "lat": 18.557148,
+      "lng": 73.908712,
+      "geocoded": true,
+      "formattedAddress": "Sakore Nagar, Viman Nagar, Pune, Maharashtra 411014, India",
+      "geocodeSource": "Places Text Search \"Ramwadi metro station Pune\" → \"Ramwadi\" (TODO_VERIFY: review)"
+    }
+  ],
   "lines": [
     {
-      "id": "line1",
+      "id": "purple",
       "name": "Purple Line",
       "color": "#903373",
       "active": true,
-      "activeSource": "Operational (Maha-Metro)",
       "stations": [
-        {
-          "id": "line1-pcmc",
-          "name": "PCMC",
-          "lat": 18.629535,
-          "lng": 73.802972,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"PCMC metro station, Pune\" → \"PCMC Metro Station\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Morewadi, Pimpri Colony, Pimpri-Chinchwad, Maharashtra 411018, India",
-          "aliases": ["PCMC Metro Station", "Pimpri Chinchwad"]
-        },
-        {
-          "id": "line1-sant-tukaram-nagar",
-          "name": "Sant Tukaram Nagar",
-          "lat": 18.614505,
-          "lng": 73.815706,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Sant Tukaram Nagar metro station, Pune\" → \"Sant Tukaram Nagar\" (TODO_VERIFY: review match)",
-          "formattedAddress": "MIDC, Pimpri Colony, Pimpri-Chinchwad, Maharashtra 411018, India"
-        },
-        {
-          "id": "line1-bhosari-nashik-phata",
-          "name": "Bhosari (Nashik Phata)",
-          "lat": 18.609422,
-          "lng": 73.820133,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Bhosari (Nashik Phata) metro station, Pune\" → \"Nashik Phata\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Kasarwadi, Pimpri-Chinchwad, Maharashtra 411034, India",
-          "aliases": ["Bhosari", "Nashik Phata"]
-        },
-        {
-          "id": "line1-kasarwadi",
-          "name": "Kasarwadi",
-          "lat": 18.59968,
-          "lng": 73.827338,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Kasarwadi metro station, Pune\" → \"Kasarwadi\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Agrasen Nagar Society, Seva Nagar, Dapodi, Pimpri-Chinchwad, Maharashtra 411012, India"
-        },
-        {
-          "id": "line1-phugewadi",
-          "name": "Phugewadi",
-          "lat": 18.591109,
-          "lng": 73.83107,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Phugewadi metro station, Pune\" → \"Phugewadi\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Phugewadi, Dapodi, Pimpri-Chinchwad, Maharashtra 411012, India"
-        },
-        {
-          "id": "line1-dapodi",
-          "name": "Dapodi",
-          "lat": 18.583763,
-          "lng": 73.833833,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Dapodi metro station, Pune\" → \"Dapodi\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Phugewadi, Dapodi, Pimpri-Chinchwad, Maharashtra 411012, India"
-        },
-        {
-          "id": "line1-bopodi",
-          "name": "Bopodi",
-          "lat": 18.569744,
-          "lng": 73.838138,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Bopodi metro station, Pune\" → \"Bopodi\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Anupam Nagar, Khadki, Pune, Maharashtra 411003, India"
-        },
-        {
-          "id": "line1-khadki",
-          "name": "Khadki",
-          "lat": 18.562369,
-          "lng": 73.841986,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Khadki metro station, Pune\" → \"Khadki Metro Station\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Railway Station, Khadki, Pune, Maharashtra 411003"
-        },
-        {
-          "id": "line1-range-hill",
-          "name": "Range Hill",
-          "lat": 18.549988,
-          "lng": 73.845922,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Range Hill metro station, Pune\" → \"Range Hill Metro Station( STILL Under construction)\" (TODO_VERIFY: review match)",
-          "open": false,
-          "openSource": "TODO_VERIFY: set open=true once Range Hill station is in service (fares.ts calibration Civil Court→PCMC = 9 stops excludes it)",
-          "formattedAddress": "GRXW+X9V, Indrayani Nagar, Range Hills, Maharashtra 411020"
-        },
-        {
-          "id": "line1-shivajinagar",
-          "name": "Shivajinagar",
-          "lat": 18.532491,
-          "lng": 73.849151,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Shivajinagar metro station, Pune\" → \"Shivaji Nagar Metro Station\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Narveer Tanaji Wadi, Shivajinagar, Pune, Maharashtra 411005"
-        },
-        {
-          "id": "line1-civil-court",
-          "name": "Civil Court",
-          "lat": 18.526776,
-          "lng": 73.857874,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Civil Court metro station, Pune\" → \"District Court\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Kamgar Putala Vasahat, Shivajinagar, Pune, Maharashtra 411005, India",
-          "aliases": ["District Court"]
-        },
-        {
-          "id": "line1-budhwar-peth",
-          "name": "Budhwar Peth",
-          "lat": 18.521558,
-          "lng": 73.859672,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Budhwar Peth Metro Station, Pune\" → \"Kasba Peth\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Kasba Peth, Pune, Maharashtra 411011",
-          "geocodeQuery": "Budhwar Peth Metro Station, Pune",
-          "aliases": ["Kasba Peth"]
-        },
-        {
-          "id": "line1-mandai",
-          "name": "Mandai",
-          "lat": 18.512722,
-          "lng": 73.857433,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Mandai metro station, Pune\" → \"Mahatma Phule Mandai\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Mandai, Shukrawar Peth, Pune, Maharashtra 411002, India",
-          "aliases": ["Mahatma Phule Mandai"]
-        },
-        {
-          "id": "line1-swargate",
-          "name": "Swargate",
-          "lat": 18.499672,
-          "lng": 73.857525,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Swargate metro station, Pune\" → \"Swargate\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Dadawadi, Pune, Maharashtra 411002, India"
-        }
+        "PIM",
+        "STG",
+        "BHO",
+        "KWA",
+        "PGD",
+        "DDI",
+        "BPI",
+        "KHK",
+        "SJO",
+        "CVC",
+        "BPD",
+        "MNA",
+        "SGT"
       ],
       "segmentMinutes": [
         {
-          "value": 2,
+          "value": 3.8,
           "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 2.14 km straight line at 34 km/h"
+        },
+        {
+          "value": 1.3,
+          "verified": false,
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 0.73 km straight line at 34 km/h"
+        },
+        {
+          "value": 2.3,
+          "verified": false,
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 1.32 km straight line at 34 km/h"
+        },
+        {
+          "value": 1.8,
+          "verified": false,
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 1.03 km straight line at 34 km/h"
+        },
+        {
+          "value": 1.5,
+          "verified": false,
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 0.87 km straight line at 34 km/h"
+        },
+        {
+          "value": 2.9,
+          "verified": false,
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 1.62 km straight line at 34 km/h"
+        },
+        {
+          "value": 1.6,
+          "verified": false,
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 0.91 km straight line at 34 km/h"
+        },
+        {
+          "value": 6,
+          "verified": false,
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 3.41 km straight line at 34 km/h"
         },
         {
           "value": 2,
           "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 1.12 km straight line at 34 km/h"
         },
         {
-          "value": 2,
+          "value": 1.1,
           "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 0.61 km straight line at 34 km/h"
         },
         {
-          "value": 2,
+          "value": 1.8,
           "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 1.01 km straight line at 34 km/h"
         },
         {
-          "value": 2,
+          "value": 2.6,
           "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 1.45 km straight line at 34 km/h"
         }
       ],
       "dwellSeconds": {
         "value": 30,
         "verified": false,
-        "source": "TODO_VERIFY: placeholder 30 s dwell"
+        "source": "secondary summary, 2026-10-17"
       },
       "firstTrain": {
         "value": "06:00",
         "verified": false,
-        "source": "TODO_VERIFY: routingConfig.metroHours.open (unverified)"
+        "source": "secondary summary, 2026-10-17"
       },
       "lastTrain": {
-        "value": "23:00",
+        "value": "22:00",
         "verified": false,
-        "source": "TODO_VERIFY: routingConfig.metroHours.close (unverified); last departure from either terminal"
+        "source": "secondary summary, 2026-10-17"
       },
       "headways": [
-        {
-          "band": "early",
-          "from": "06:00",
-          "to": "08:00",
-          "headwayMin": {
-            "value": 10,
-            "verified": false,
-            "source": "TODO_VERIFY: placeholder headway, check Maha-Metro timetable"
-          }
-        },
         {
           "band": "peak_am",
           "from": "08:00",
           "to": "11:00",
           "headwayMin": {
-            "value": 7,
-            "verified": false,
-            "source": "TODO_VERIFY: placeholder headway, check Maha-Metro timetable"
-          }
-        },
-        {
-          "band": "off_peak",
-          "from": "11:00",
-          "to": "17:00",
-          "headwayMin": {
             "value": 10,
             "verified": false,
-            "source": "TODO_VERIFY: placeholder headway, check Maha-Metro timetable"
+            "source": "secondary summary, 2026-10-17"
           }
         },
         {
@@ -275,321 +430,157 @@
           "from": "17:00",
           "to": "20:00",
           "headwayMin": {
-            "value": 7,
-            "verified": false,
-            "source": "TODO_VERIFY: placeholder headway, check Maha-Metro timetable"
-          }
-        },
-        {
-          "band": "late",
-          "from": "20:00",
-          "to": "24:00",
-          "headwayMin": {
             "value": 10,
             "verified": false,
-            "source": "TODO_VERIFY: placeholder headway, check Maha-Metro timetable"
+            "source": "secondary summary, 2026-10-17"
           }
         }
       ],
-      "colorSource": "Google Transit line colour (Routes API transitLine.color, probed 2026-10-07)"
+      "offPeakHeadwayMin": {
+        "value": 15,
+        "verified": false,
+        "source": "secondary summary, 2026-10-17"
+      }
     },
     {
-      "id": "line2",
+      "id": "aqua",
       "name": "Aqua Line",
-      "color": "#007CB0",
+      "color": "#039BE5",
       "active": true,
-      "activeSource": "Operational (Maha-Metro)",
       "stations": [
-        {
-          "id": "line2-vanaz",
-          "name": "Vanaz",
-          "lat": 18.507168,
-          "lng": 73.80523,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Vanaz metro station, Pune\" → \"Vanaz\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Lokmanya Colony, Kothrud, Pune, Maharashtra 411038, India"
-        },
-        {
-          "id": "line2-anand-nagar",
-          "name": "Anand Nagar",
-          "lat": 18.509535,
-          "lng": 73.814015,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Anand Nagar metro station, Pune\" → \"Anand Nagar Metro Statian , Kothrud , Pune , Maharashtra\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Behede Complex, पौड रस्ता, सर्वत्र सोसायटी, आनंद नगर, कोथरूड, पुणे, महाराष्ट्र 411038"
-        },
-        {
-          "id": "line2-ideal-colony",
-          "name": "Ideal Colony",
-          "lat": 18.509091,
-          "lng": 73.821892,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Ideal Colony Metro Station, Paud Road, Kothrud, Pune\" → \"Paud Phata\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Mahaganesh Colony, Kothrud, Pune, Maharashtra 411038, India",
-          "geocodeQuery": "Ideal Colony Metro Station, Paud Road, Kothrud, Pune"
-        },
-        {
-          "id": "line2-nal-stop",
-          "name": "Nal Stop",
-          "lat": 18.507327,
-          "lng": 73.82874,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Nal Stop metro station, Pune\" → \"S.N.D.T.College\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Pandurang Colony, Erandwane, Pune, Maharashtra 411038, India"
-        },
-        {
-          "id": "line2-garware-college",
-          "name": "Garware College",
-          "lat": 18.511777,
-          "lng": 73.837714,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Garware College metro station, Pune\" → \"Garware College Metro Station\" (TODO_VERIFY: review match)",
-          "formattedAddress": "GR6Q+P38, opposite Garware College, Khilarewadi, Erandwane, Pune, Maharashtra 411004"
-        },
-        {
-          "id": "line2-deccan-gymkhana",
-          "name": "Deccan Gymkhana",
-          "lat": 18.516181,
-          "lng": 73.844305,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Deccan Gymkhana metro station, Pune\" → \"Deccan Metro Station\" (TODO_VERIFY: review match)",
-          "formattedAddress": "GR8V+FPF, Pulachi Wadi, Narayan Peth, Pune, Maharashtra 411004",
-          "aliases": ["Deccan"]
-        },
-        {
-          "id": "line2-chhatrapati-sambhaji-udyan",
-          "name": "Chhatrapati Sambhaji Udyan",
-          "lat": 18.520115,
-          "lng": 73.847593,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Chhatrapati Sambhaji Udyan metro station, Pune\" → \"Chhatrapati Sambhaji Garden\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Shivajinagar, Pune, Maharashtra 411004, India",
-          "aliases": ["Chhatrapati Sambhaji Garden", "Sambhaji Udyan", "Sambhaji Park"]
-        },
-        {
-          "id": "line2-pmc",
-          "name": "PMC",
-          "lat": 18.522746,
-          "lng": 73.853493,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"PMC metro station, Pune\" → \"PMC Metro Station\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Shivajinagar, Pune, Maharashtra 411005, India"
-        },
-        {
-          "id": "line2-civil-court",
-          "name": "Civil Court",
-          "lat": 18.527256,
-          "lng": 73.856692,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Civil Court metro station, Pune\" → \"Civil Court Metro Drop\" (TODO_VERIFY: review match)",
-          "formattedAddress": "35/37, Chhatrapati Shahu Setu, near Family Court, Tophakhana, Kamgar Putala Vasahat, Shivajinagar, Pune, Maharashtra 411005",
-          "aliases": ["District Court"]
-        },
-        {
-          "id": "line2-mangalwar-peth",
-          "name": "Mangalwar Peth",
-          "lat": 18.530039,
-          "lng": 73.865251,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Mangalwar Peth metro station, Pune\" → \"R.T.O. Pune\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Sangamvadi, Pune, Maharashtra 411001, India",
-          "aliases": ["RTO"]
-        },
-        {
-          "id": "line2-pune-railway-station",
-          "name": "Pune Railway Station",
-          "lat": 18.529659,
-          "lng": 73.872576,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Pune Railway Station metro station, Pune\" → \"Pune Railway Metro Station\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Sangamvadi, Pune, Maharashtra 411001",
-          "aliases": ["Pune Station"]
-        },
-        {
-          "id": "line2-ruby-hall-clinic",
-          "name": "Ruby Hall Clinic",
-          "lat": 18.532694,
-          "lng": 73.877848,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Ruby Hall Clinic metro station, Pune\" → \"Ruby Hall Clinic\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Sangamvadi, Pune, Maharashtra 411001, India",
-          "aliases": ["Ruby Hall"]
-        },
-        {
-          "id": "line2-bund-garden",
-          "name": "Bund Garden",
-          "lat": 18.540793,
-          "lng": 73.883577,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Bund Garden metro station, Pune\" → \"Bund Garden\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Bund Garden, Sangamvadi, Pune, Maharashtra 411001, India"
-        },
-        {
-          "id": "line2-yerawada",
-          "name": "Yerawada",
-          "lat": 18.545326,
-          "lng": 73.886673,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Yerawada metro station, Pune\" → \"Yerawada\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Yerwada Village, Yerawada, Pune, Maharashtra 411006, India",
-          "aliases": ["Yerwada"]
-        },
-        {
-          "id": "line2-kalyani-nagar",
-          "name": "Kalyani Nagar",
-          "lat": 18.545147,
-          "lng": 73.905844,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Kalyani Nagar metro station, Pune\" → \"Kalyani Nagar\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Kalyani Nagar, Pune, Maharashtra 411006, India"
-        },
-        {
-          "id": "line2-ramwadi",
-          "name": "Ramwadi",
-          "lat": 18.557148,
-          "lng": 73.908712,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Ramwadi metro station, Pune\" → \"Ramwadi\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Sakore Nagar, Viman Nagar, Pune, Maharashtra 411014, India"
-        }
+        "VNZ",
+        "AND",
+        "ICY",
+        "NST",
+        "GWC",
+        "DGK",
+        "SAN",
+        "PMC",
+        "CVC",
+        "MGA",
+        "PRS",
+        "RUC",
+        "BUN",
+        "YER",
+        "KNA",
+        "RAW"
       ],
       "segmentMinutes": [
         {
-          "value": 2,
+          "value": 1.7,
           "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 0.96 km straight line at 34 km/h"
         },
         {
-          "value": 2,
+          "value": 1.5,
           "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 0.83 km straight line at 34 km/h"
         },
         {
-          "value": 2,
+          "value": 1.3,
           "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 0.75 km straight line at 34 km/h"
         },
         {
-          "value": 2,
+          "value": 1.9,
           "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 1.07 km straight line at 34 km/h"
         },
         {
-          "value": 2,
+          "value": 1.5,
           "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 0.85 km straight line at 34 km/h"
         },
         {
-          "value": 2,
+          "value": 1,
           "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 0.56 km straight line at 34 km/h"
         },
         {
-          "value": 2,
+          "value": 1.2,
           "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 0.69 km straight line at 34 km/h"
         },
         {
-          "value": 2,
+          "value": 1.1,
           "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 0.64 km straight line at 34 km/h"
         },
         {
-          "value": 2,
+          "value": 1.5,
           "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 0.86 km straight line at 34 km/h"
         },
         {
-          "value": 2,
+          "value": 1.4,
           "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 0.77 km straight line at 34 km/h"
         },
         {
-          "value": 2,
+          "value": 1.1,
           "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 0.65 km straight line at 34 km/h"
         },
         {
-          "value": 2,
+          "value": 1.9,
           "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 1.08 km straight line at 34 km/h"
         },
         {
-          "value": 2,
+          "value": 1.1,
           "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 0.60 km straight line at 34 km/h"
         },
         {
-          "value": 2,
+          "value": 3.6,
           "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 2.02 km straight line at 34 km/h"
         },
         {
-          "value": 2,
+          "value": 2.4,
           "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
+          "estimated": true,
+          "source": "TODO_VERIFY: estimated from 1.37 km straight line at 34 km/h"
         }
       ],
       "dwellSeconds": {
         "value": 30,
         "verified": false,
-        "source": "TODO_VERIFY: placeholder 30 s dwell"
+        "source": "secondary summary, 2026-10-17"
       },
       "firstTrain": {
         "value": "06:00",
         "verified": false,
-        "source": "TODO_VERIFY: routingConfig.metroHours.open (unverified)"
+        "source": "secondary summary, 2026-10-17"
       },
       "lastTrain": {
-        "value": "23:00",
+        "value": "22:00",
         "verified": false,
-        "source": "TODO_VERIFY: routingConfig.metroHours.close (unverified); last departure from either terminal"
+        "source": "secondary summary, 2026-10-17"
       },
       "headways": [
-        {
-          "band": "early",
-          "from": "06:00",
-          "to": "08:00",
-          "headwayMin": {
-            "value": 10,
-            "verified": false,
-            "source": "TODO_VERIFY: placeholder headway, check Maha-Metro timetable"
-          }
-        },
         {
           "band": "peak_am",
           "from": "08:00",
           "to": "11:00",
           "headwayMin": {
-            "value": 7,
-            "verified": false,
-            "source": "TODO_VERIFY: placeholder headway, check Maha-Metro timetable"
-          }
-        },
-        {
-          "band": "off_peak",
-          "from": "11:00",
-          "to": "17:00",
-          "headwayMin": {
             "value": 10,
             "verified": false,
-            "source": "TODO_VERIFY: placeholder headway, check Maha-Metro timetable"
+            "source": "secondary summary, 2026-10-17"
           }
         },
         {
@@ -597,520 +588,959 @@
           "from": "17:00",
           "to": "20:00",
           "headwayMin": {
-            "value": 7,
-            "verified": false,
-            "source": "TODO_VERIFY: placeholder headway, check Maha-Metro timetable"
-          }
-        },
-        {
-          "band": "late",
-          "from": "20:00",
-          "to": "24:00",
-          "headwayMin": {
             "value": 10,
             "verified": false,
-            "source": "TODO_VERIFY: placeholder headway, check Maha-Metro timetable"
+            "source": "secondary summary, 2026-10-17"
           }
         }
       ],
-      "colorSource": "Google Transit line colour (Routes API transitLine.color, probed 2026-10-07)"
+      "offPeakHeadwayMin": {
+        "value": 15,
+        "verified": false,
+        "source": "secondary summary, 2026-10-17"
+      }
     },
     {
       "id": "line3",
       "name": "Line 3 (Hinjewadi–Shivajinagar)",
       "color": "#1F5FAD",
       "active": false,
-      "activeSource": "TODO_VERIFY: set active=true only once confirmed operational",
-      "stations": [
-        {
-          "id": "line3-megapolis-circle",
-          "name": "Megapolis Circle",
-          "lat": 18.579101,
-          "lng": 73.687988,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Megapolis Circle metro station, Pune\" → \"Megapolis Circle Metro Station\" (TODO_VERIFY: review match)",
-          "formattedAddress": "HMHQ+J5X, MIDC Phase III Main Rd, Phase 3, Rajiv Gandhi Infotech Park, Hinjawadi, Man, Maharashtra 411057"
-        },
-        {
-          "id": "line3-embassy-quadron",
-          "name": "Embassy Quadron",
-          "lat": 18.585435,
-          "lng": 73.696637,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Embassy Quadron metro station, Pune\" → \"Embassy Quadron Business Park\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Plot No. 28, Hinjawadi Phase II, Rajiv Gandhi Infotech Park, Hinjawadi, Man, Maharashtra 411057"
-        },
-        {
-          "id": "line3-dohler",
-          "name": "Dohler",
-          "lat": 18.587925,
-          "lng": 73.702375,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Dohler metro station, Pune\" → \"Doehler India Metro Station\" (TODO_VERIFY: review match)",
-          "formattedAddress": "281, Hinjawadi - Kasarsai Rd, Hinjawadi Phase II, Rajiv Gandhi Infotech Park, Hinjawadi, Man, Maharashtra 411057"
-        },
-        {
-          "id": "line3-infosys-phase-2",
-          "name": "Infosys Phase 2",
-          "lat": 18.598046,
-          "lng": 73.713031,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Infosys Phase 2 metro station, Pune\" → \"Infosys Phase 2\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Hinjawadi Phase II, Rajiv Gandhi Infotech Park, Hinjawadi, Pimpri-Chinchwad, Maharashtra 411057"
-        },
-        {
-          "id": "line3-wipro-phase-2",
-          "name": "Wipro Phase 2",
-          "lat": 18.59892,
-          "lng": 73.719796,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Wipro Phase 2 metro station, Pune\" → \"Wipro Technologies Ltd\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Pune development Center (PDC2, Plot No. 31, MIDC, Hinjawadi Phase II, Rajiv Gandhi Infotech Park, Hinjawadi, Marunji, Maharashtra 411057"
-        },
-        {
-          "id": "line3-pall-india",
-          "name": "Pall India",
-          "lat": 18.592628,
-          "lng": 73.72823,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Pall India Metro Station, Hinjawadi Phase 1, Pune\" → \"Pall Corporation\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Survey No. 237, IT Park, Phase 1, Rajiv Gandhi Infotech Park, Hinjawadi, Maharashtra 411057",
-          "geocodeQuery": "Pall India Metro Station, Hinjawadi Phase 1, Pune"
-        },
-        {
-          "id": "line3-shivaji-chowk",
-          "name": "Shivaji Chowk",
-          "lat": 18.592577,
-          "lng": 73.737146,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Shivaji Chowk metro station, Pune\" → \"Shivaji Chowk Metro Station\" (TODO_VERIFY: review match)",
-          "formattedAddress": "HPVP+2VJ, Hinjawadi Phase 2 Rd, Hinjawadi, Maharashtra 411057"
-        },
-        {
-          "id": "line3-hinjewadi",
-          "name": "Hinjewadi",
-          "lat": 18.590839,
-          "lng": 73.747106,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Hinjewadi metro station, Pune\" → \"Proposed Metro Station Hinjewadi\" (TODO_VERIFY: review match)",
-          "formattedAddress": "HPRW+6RP, Hinjawadi, Pune, Maharashtra 411057"
-        },
-        {
-          "id": "line3-wakad-chowk",
-          "name": "Wakad Chowk",
-          "lat": 18.58999,
-          "lng": 73.757724,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Wakad Chowk metro station, Pune\" → \"Wakad Metro station\" (TODO_VERIFY: review match)",
-          "formattedAddress": "HQQ5+X3X, Hinjewadi - Wakad Rd, Bhujbal Vasti, Wakad, Pimpri-Chinchwad, Pune, Maharashtra 411057"
-        },
-        {
-          "id": "line3-balewadi-stadium",
-          "name": "Balewadi Stadium",
-          "lat": 18.579768,
-          "lng": 73.761568,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Balewadi Stadium metro station, Pune\" → \"Balewadi Stadium Metro Station\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Survey No. 27, 1/2/6, Patil Nagar, Balewadi, Pune, Maharashtra 411045"
-        },
-        {
-          "id": "line3-nicmar",
-          "name": "NICMAR",
-          "lat": 18.574998,
-          "lng": 73.765904,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"NICMAR metro station, Pune\" → \"NICMAR\" (TODO_VERIFY: review match)",
-          "formattedAddress": "HQF8+X9R, near to NICMAR college, Balewadi, Pune, Maharashtra 411045"
-        },
-        {
-          "id": "line3-ram-nagar",
-          "name": "Ram Nagar",
-          "lat": null,
-          "lng": null,
-          "geocoded": false,
-          "verified": false,
-          "source": "TODO_VERIFY: Places Text Search found no reliable match; enter coordinates by hand",
-          "geocodeQuery": "Ramnagar Metro Station, Baner Road, Pune"
-        },
-        {
-          "id": "line3-laxmi-nagar",
-          "name": "Laxmi Nagar",
-          "lat": 18.570689,
-          "lng": 73.774857,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Laxmi Nagar metro station, Pune\" → \"Laxmi nagar metro station\" (TODO_VERIFY: review match)",
-          "formattedAddress": "HQCF+7WH, Laxman Nagar, Baner, Pune, Maharashtra 411045"
-        },
-        {
-          "id": "line3-balewadi-phata",
-          "name": "Balewadi Phata",
-          "lat": 18.564198,
-          "lng": 73.77942,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Balewadi Phata metro station, Pune\" → \"Balewadi phata Metro Station\" (TODO_VERIFY: review match)",
-          "formattedAddress": "HQ7H+MQF, Baner - Mahalunge Rd, Lalit Estate, Baner, Pune, Maharashtra 411045"
-        },
-        {
-          "id": "line3-baner-gaon",
-          "name": "Baner Gaon",
-          "lat": 18.55876,
-          "lng": 73.791223,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Baner Gaon metro station, Pune\" → \"Banergaon Metro station\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Plot 16, Essencia Heights, B-602, off Baner - Mahalunge Road, opp. Orchid Hotel, Baner, Pune, Maharashtra 411069"
-        },
-        {
-          "id": "line3-baner",
-          "name": "Baner",
-          "lat": null,
-          "lng": null,
-          "geocoded": false,
-          "verified": false,
-          "source": "TODO_VERIFY: Places Text Search found no reliable match; enter coordinates by hand",
-          "geocodeQuery": "Baner Metro Station, Baner Road near Pan Card Club Road, Pune"
-        },
-        {
-          "id": "line3-krishi-anusandhan",
-          "name": "Krishi Anusandhan",
-          "lat": 18.562279,
-          "lng": 73.825205,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Krishi Anusandhan metro station, Pune\" → \"MPKV Agricultural Research Station\" (TODO_VERIFY: review match)",
-          "formattedAddress": "HR6G+W38, Ganeshkhind, Pune, Maharashtra 411067"
-        },
-        {
-          "id": "line3-sakal-nagar",
-          "name": "Sakal Nagar",
-          "lat": 18.546483,
-          "lng": 73.819257,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Sakal Nagar metro station, Pune\" → \"Sakal Nagar\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Chavan Nagar, Pune, Maharashtra 411007, India"
-        },
-        {
-          "id": "line3-savitribai-phule-pune-university",
-          "name": "Savitribai Phule Pune University",
-          "lat": null,
-          "lng": null,
-          "geocoded": false,
-          "verified": false,
-          "source": "TODO_VERIFY: Places Text Search found no reliable match; enter coordinates by hand",
-          "geocodeQuery": "Pune University Metro Station, Ganeshkhind Road, Pune"
-        },
-        {
-          "id": "line3-rbi",
-          "name": "RBI",
-          "lat": 18.536627,
-          "lng": 73.836486,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"RBI metro station, Pune\" → \"R.B.I. Metro station\" (TODO_VERIFY: review match)",
-          "formattedAddress": "GRPP+MH5, opp. E-SQUARE Leisure, Model Colony, Shivajinagar, Pune, Maharashtra 411016"
-        },
-        {
-          "id": "line3-agriculture-college",
-          "name": "Agriculture College",
-          "lat": 18.532532,
-          "lng": 73.842252,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Agriculture College metro station, Pune\" → \"Agriculture College Metro station\" (TODO_VERIFY: review match)",
-          "formattedAddress": "1109, University Rd, Modibaug, Model Colony, Shivajinagar, Pune, Maharashtra 411016"
-        },
-        {
-          "id": "line3-shivajinagar",
-          "name": "Shivajinagar",
-          "lat": 18.532491,
-          "lng": 73.849151,
-          "geocoded": true,
-          "verified": false,
-          "source": "Google Places Text Search \"Shivajinagar metro station, Pune\" → \"Shivaji Nagar Metro Station\" (TODO_VERIFY: review match)",
-          "formattedAddress": "Narveer Tanaji Wadi, Shivajinagar, Pune, Maharashtra 411005"
-        }
-      ],
-      "segmentMinutes": [
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        },
-        {
-          "value": 2,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder 2 min run time per segment (not from a timetable)"
-        }
-      ],
+      "stations": [],
+      "segmentMinutes": [],
       "dwellSeconds": {
-        "value": 30,
+        "value": null,
         "verified": false,
-        "source": "TODO_VERIFY: placeholder 30 s dwell"
+        "source": "TODO_VERIFY"
       },
       "firstTrain": {
-        "value": "06:00",
+        "value": null,
         "verified": false,
-        "source": "TODO_VERIFY: routingConfig.metroHours.open (unverified)"
+        "source": "TODO_VERIFY"
       },
       "lastTrain": {
-        "value": "23:00",
+        "value": null,
         "verified": false,
-        "source": "TODO_VERIFY: routingConfig.metroHours.close (unverified); last departure from either terminal"
+        "source": "TODO_VERIFY"
       },
-      "headways": [
-        {
-          "band": "early",
-          "from": "06:00",
-          "to": "08:00",
-          "headwayMin": {
-            "value": 10,
-            "verified": false,
-            "source": "TODO_VERIFY: placeholder headway, check Maha-Metro timetable"
-          }
-        },
-        {
-          "band": "peak_am",
-          "from": "08:00",
-          "to": "11:00",
-          "headwayMin": {
-            "value": 7,
-            "verified": false,
-            "source": "TODO_VERIFY: placeholder headway, check Maha-Metro timetable"
-          }
-        },
-        {
-          "band": "off_peak",
-          "from": "11:00",
-          "to": "17:00",
-          "headwayMin": {
-            "value": 10,
-            "verified": false,
-            "source": "TODO_VERIFY: placeholder headway, check Maha-Metro timetable"
-          }
-        },
-        {
-          "band": "peak_pm",
-          "from": "17:00",
-          "to": "20:00",
-          "headwayMin": {
-            "value": 7,
-            "verified": false,
-            "source": "TODO_VERIFY: placeholder headway, check Maha-Metro timetable"
-          }
-        },
-        {
-          "band": "late",
-          "from": "20:00",
-          "to": "24:00",
-          "headwayMin": {
-            "value": 10,
-            "verified": false,
-            "source": "TODO_VERIFY: placeholder headway, check Maha-Metro timetable"
-          }
-        }
-      ],
-      "stationsSource": "TODO_VERIFY: names from memory of the published alignment; Wakad–Baner order corrected from geocoded positions. Check against PITCMRL.",
-      "colorSource": "TODO_VERIFY: official Line 3 colour unknown; display colour only"
+      "headways": [],
+      "offPeakHeadwayMin": {
+        "value": null,
+        "verified": false,
+        "source": "TODO_VERIFY"
+      }
     }
   ],
   "interchanges": [
     {
-      "a": "line1-civil-court",
-      "b": "line2-civil-court",
+      "station": "CVC",
+      "lines": [
+        "purple",
+        "aqua"
+      ],
       "walkMinutes": {
         "value": 4,
         "verified": false,
-        "source": "TODO_VERIFY: placeholder transfer walk"
-      }
-    },
-    {
-      "a": "line1-shivajinagar",
-      "b": "line3-shivajinagar",
-      "walkMinutes": {
-        "value": 6,
-        "verified": false,
-        "source": "TODO_VERIFY: placeholder transfer walk (separate stations)"
+        "source": "TODO_VERIFY: Phase 1 brief placeholder"
       }
     }
   ],
   "fares": {
-    "basis": "stations",
-    "basisSource": "TODO_VERIFY: fares.ts calibration uses stops travelled; switch to \"km\" if the published chart is by distance",
-    "interchange": "single_journey",
-    "interchangeSource": "TODO_VERIFY: assumes one fare for the whole trip across Line 1/2 interchange",
-    "$comment": "Slab = max stations travelled (or km) → ₹. Same slabs as fares.ts metroStopSlabs; only 9→₹20 and 11→₹25 were checked against published fares.",
-    "slabs": [
-      {
-        "upTo": 3,
-        "fare": {
-          "value": 10,
-          "verified": false,
-          "source": "TODO_VERIFY: fares.ts extrapolation"
-        }
+    "source": "Maha-Metro official fare matrix (image)",
+    "checkedOn": "2026-10-17",
+    "verified": true,
+    "matrix": {
+      "PIM": {
+        "PIM": 0,
+        "STG": 15,
+        "BHO": 15,
+        "KWA": 20,
+        "PGD": 20,
+        "DDI": 25,
+        "BPI": 25,
+        "KHK": 25,
+        "SJO": 30,
+        "CVC": 30,
+        "BPD": 30,
+        "MNA": 30,
+        "SGT": 30,
+        "VNZ": 35,
+        "AND": 35,
+        "ICY": 30,
+        "NST": 30,
+        "GWC": 30,
+        "DGK": 30,
+        "SAN": 30,
+        "PMC": 30,
+        "MGA": 30,
+        "PRS": 30,
+        "RUC": 30,
+        "BUN": 30,
+        "YER": 30,
+        "KNA": 35,
+        "RAW": 35
       },
-      {
-        "upTo": 6,
-        "fare": {
-          "value": 15,
-          "verified": false,
-          "source": "TODO_VERIFY: fares.ts extrapolation"
-        }
+      "STG": {
+        "PIM": 15,
+        "STG": 0,
+        "BHO": 10,
+        "KWA": 15,
+        "PGD": 15,
+        "DDI": 15,
+        "BPI": 20,
+        "KHK": 25,
+        "SJO": 25,
+        "CVC": 25,
+        "BPD": 30,
+        "MNA": 30,
+        "SGT": 30,
+        "VNZ": 30,
+        "AND": 30,
+        "ICY": 30,
+        "NST": 30,
+        "GWC": 30,
+        "DGK": 30,
+        "SAN": 30,
+        "PMC": 25,
+        "MGA": 30,
+        "PRS": 30,
+        "RUC": 30,
+        "BUN": 30,
+        "YER": 30,
+        "KNA": 30,
+        "RAW": 35
       },
-      {
-        "upTo": 9,
-        "fare": {
-          "value": 20,
-          "verified": false,
-          "source": "Calibration: Civil Court→PCMC (9 stops) = ₹20 published; slab edges TODO_VERIFY"
-        }
+      "BHO": {
+        "PIM": 15,
+        "STG": 10,
+        "BHO": 0,
+        "KWA": 10,
+        "PGD": 15,
+        "DDI": 15,
+        "BPI": 20,
+        "KHK": 20,
+        "SJO": 25,
+        "CVC": 25,
+        "BPD": 25,
+        "MNA": 30,
+        "SGT": 30,
+        "VNZ": 30,
+        "AND": 30,
+        "ICY": 30,
+        "NST": 30,
+        "GWC": 30,
+        "DGK": 30,
+        "SAN": 25,
+        "PMC": 25,
+        "MGA": 25,
+        "PRS": 30,
+        "RUC": 30,
+        "BUN": 30,
+        "YER": 30,
+        "KNA": 30,
+        "RAW": 35
       },
-      {
-        "upTo": 12,
-        "fare": {
-          "value": 25,
-          "verified": false,
-          "source": "Calibration: Vanaz→Ruby Hall (11 stops) = ₹25 published; slab edges TODO_VERIFY"
-        }
+      "KWA": {
+        "PIM": 20,
+        "STG": 15,
+        "BHO": 10,
+        "KWA": 0,
+        "PGD": 10,
+        "DDI": 10,
+        "BPI": 15,
+        "KHK": 20,
+        "SJO": 25,
+        "CVC": 25,
+        "BPD": 25,
+        "MNA": 25,
+        "SGT": 30,
+        "VNZ": 30,
+        "AND": 30,
+        "ICY": 30,
+        "NST": 30,
+        "GWC": 25,
+        "DGK": 25,
+        "SAN": 25,
+        "PMC": 25,
+        "MGA": 25,
+        "PRS": 25,
+        "RUC": 25,
+        "BUN": 30,
+        "YER": 30,
+        "KNA": 30,
+        "RAW": 30
       },
-      {
-        "upTo": 16,
-        "fare": {
-          "value": 30,
-          "verified": false,
-          "source": "TODO_VERIFY: fares.ts extrapolation"
-        }
+      "PGD": {
+        "PIM": 20,
+        "STG": 15,
+        "BHO": 15,
+        "KWA": 10,
+        "PGD": 0,
+        "DDI": 10,
+        "BPI": 15,
+        "KHK": 15,
+        "SJO": 25,
+        "CVC": 25,
+        "BPD": 25,
+        "MNA": 25,
+        "SGT": 30,
+        "VNZ": 30,
+        "AND": 30,
+        "ICY": 30,
+        "NST": 25,
+        "GWC": 25,
+        "DGK": 25,
+        "SAN": 25,
+        "PMC": 25,
+        "MGA": 25,
+        "PRS": 25,
+        "RUC": 25,
+        "BUN": 25,
+        "YER": 30,
+        "KNA": 30,
+        "RAW": 30
       },
-      {
-        "upTo": null,
-        "fare": {
-          "value": 35,
-          "verified": false,
-          "source": "TODO_VERIFY: fares.ts extrapolation (maximum fare)"
-        }
+      "DDI": {
+        "PIM": 25,
+        "STG": 15,
+        "BHO": 15,
+        "KWA": 10,
+        "PGD": 10,
+        "DDI": 0,
+        "BPI": 10,
+        "KHK": 15,
+        "SJO": 25,
+        "CVC": 25,
+        "BPD": 25,
+        "MNA": 25,
+        "SGT": 30,
+        "VNZ": 30,
+        "AND": 30,
+        "ICY": 25,
+        "NST": 25,
+        "GWC": 25,
+        "DGK": 25,
+        "SAN": 25,
+        "PMC": 25,
+        "MGA": 25,
+        "PRS": 25,
+        "RUC": 25,
+        "BUN": 25,
+        "YER": 25,
+        "KNA": 30,
+        "RAW": 30
+      },
+      "BPI": {
+        "PIM": 25,
+        "STG": 20,
+        "BHO": 20,
+        "KWA": 15,
+        "PGD": 15,
+        "DDI": 10,
+        "BPI": 0,
+        "KHK": 10,
+        "SJO": 20,
+        "CVC": 20,
+        "BPD": 25,
+        "MNA": 25,
+        "SGT": 25,
+        "VNZ": 30,
+        "AND": 25,
+        "ICY": 25,
+        "NST": 25,
+        "GWC": 25,
+        "DGK": 25,
+        "SAN": 25,
+        "PMC": 25,
+        "MGA": 25,
+        "PRS": 25,
+        "RUC": 25,
+        "BUN": 25,
+        "YER": 25,
+        "KNA": 25,
+        "RAW": 30
+      },
+      "KHK": {
+        "PIM": 25,
+        "STG": 25,
+        "BHO": 20,
+        "KWA": 20,
+        "PGD": 15,
+        "DDI": 15,
+        "BPI": 10,
+        "KHK": 0,
+        "SJO": 15,
+        "CVC": 20,
+        "BPD": 20,
+        "MNA": 25,
+        "SGT": 25,
+        "VNZ": 25,
+        "AND": 25,
+        "ICY": 25,
+        "NST": 25,
+        "GWC": 25,
+        "DGK": 25,
+        "SAN": 20,
+        "PMC": 20,
+        "MGA": 20,
+        "PRS": 25,
+        "RUC": 25,
+        "BUN": 25,
+        "YER": 25,
+        "KNA": 25,
+        "RAW": 30
+      },
+      "SJO": {
+        "PIM": 30,
+        "STG": 25,
+        "BHO": 25,
+        "KWA": 25,
+        "PGD": 25,
+        "DDI": 25,
+        "BPI": 20,
+        "KHK": 15,
+        "SJO": 0,
+        "CVC": 10,
+        "BPD": 15,
+        "MNA": 15,
+        "SGT": 20,
+        "VNZ": 25,
+        "AND": 25,
+        "ICY": 20,
+        "NST": 20,
+        "GWC": 15,
+        "DGK": 15,
+        "SAN": 15,
+        "PMC": 10,
+        "MGA": 15,
+        "PRS": 15,
+        "RUC": 15,
+        "BUN": 20,
+        "YER": 20,
+        "KNA": 25,
+        "RAW": 25
+      },
+      "CVC": {
+        "PIM": 30,
+        "STG": 25,
+        "BHO": 25,
+        "KWA": 25,
+        "PGD": 25,
+        "DDI": 25,
+        "BPI": 20,
+        "KHK": 20,
+        "SJO": 10,
+        "CVC": 0,
+        "BPD": 10,
+        "MNA": 15,
+        "SGT": 15,
+        "VNZ": 25,
+        "AND": 20,
+        "ICY": 20,
+        "NST": 15,
+        "GWC": 15,
+        "DGK": 10,
+        "SAN": 10,
+        "PMC": 10,
+        "MGA": 10,
+        "PRS": 10,
+        "RUC": 15,
+        "BUN": 15,
+        "YER": 20,
+        "KNA": 25,
+        "RAW": 25
+      },
+      "BPD": {
+        "PIM": 30,
+        "STG": 30,
+        "BHO": 25,
+        "KWA": 25,
+        "PGD": 25,
+        "DDI": 25,
+        "BPI": 25,
+        "KHK": 20,
+        "SJO": 15,
+        "CVC": 10,
+        "BPD": 0,
+        "MNA": 10,
+        "SGT": 15,
+        "VNZ": 25,
+        "AND": 25,
+        "ICY": 20,
+        "NST": 20,
+        "GWC": 15,
+        "DGK": 15,
+        "SAN": 15,
+        "PMC": 10,
+        "MGA": 15,
+        "PRS": 15,
+        "RUC": 15,
+        "BUN": 20,
+        "YER": 20,
+        "KNA": 25,
+        "RAW": 25
+      },
+      "MNA": {
+        "PIM": 30,
+        "STG": 30,
+        "BHO": 30,
+        "KWA": 25,
+        "PGD": 25,
+        "DDI": 25,
+        "BPI": 25,
+        "KHK": 25,
+        "SJO": 15,
+        "CVC": 15,
+        "BPD": 10,
+        "MNA": 0,
+        "SGT": 10,
+        "VNZ": 25,
+        "AND": 25,
+        "ICY": 25,
+        "NST": 20,
+        "GWC": 20,
+        "DGK": 15,
+        "SAN": 15,
+        "PMC": 15,
+        "MGA": 15,
+        "PRS": 15,
+        "RUC": 20,
+        "BUN": 20,
+        "YER": 25,
+        "KNA": 25,
+        "RAW": 25
+      },
+      "SGT": {
+        "PIM": 30,
+        "STG": 30,
+        "BHO": 30,
+        "KWA": 30,
+        "PGD": 30,
+        "DDI": 30,
+        "BPI": 25,
+        "KHK": 25,
+        "SJO": 20,
+        "CVC": 15,
+        "BPD": 15,
+        "MNA": 10,
+        "SGT": 0,
+        "VNZ": 25,
+        "AND": 25,
+        "ICY": 25,
+        "NST": 25,
+        "GWC": 25,
+        "DGK": 20,
+        "SAN": 20,
+        "PMC": 20,
+        "MGA": 20,
+        "PRS": 20,
+        "RUC": 25,
+        "BUN": 25,
+        "YER": 25,
+        "KNA": 25,
+        "RAW": 25
+      },
+      "VNZ": {
+        "PIM": 35,
+        "STG": 30,
+        "BHO": 30,
+        "KWA": 30,
+        "PGD": 30,
+        "DDI": 30,
+        "BPI": 30,
+        "KHK": 25,
+        "SJO": 25,
+        "CVC": 25,
+        "BPD": 25,
+        "MNA": 25,
+        "SGT": 25,
+        "VNZ": 0,
+        "AND": 10,
+        "ICY": 10,
+        "NST": 15,
+        "GWC": 15,
+        "DGK": 20,
+        "SAN": 20,
+        "PMC": 20,
+        "MGA": 25,
+        "PRS": 25,
+        "RUC": 25,
+        "BUN": 25,
+        "YER": 25,
+        "KNA": 30,
+        "RAW": 30
+      },
+      "AND": {
+        "PIM": 35,
+        "STG": 30,
+        "BHO": 30,
+        "KWA": 30,
+        "PGD": 30,
+        "DDI": 30,
+        "BPI": 25,
+        "KHK": 25,
+        "SJO": 25,
+        "CVC": 20,
+        "BPD": 25,
+        "MNA": 25,
+        "SGT": 25,
+        "VNZ": 10,
+        "AND": 0,
+        "ICY": 10,
+        "NST": 10,
+        "GWC": 15,
+        "DGK": 15,
+        "SAN": 20,
+        "PMC": 20,
+        "MGA": 25,
+        "PRS": 25,
+        "RUC": 25,
+        "BUN": 25,
+        "YER": 25,
+        "KNA": 30,
+        "RAW": 30
+      },
+      "ICY": {
+        "PIM": 30,
+        "STG": 30,
+        "BHO": 30,
+        "KWA": 30,
+        "PGD": 30,
+        "DDI": 25,
+        "BPI": 25,
+        "KHK": 25,
+        "SJO": 20,
+        "CVC": 20,
+        "BPD": 20,
+        "MNA": 25,
+        "SGT": 25,
+        "VNZ": 10,
+        "AND": 10,
+        "ICY": 0,
+        "NST": 10,
+        "GWC": 10,
+        "DGK": 15,
+        "SAN": 15,
+        "PMC": 20,
+        "MGA": 20,
+        "PRS": 25,
+        "RUC": 25,
+        "BUN": 25,
+        "YER": 25,
+        "KNA": 25,
+        "RAW": 30
+      },
+      "NST": {
+        "PIM": 30,
+        "STG": 30,
+        "BHO": 30,
+        "KWA": 30,
+        "PGD": 25,
+        "DDI": 25,
+        "BPI": 25,
+        "KHK": 25,
+        "SJO": 20,
+        "CVC": 15,
+        "BPD": 20,
+        "MNA": 20,
+        "SGT": 25,
+        "VNZ": 15,
+        "AND": 10,
+        "ICY": 10,
+        "NST": 0,
+        "GWC": 10,
+        "DGK": 10,
+        "SAN": 15,
+        "PMC": 15,
+        "MGA": 20,
+        "PRS": 20,
+        "RUC": 25,
+        "BUN": 25,
+        "YER": 25,
+        "KNA": 25,
+        "RAW": 25
+      },
+      "GWC": {
+        "PIM": 30,
+        "STG": 30,
+        "BHO": 30,
+        "KWA": 25,
+        "PGD": 25,
+        "DDI": 25,
+        "BPI": 25,
+        "KHK": 25,
+        "SJO": 15,
+        "CVC": 15,
+        "BPD": 15,
+        "MNA": 20,
+        "SGT": 25,
+        "VNZ": 15,
+        "AND": 15,
+        "ICY": 10,
+        "NST": 10,
+        "GWC": 0,
+        "DGK": 10,
+        "SAN": 10,
+        "PMC": 15,
+        "MGA": 15,
+        "PRS": 20,
+        "RUC": 20,
+        "BUN": 25,
+        "YER": 25,
+        "KNA": 25,
+        "RAW": 25
+      },
+      "DGK": {
+        "PIM": 30,
+        "STG": 30,
+        "BHO": 30,
+        "KWA": 25,
+        "PGD": 25,
+        "DDI": 25,
+        "BPI": 25,
+        "KHK": 25,
+        "SJO": 15,
+        "CVC": 10,
+        "BPD": 15,
+        "MNA": 15,
+        "SGT": 20,
+        "VNZ": 20,
+        "AND": 15,
+        "ICY": 15,
+        "NST": 10,
+        "GWC": 10,
+        "DGK": 0,
+        "SAN": 10,
+        "PMC": 10,
+        "MGA": 15,
+        "PRS": 15,
+        "RUC": 25,
+        "BUN": 25,
+        "YER": 20,
+        "KNA": 25,
+        "RAW": 25
+      },
+      "SAN": {
+        "PIM": 30,
+        "STG": 30,
+        "BHO": 25,
+        "KWA": 25,
+        "PGD": 25,
+        "DDI": 25,
+        "BPI": 25,
+        "KHK": 20,
+        "SJO": 15,
+        "CVC": 10,
+        "BPD": 15,
+        "MNA": 15,
+        "SGT": 20,
+        "VNZ": 20,
+        "AND": 20,
+        "ICY": 15,
+        "NST": 15,
+        "GWC": 10,
+        "DGK": 10,
+        "SAN": 0,
+        "PMC": 10,
+        "MGA": 15,
+        "PRS": 15,
+        "RUC": 15,
+        "BUN": 25,
+        "YER": 20,
+        "KNA": 25,
+        "RAW": 25
+      },
+      "PMC": {
+        "PIM": 30,
+        "STG": 25,
+        "BHO": 25,
+        "KWA": 25,
+        "PGD": 25,
+        "DDI": 25,
+        "BPI": 25,
+        "KHK": 20,
+        "SJO": 10,
+        "CVC": 10,
+        "BPD": 10,
+        "MNA": 15,
+        "SGT": 20,
+        "VNZ": 20,
+        "AND": 20,
+        "ICY": 20,
+        "NST": 15,
+        "GWC": 15,
+        "DGK": 10,
+        "SAN": 10,
+        "PMC": 0,
+        "MGA": 10,
+        "PRS": 15,
+        "RUC": 15,
+        "BUN": 20,
+        "YER": 20,
+        "KNA": 25,
+        "RAW": 25
+      },
+      "MGA": {
+        "PIM": 30,
+        "STG": 30,
+        "BHO": 25,
+        "KWA": 25,
+        "PGD": 25,
+        "DDI": 25,
+        "BPI": 25,
+        "KHK": 20,
+        "SJO": 15,
+        "CVC": 10,
+        "BPD": 15,
+        "MNA": 15,
+        "SGT": 20,
+        "VNZ": 25,
+        "AND": 25,
+        "ICY": 20,
+        "NST": 20,
+        "GWC": 15,
+        "DGK": 15,
+        "SAN": 15,
+        "PMC": 10,
+        "MGA": 0,
+        "PRS": 10,
+        "RUC": 10,
+        "BUN": 15,
+        "YER": 15,
+        "KNA": 20,
+        "RAW": 25
+      },
+      "PRS": {
+        "PIM": 30,
+        "STG": 30,
+        "BHO": 30,
+        "KWA": 25,
+        "PGD": 25,
+        "DDI": 25,
+        "BPI": 25,
+        "KHK": 25,
+        "SJO": 15,
+        "CVC": 10,
+        "BPD": 15,
+        "MNA": 15,
+        "SGT": 20,
+        "VNZ": 25,
+        "AND": 25,
+        "ICY": 25,
+        "NST": 20,
+        "GWC": 20,
+        "DGK": 15,
+        "SAN": 15,
+        "PMC": 15,
+        "MGA": 10,
+        "PRS": 0,
+        "RUC": 10,
+        "BUN": 10,
+        "YER": 15,
+        "KNA": 20,
+        "RAW": 25
+      },
+      "RUC": {
+        "PIM": 30,
+        "STG": 30,
+        "BHO": 30,
+        "KWA": 25,
+        "PGD": 25,
+        "DDI": 25,
+        "BPI": 25,
+        "KHK": 25,
+        "SJO": 15,
+        "CVC": 15,
+        "BPD": 15,
+        "MNA": 20,
+        "SGT": 25,
+        "VNZ": 25,
+        "AND": 25,
+        "ICY": 25,
+        "NST": 25,
+        "GWC": 20,
+        "DGK": 25,
+        "SAN": 15,
+        "PMC": 15,
+        "MGA": 10,
+        "PRS": 10,
+        "RUC": 0,
+        "BUN": 10,
+        "YER": 10,
+        "KNA": 20,
+        "RAW": 20
+      },
+      "BUN": {
+        "PIM": 30,
+        "STG": 30,
+        "BHO": 30,
+        "KWA": 30,
+        "PGD": 25,
+        "DDI": 25,
+        "BPI": 25,
+        "KHK": 25,
+        "SJO": 20,
+        "CVC": 15,
+        "BPD": 20,
+        "MNA": 20,
+        "SGT": 25,
+        "VNZ": 25,
+        "AND": 25,
+        "ICY": 25,
+        "NST": 25,
+        "GWC": 25,
+        "DGK": 25,
+        "SAN": 25,
+        "PMC": 20,
+        "MGA": 15,
+        "PRS": 10,
+        "RUC": 10,
+        "BUN": 0,
+        "YER": 10,
+        "KNA": 15,
+        "RAW": 20
+      },
+      "YER": {
+        "PIM": 30,
+        "STG": 30,
+        "BHO": 30,
+        "KWA": 30,
+        "PGD": 30,
+        "DDI": 25,
+        "BPI": 25,
+        "KHK": 25,
+        "SJO": 20,
+        "CVC": 20,
+        "BPD": 20,
+        "MNA": 25,
+        "SGT": 25,
+        "VNZ": 25,
+        "AND": 25,
+        "ICY": 25,
+        "NST": 25,
+        "GWC": 25,
+        "DGK": 20,
+        "SAN": 20,
+        "PMC": 20,
+        "MGA": 15,
+        "PRS": 15,
+        "RUC": 10,
+        "BUN": 10,
+        "YER": 0,
+        "KNA": 15,
+        "RAW": 15
+      },
+      "KNA": {
+        "PIM": 35,
+        "STG": 30,
+        "BHO": 30,
+        "KWA": 30,
+        "PGD": 30,
+        "DDI": 30,
+        "BPI": 25,
+        "KHK": 25,
+        "SJO": 25,
+        "CVC": 25,
+        "BPD": 25,
+        "MNA": 25,
+        "SGT": 25,
+        "VNZ": 30,
+        "AND": 30,
+        "ICY": 25,
+        "NST": 25,
+        "GWC": 25,
+        "DGK": 25,
+        "SAN": 25,
+        "PMC": 25,
+        "MGA": 20,
+        "PRS": 20,
+        "RUC": 20,
+        "BUN": 15,
+        "YER": 15,
+        "KNA": 0,
+        "RAW": 10
+      },
+      "RAW": {
+        "PIM": 35,
+        "STG": 35,
+        "BHO": 35,
+        "KWA": 30,
+        "PGD": 30,
+        "DDI": 30,
+        "BPI": 30,
+        "KHK": 30,
+        "SJO": 25,
+        "CVC": 25,
+        "BPD": 25,
+        "MNA": 25,
+        "SGT": 25,
+        "VNZ": 30,
+        "AND": 30,
+        "ICY": 30,
+        "NST": 25,
+        "GWC": 25,
+        "DGK": 25,
+        "SAN": 25,
+        "PMC": 25,
+        "MGA": 25,
+        "PRS": 25,
+        "RUC": 20,
+        "BUN": 20,
+        "YER": 15,
+        "KNA": 10,
+        "RAW": 0
       }
-    ],
-    "line3": {
-      "$comment": "Line 3 is run separately (PITCMRL) and has its own fares.",
-      "slabs": [
-        {
-          "upTo": null,
-          "fare": {
-            "value": null,
-            "verified": false,
-            "source": "TODO_VERIFY: Line 3 fare chart"
-          }
-        }
-      ]
-    }
-  },
-  "$aliases": "aliases: other names Google Transit uses for a station (matched when overriding Google metro fares)."
+    },
+    "adjusted": [
+      {
+        "from": "PGD",
+        "to": "SGT",
+        "note": "asymmetric in official chart; higher fare used"
+      },
+      {
+        "from": "DDI",
+        "to": "SGT",
+        "note": "asymmetric in official chart; higher fare used"
+      },
+      {
+        "from": "BPI",
+        "to": "DGK",
+        "note": "asymmetric in official chart; higher fare used"
+      },
+      {
+        "from": "AND",
+        "to": "DDI",
+        "note": "asymmetric in official chart; higher fare used"
+      },
+      {
+        "from": "GWC",
+        "to": "STG",
+        "note": "asymmetric in official chart; higher fare used"
+      },
+      {
+        "from": "DGK",
+        "to": "STG",
+        "note": "asymmetric in official chart; higher fare used"
+      },
+      {
+        "from": "DGK",
+        "to": "RUC",
+        "note": "asymmetric in official chart; higher fare used"
+      },
+      {
+        "from": "BUN",
+        "to": "DGK",
+        "note": "asymmetric in official chart; higher fare used"
+      },
+      {
+        "from": "BUN",
+        "to": "SAN",
+        "note": "asymmetric in official chart; higher fare used"
+      },
+      {
+        "from": "KNA",
+        "to": "RUC",
+        "note": "asymmetric in official chart; higher fare used"
+      }
+    ]
+  }
 }

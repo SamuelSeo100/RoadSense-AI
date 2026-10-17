@@ -1,309 +1,4223 @@
 {
-  "$comment": "Pune–Lonavala suburban (Central Railway). trips[] comes from scripts/import-suburban-csv.ts (official CR timetable only). Times IST; hours ≥ 24 = after midnight of the service day. days: 0 = Sunday.",
   "line": {
     "id": "pune-lonavala",
-    "name": "Pune–Lonavala Local",
-    "directions": {
-      "UP": "Pune Jn → Lonavala (towards Mumbai)",
-      "DOWN": "Lonavala → Pune Jn"
-    }
+    "name": "Pune–Lonavala Suburban",
+    "operator": "Central Railway (Pune Division)",
+    "mode": "TRAIN"
+  },
+  "source": {
+    "name": "punelocaltraintimetable.com",
+    "author": "Mahendra Gadmire",
+    "permission": "Permission given to Routly team in person and confirmed in writing (WhatsApp), 2026-10-17",
+    "fieldCheck": "Team spot-checked Kasarwadi–Lonavala times against actual departures, 2026-10",
+    "retrieved": "2026-10-17",
+    "credit": "Local train timings: punelocaltraintimetable.com (Mahendra Gadmire)"
   },
   "stations": [
     {
-      "id": "sub-pune-jn",
+      "code": "PUNE",
       "name": "Pune Jn",
-      "lat": 18.529292,
-      "lng": 73.874247,
+      "kmFromPune": 0,
       "geocoded": true,
-      "verified": false,
-      "source": "Google Places Text Search \"Pune Junction railway station, Maharashtra\" → \"PUNE JUNCTION\" (TODO_VERIFY: review match)",
-      "km": {
-        "value": null,
-        "verified": false,
-        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
-      },
-      "formattedAddress": "GVHF+PM9, Agarkar Nagar, Pune, Maharashtra 411001"
+      "lat": 18.528424,
+      "lng": 73.873865,
+      "formattedAddress": "Agarkar Nagar, Pune, Maharashtra 411001, India",
+      "geocodeSource": "Places Text Search \"Pune Jn railway station\" → \"Pune Junction railway station\" (TODO_VERIFY: review)"
     },
     {
-      "id": "sub-shivajinagar",
-      "name": "Shivajinagar",
+      "code": "SVJR",
+      "name": "Shivaji Nagar",
+      "kmFromPune": 2.6,
+      "geocoded": true,
       "lat": 18.532217,
       "lng": 73.851663,
-      "geocoded": true,
-      "verified": false,
-      "source": "Google Places Text Search \"Shivajinagar railway station, Maharashtra\" → \"Chatrapati Shivaji Maharaj Nagar\" (TODO_VERIFY: review match)",
-      "km": {
-        "value": null,
-        "verified": false,
-        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
-      },
-      "formattedAddress": "Narveer Tanaji Wadi, Shivajinagar, Pune, Maharashtra 411005"
+      "formattedAddress": "Narveer Tanaji Wadi, Shivajinagar, Pune, Maharashtra 411005",
+      "geocodeSource": "Places Text Search \"Shivaji Nagar railway station\" → \"Chatrapati Shivaji Maharaj Nagar\" (TODO_VERIFY: review)"
     },
     {
-      "id": "sub-khadki",
+      "code": "KK",
       "name": "Khadki",
+      "kmFromPune": 6.2,
+      "geocoded": true,
       "lat": 18.563181,
       "lng": 73.84062,
-      "geocoded": true,
-      "verified": false,
-      "source": "Google Places Text Search \"Khadki railway station, Maharashtra\" → \"Khadki Railway Station\" (TODO_VERIFY: review match)",
-      "km": {
-        "value": null,
-        "verified": false,
-        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
-      },
-      "formattedAddress": "Khadki, Maharashtra, India"
+      "formattedAddress": "Khadki, Maharashtra, India",
+      "geocodeSource": "Places Text Search \"Khadki railway station\" → \"Khadki Railway Station\" (TODO_VERIFY: review)"
     },
     {
-      "id": "sub-dapodi",
+      "code": "DAPD",
       "name": "Dapodi",
+      "kmFromPune": 8.5,
+      "geocoded": true,
       "lat": 18.580785,
       "lng": 73.832795,
-      "geocoded": true,
-      "verified": false,
-      "source": "Google Places Text Search \"Dapodi railway station, Maharashtra\" → \"Dapodi\" (TODO_VERIFY: review match)",
-      "km": {
-        "value": null,
-        "verified": false,
-        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
-      },
-      "formattedAddress": "6, Old Mumbai - Pune Hwy, Dapodi, Pimpri-Chinchwad, Maharashtra 411012"
+      "formattedAddress": "6, Old Mumbai - Pune Hwy, Dapodi, Pimpri-Chinchwad, Maharashtra 411012",
+      "geocodeSource": "Places Text Search \"Dapodi railway station\" → \"Dapodi\" (TODO_VERIFY: review)"
     },
     {
-      "id": "sub-kasarwadi",
+      "code": "KSWD",
       "name": "Kasarwadi",
-      "lat": 18.607579,
-      "lng": 73.821098,
+      "kmFromPune": 11.8,
       "geocoded": true,
-      "verified": false,
-      "source": "Google Places Text Search \"Kasarwadi railway station, Maharashtra\" → \"Kasarwadi\" (TODO_VERIFY: review match)",
-      "km": {
-        "value": null,
-        "verified": false,
-        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
-      },
-      "formattedAddress": "Old Mumbai - Pune Hwy, Kasarwadi, Pimpri-Chinchwad, Maharashtra 411034"
+      "lat": 18.607857,
+      "lng": 73.820908,
+      "formattedAddress": "Kasarwadi, Pimpri-Chinchwad, Maharashtra 411034, India",
+      "geocodeSource": "Places Text Search \"Kasarwadi railway station\" → \"Kasarwadi Railway Station\" (TODO_VERIFY: review)"
     },
     {
-      "id": "sub-pimpri",
+      "code": "PMP",
       "name": "Pimpri",
+      "kmFromPune": 14.4,
+      "geocoded": true,
       "lat": 18.623467,
       "lng": 73.802038,
-      "geocoded": true,
-      "verified": false,
-      "source": "Google Places Text Search \"Pimpri railway station, Maharashtra\" → \"Pimpri\" (TODO_VERIFY: review match)",
-      "km": {
-        "value": null,
-        "verified": false,
-        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
-      },
-      "formattedAddress": "Shastri Nagar, Pimpri Colony, Pimpri-Chinchwad, Maharashtra 411018"
+      "formattedAddress": "Shastri Nagar, Pimpri Colony, Pimpri-Chinchwad, Maharashtra 411018",
+      "geocodeSource": "Places Text Search \"Pimpri railway station\" → \"Pimpri\" (TODO_VERIFY: review)"
     },
     {
-      "id": "sub-chinchwad",
+      "code": "CCH",
       "name": "Chinchwad",
+      "kmFromPune": 16.6,
+      "geocoded": true,
       "lat": 18.639801,
       "lng": 73.791743,
-      "geocoded": true,
-      "verified": false,
-      "source": "Google Places Text Search \"Chinchwad railway station, Maharashtra\" → \"Chinchwad Junction\" (TODO_VERIFY: review match)",
-      "km": {
-        "value": null,
-        "verified": false,
-        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
-      },
-      "formattedAddress": "44, Chinchwad Station Rd, Chinchwad, Pimpri-Chinchwad, Maharashtra 411033"
+      "formattedAddress": "44, Chinchwad Station Rd, Chinchwad, Pimpri-Chinchwad, Maharashtra 411033",
+      "geocodeSource": "Places Text Search \"Chinchwad railway station\" → \"Chinchwad Junction\" (TODO_VERIFY: review)"
     },
     {
-      "id": "sub-akurdi",
+      "code": "AKRD",
       "name": "Akurdi",
+      "kmFromPune": 19.9,
+      "geocoded": true,
       "lat": 18.64853,
       "lng": 73.764669,
-      "geocoded": true,
-      "verified": false,
-      "source": "Google Places Text Search \"Akurdi railway station, Maharashtra\" → \"Akurdi\" (TODO_VERIFY: review match)",
-      "km": {
-        "value": null,
-        "verified": false,
-        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
-      },
-      "formattedAddress": "Ganga Nagar Rd, Pradhikaran, Nigdi, Pimpri-Chinchwad, Maharashtra 411044"
+      "formattedAddress": "Ganga Nagar Rd, Pradhikaran, Nigdi, Pimpri-Chinchwad, Maharashtra 411044",
+      "geocodeSource": "Places Text Search \"Akurdi railway station\" → \"Akurdi\" (TODO_VERIFY: review)"
     },
     {
-      "id": "sub-dehu-road",
+      "code": "DEHR",
       "name": "Dehu Road",
+      "kmFromPune": 25,
+      "geocoded": true,
       "lat": 18.680362,
       "lng": 73.734416,
-      "geocoded": true,
-      "verified": false,
-      "source": "Google Places Text Search \"Dehu Road railway station, Maharashtra\" → \"Dehu Road\" (TODO_VERIFY: review match)",
-      "km": {
-        "value": null,
-        "verified": false,
-        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
-      },
-      "formattedAddress": "Dehu Road, Maharashtra 412101"
+      "formattedAddress": "Dehu Road, Maharashtra 412101",
+      "geocodeSource": "Places Text Search \"Dehu Road railway station\" → \"Dehu Road\" (TODO_VERIFY: review)"
     },
     {
-      "id": "sub-begdewadi",
+      "code": "BGWI",
       "name": "Begdewadi",
+      "kmFromPune": 28.6,
+      "geocoded": true,
       "lat": 18.700674,
       "lng": 73.708775,
-      "geocoded": true,
-      "verified": false,
-      "source": "Google Places Text Search \"Begdewadi railway station, Maharashtra\" → \"Begdewadi\" (TODO_VERIFY: review match)",
-      "km": {
-        "value": null,
-        "verified": false,
-        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
-      },
-      "formattedAddress": "Talegaon Dabhade R, Maharashtra 412101"
+      "formattedAddress": "Talegaon Dabhade R, Maharashtra 412101",
+      "geocodeSource": "Places Text Search \"Begdewadi railway station\" → \"Begdewadi\" (TODO_VERIFY: review)"
     },
     {
-      "id": "sub-ghorawadi",
+      "code": "GRWD",
       "name": "Ghorawadi",
-      "lat": 18.721061,
-      "lng": 73.696464,
+      "kmFromPune": 31.7,
       "geocoded": true,
-      "verified": false,
-      "source": "Google Places Text Search \"Ghorawadi railway station, Maharashtra\" → \"Ghorawadi Railway Station\" (TODO_VERIFY: review match)",
-      "km": {
-        "value": null,
-        "verified": false,
-        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
-      },
-      "formattedAddress": "PMCW+CHG, Bhegade Aali, Talegaon Dabhade R, Maharashtra 410506"
+      "lat": 18.721552,
+      "lng": 73.696113,
+      "formattedAddress": "Bhegade Aali, Talegaon Dabhade, Talegaon Dabhade R, Maharashtra 410506",
+      "geocodeSource": "Places Text Search \"Ghorawadi railway station\" → \"Ghorawadi\" (TODO_VERIFY: review)"
     },
     {
-      "id": "sub-talegaon",
+      "code": "TGN",
       "name": "Talegaon",
+      "kmFromPune": 34.8,
+      "geocoded": true,
       "lat": 18.735067,
       "lng": 73.672221,
-      "geocoded": true,
-      "verified": false,
-      "source": "Google Places Text Search \"Talegaon railway station, Maharashtra\" → \"Talegaon\" (TODO_VERIFY: review match)",
-      "km": {
-        "value": null,
-        "verified": false,
-        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
-      },
-      "formattedAddress": "Talegaon Dhabhade Road, Rajgurav Colony, Talegaon Dabhade, Talegaon Dabhade R, Maharashtra 410507"
+      "formattedAddress": "Talegaon Dhabhade Road, Rajgurav Colony, Talegaon Dabhade, Talegaon Dabhade R, Maharashtra 410507",
+      "geocodeSource": "Places Text Search \"Talegaon railway station\" → \"Talegaon\" (TODO_VERIFY: review)"
     },
     {
-      "id": "sub-vadgaon",
+      "code": "VDN",
       "name": "Vadgaon",
+      "kmFromPune": 38.7,
+      "geocoded": true,
       "lat": 18.742392,
       "lng": 73.636907,
-      "geocoded": true,
-      "verified": false,
-      "source": "Google Places Text Search \"Vadgaon railway station, Maharashtra\" → \"Vadgaon\" (TODO_VERIFY: review match)",
-      "km": {
-        "value": null,
-        "verified": false,
-        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
-      },
-      "formattedAddress": "Vijay Nagar Colony, Vadgaon, Maharashtra 412106"
+      "formattedAddress": "Vijay Nagar Colony, Vadgaon, Maharashtra 412106",
+      "geocodeSource": "Places Text Search \"Vadgaon railway station\" → \"Vadgaon\" (TODO_VERIFY: review)"
     },
     {
-      "id": "sub-kanhe",
+      "code": "KNHE",
       "name": "Kanhe",
+      "kmFromPune": 43.8,
+      "geocoded": true,
       "lat": 18.762135,
       "lng": 73.594209,
-      "geocoded": true,
-      "verified": false,
-      "source": "Google Places Text Search \"Kanhe railway station, Maharashtra\" → \"Kanhe\" (TODO_VERIFY: review match)",
-      "km": {
-        "value": null,
-        "verified": false,
-        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
-      },
-      "formattedAddress": "Kanhe, Maharashtra 412106"
+      "formattedAddress": "Kanhe, Maharashtra 412106",
+      "geocodeSource": "Places Text Search \"Kanhe railway station\" → \"Kanhe\" (TODO_VERIFY: review)"
     },
     {
-      "id": "sub-kamshet",
+      "code": "KMST",
       "name": "Kamshet",
+      "kmFromPune": 48.4,
+      "geocoded": true,
       "lat": 18.766915,
       "lng": 73.552264,
-      "geocoded": true,
-      "verified": false,
-      "source": "Google Places Text Search \"Kamshet railway station, Maharashtra\" → \"Kamshet\" (TODO_VERIFY: review match)",
-      "km": {
-        "value": null,
-        "verified": false,
-        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
-      },
-      "formattedAddress": "Kamshet, Khadkale, Maharashtra 410405"
+      "formattedAddress": "Kamshet, Khadkale, Maharashtra 410405",
+      "geocodeSource": "Places Text Search \"Kamshet railway station\" → \"Kamshet\" (TODO_VERIFY: review)"
     },
     {
-      "id": "sub-malavli",
+      "code": "MVL",
       "name": "Malavli",
+      "kmFromPune": 56.4,
+      "geocoded": true,
       "lat": 18.744275,
       "lng": 73.481245,
-      "geocoded": true,
-      "verified": false,
-      "source": "Google Places Text Search \"Malavli railway station, Maharashtra\" → \"Malavli Railway Station\" (TODO_VERIFY: review match)",
-      "km": {
-        "value": null,
-        "verified": false,
-        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
-      },
-      "formattedAddress": "PFVJ+PF9, Ekvira Devi Rd, Malavli, Maharashtra 410405"
+      "formattedAddress": "PFVJ+PF9, Ekvira Devi Rd, Malavli, Maharashtra 410405",
+      "geocodeSource": "Places Text Search \"Malavli railway station\" → \"Malavli Railway Station\" (TODO_VERIFY: review)"
     },
     {
-      "id": "sub-lonavala",
+      "code": "LNL",
       "name": "Lonavala",
+      "kmFromPune": 64.4,
+      "geocoded": true,
       "lat": 18.749466,
       "lng": 73.407574,
-      "geocoded": true,
-      "verified": false,
-      "source": "Google Places Text Search \"Lonavala railway station, Maharashtra\" → \"Lonavala railway station\" (TODO_VERIFY: review match)",
-      "km": {
-        "value": null,
-        "verified": false,
-        "source": "TODO_VERIFY: chainage km from Pune Jn (falls back to straight-line distance)"
-      },
-      "formattedAddress": "Siddharth Nagar, Lonavala, Maharashtra 410401"
+      "formattedAddress": "Siddharth Nagar, Lonavala, Maharashtra 410401",
+      "geocodeSource": "Places Text Search \"Lonavala railway station\" → \"Lonavala railway station\" (TODO_VERIFY: review)"
     }
   ],
-  "fares": {
-    "class": "second",
-    "basis": "km",
-    "$comment": "Second-class single journey by distance slab.",
+  "fare": {
+    "class": "Second (General), adult, single journey",
+    "basis": "distance between boarding and alighting station (kmFromPune difference)",
     "slabs": [
       {
-        "upTo": 10,
-        "fare": {
-          "value": 5,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder, check Indian Railways suburban fare table"
-        }
+        "maxKm": 15,
+        "fareInr": 5
       },
       {
-        "upTo": 20,
-        "fare": {
-          "value": 10,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder"
-        }
+        "maxKm": 45,
+        "fareInr": 10
       },
       {
-        "upTo": 45,
-        "fare": {
-          "value": 15,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder"
-        }
-      },
-      {
-        "upTo": null,
-        "fare": {
-          "value": 20,
-          "verified": false,
-          "source": "TODO_VERIFY: placeholder"
-        }
+        "maxKm": 70,
+        "fareInr": 15
       }
+    ],
+    "verified": false,
+    "source": "Chatbot summary, 2026-10-17; NOT yet checked in UTS",
+    "knownPoints": {
+      "SVJR": 5,
+      "KK": 5,
+      "KSWD": 5,
+      "PMP": 5,
+      "AKRD": 10,
+      "DEHR": 10,
+      "TGN": 10,
+      "KMST": 15,
+      "LNL": 15
+    },
+    "uncertainBoundaries": "5->10 jump lies between 14.4 km (Pimpri) and 19.9 km (Akurdi); 10->15 between 34.8 km (Talegaon) and 48.4 km (Kamshet)",
+    "toVerifyInUTS": [
+      "Pune Jn -> Chinchwad (16.6 km)",
+      "Pune Jn -> Vadgaon (38.7 km)",
+      "Pune Jn -> Kanhe (43.8 km)",
+      "Pimpri -> Lonavala (50.0 km)"
     ]
   },
-  "trips": [],
-  "tripsSource": "TODO_VERIFY: fill data/transit/suburban_trips_template.csv from the official Central Railway timetable, then run scripts/import-suburban-csv.ts"
+  "trips": [
+    {
+      "id": "UP-01",
+      "label": "1ST LOCAL",
+      "direction": "UP",
+      "origin": "PUNE",
+      "terminus": "LNL",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "PUNE",
+          "time": "00:10",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "00:16",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "00:21",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "00:26",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "00:30",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "00:33",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "00:37",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "00:41",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "00:46",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "00:50",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "00:53",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "00:58",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "01:02",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "01:06",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "01:10",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "01:17",
+          "dayOffset": 0
+        },
+        {
+          "station": "LNL",
+          "time": "01:30",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "UP-02",
+      "label": "2ND LOCAL",
+      "direction": "UP",
+      "origin": "PUNE",
+      "terminus": "LNL",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "PUNE",
+          "time": "04:45",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "04:51",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "04:56",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "05:01",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "05:05",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "05:08",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "05:12",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "05:16",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "05:21",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "05:25",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "05:28",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "05:33",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "05:37",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "05:41",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "05:45",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "05:52",
+          "dayOffset": 0
+        },
+        {
+          "station": "LNL",
+          "time": "06:05",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "UP-03",
+      "label": "3RD LOCAL",
+      "direction": "UP",
+      "origin": "PUNE",
+      "terminus": "LNL",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "PUNE",
+          "time": "05:45",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "05:51",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "05:56",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "06:01",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "06:05",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "06:08",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "06:12",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "06:16",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "06:21",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "06:25",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "06:28",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "06:33",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "06:37",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "06:41",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "06:45",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "06:52",
+          "dayOffset": 0
+        },
+        {
+          "station": "LNL",
+          "time": "07:05",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "UP-04",
+      "label": "4TH LOCAL",
+      "direction": "UP",
+      "origin": "PUNE",
+      "terminus": "LNL",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "PUNE",
+          "time": "06:30",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "06:30",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "06:41",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "06:46",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "06:50",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "06:53",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "06:57",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "07:01",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "07:06",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "07:10",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "07:13",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "07:18",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "07:22",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "07:26",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "07:30",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "07:37",
+          "dayOffset": 0
+        },
+        {
+          "station": "LNL",
+          "time": "07:50",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "UP-05",
+      "label": "5TH LOCAL",
+      "direction": "UP",
+      "origin": "PUNE",
+      "terminus": "TGN",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "PUNE",
+          "time": "06:50",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "06:56",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "07:01",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "07:06",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "07:10",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "07:13",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "07:17",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "07:21",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "07:26",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "07:30",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "07:33",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "07:40",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "UP-06",
+      "label": "6TH LOCAL",
+      "direction": "UP",
+      "origin": "PUNE",
+      "terminus": "LNL",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "PUNE",
+          "time": "08:05",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "08:11",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "08:16",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "08:21",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "08:25",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "08:28",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "08:32",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "08:36",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "08:41",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "08:45",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "08:48",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "08:53",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "08:57",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "09:01",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "09:05",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "09:12",
+          "dayOffset": 0
+        },
+        {
+          "station": "LNL",
+          "time": "09:25",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "UP-07",
+      "label": "7TH LOCAL",
+      "direction": "UP",
+      "origin": "PUNE",
+      "terminus": "TGN",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "PUNE",
+          "time": "08:57",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "09:03",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "09:08",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "09:13",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "09:17",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "09:20",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "09:24",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "09:28",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "09:33",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "09:37",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "09:40",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "09:47",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "UP-08",
+      "label": "8TH LOCAL",
+      "direction": "UP",
+      "origin": "PUNE",
+      "terminus": "LNL",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "PUNE",
+          "time": "09:55",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "10:01",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "10:06",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "10:11",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "10:15",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "10:18",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "10:22",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "10:26",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "10:31",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "10:35",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "10:38",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "10:43",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "10:47",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "10:51",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "10:55",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "11:02",
+          "dayOffset": 0
+        },
+        {
+          "station": "LNL",
+          "time": "11:15",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "UP-09",
+      "label": "9TH LOCAL",
+      "direction": "UP",
+      "origin": "SVJR",
+      "terminus": "LNL",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "SVJR",
+          "time": "11:20",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "11:25",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "11:30",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "11:34",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "11:36",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "11:41",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "11:45",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "11:50",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "11:54",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "11:57",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "12:02",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "12:06",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "12:10",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "12:14",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "12:21",
+          "dayOffset": 0
+        },
+        {
+          "station": "LNL",
+          "time": "12:34",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "UP-10",
+      "label": "10TH LOCAL",
+      "direction": "UP",
+      "origin": "PUNE",
+      "terminus": "LNL",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "PUNE",
+          "time": "12:15",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "12:21",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "12:24",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "12:31",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "12:35",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "12:38",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "12:42",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "12:46",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "12:51",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "12:55",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "12:58",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "13:03",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "13:07",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "13:11",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "13:21",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "13:31",
+          "dayOffset": 0
+        },
+        {
+          "station": "LNL",
+          "time": "13:50",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "UP-11",
+      "label": "11TH LOCAL",
+      "direction": "UP",
+      "origin": "PUNE",
+      "terminus": "LNL",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "PUNE",
+          "time": "13:00",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "13:06",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "13:11",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "13:16",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "13:20",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "13:23",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "13:27",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "13:31",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "13:36",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "13:40",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "13:43",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "13:48",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "13:52",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "13:56",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "14:00",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "14:07",
+          "dayOffset": 0
+        },
+        {
+          "station": "LNL",
+          "time": "14:20",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "UP-12",
+      "label": "12TH LOCAL",
+      "direction": "UP",
+      "origin": "PUNE",
+      "terminus": "LNL",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "PUNE",
+          "time": "15:00",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "15:06",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "15:11",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "15:16",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "15:20",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "15:23",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "15:27",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "15:31",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "15:36",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "15:40",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "15:43",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "15:48",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "15:52",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "15:56",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "16:00",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "16:10",
+          "dayOffset": 0
+        },
+        {
+          "station": "LNL",
+          "time": "16:32",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "UP-13",
+      "label": "13TH LOCAL",
+      "direction": "UP",
+      "origin": "PUNE",
+      "terminus": "TGN",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "PUNE",
+          "time": "15:40",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "15:46",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "15:51",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "15:56",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "16:00",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "16:03",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "16:07",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "16:16",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "16:18",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "16:20",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "16:23",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "16:30",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "UP-14",
+      "label": "14TH LOCAL",
+      "direction": "UP",
+      "origin": "PUNE",
+      "terminus": "LNL",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "PUNE",
+          "time": "16:25",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "16:31",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "16:36",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "16:41",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "16:45",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "16:48",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "16:52",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "16:56",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "17:01",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "17:05",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "17:08",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "17:13",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "17:17",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "17:21",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "17:25",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "17:32",
+          "dayOffset": 0
+        },
+        {
+          "station": "LNL",
+          "time": "17:45",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "UP-15",
+      "label": "15TH LOCAL",
+      "direction": "UP",
+      "origin": "PUNE",
+      "terminus": "LNL",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "PUNE",
+          "time": "17:15",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "17:23",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "17:28",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "17:33",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "17:37",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "17:41",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "17:45",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "17:50",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "17:55",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "17:59",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "18:02",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "18:07",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "18:11",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "18:16",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "18:20",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "18:28",
+          "dayOffset": 0
+        },
+        {
+          "station": "LNL",
+          "time": "18:40",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "UP-16",
+      "label": "16TH LOCAL",
+      "direction": "UP",
+      "origin": "PUNE",
+      "terminus": "LNL",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "PUNE",
+          "time": "18:02",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "18:10",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "18:15",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "18:20",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "18:24",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "18:27",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "18:31",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "18:35",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "18:40",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "18:44",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "18:47",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "18:52",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "18:56",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "19:01",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "19:05",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "19:13",
+          "dayOffset": 0
+        },
+        {
+          "station": "LNL",
+          "time": "19:27",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "UP-17",
+      "label": "17TH LOCAL",
+      "direction": "UP",
+      "origin": "PUNE",
+      "terminus": "LNL",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "PUNE",
+          "time": "19:05",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "19:18",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "19:16",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "19:21",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "19:25",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "19:28",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "19:32",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "19:36",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "19:41",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "19:45",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "19:48",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "19:53",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "19:57",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "20:01",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "20:05",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "20:12",
+          "dayOffset": 0
+        },
+        {
+          "station": "LNL",
+          "time": "20:25",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "UP-18",
+      "label": "18TH LOCAL",
+      "direction": "UP",
+      "origin": "PUNE",
+      "terminus": "LNL",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "PUNE",
+          "time": "20:05",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "20:11",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "20:16",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "20:21",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "20:25",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "20:28",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "20:32",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "20:36",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "20:41",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "20:45",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "20:48",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "20:53",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "20:57",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "21:01",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "21:05",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "21:12",
+          "dayOffset": 0
+        },
+        {
+          "station": "LNL",
+          "time": "21:25",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "UP-19",
+      "label": "19TH LOCAL",
+      "direction": "UP",
+      "origin": "SVJR",
+      "terminus": "LNL",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "SVJR",
+          "time": "20:35",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "20:40",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "20:45",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "20:49",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "20:52",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "20:56",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "21:00",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "21:05",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "21:09",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "21:12",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "21:17",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "21:21",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "21:25",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "21:29",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "21:36",
+          "dayOffset": 0
+        },
+        {
+          "station": "LNL",
+          "time": "21:50",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "UP-20",
+      "label": "20TH LOCAL",
+      "direction": "UP",
+      "origin": "PUNE",
+      "terminus": "LNL",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "PUNE",
+          "time": "21:02",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "21:08",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "21:13",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "21:18",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "21:22",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "21:25",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "21:29",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "21:33",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "21:38",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "21:42",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "21:45",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "21:50",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "21:54",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "21:59",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "22:02",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "22:12",
+          "dayOffset": 0
+        },
+        {
+          "station": "LNL",
+          "time": "22:23",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "UP-21",
+      "label": "21ST LOCAL",
+      "direction": "UP",
+      "origin": "PUNE",
+      "terminus": "LNL",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "PUNE",
+          "time": "22:10",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "22:16",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "22:21",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "22:26",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "22:30",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "22:33",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "22:37",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "22:41",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "22:46",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "22:50",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "22:53",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "22:58",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "23:02",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "23:06",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "23:10",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "23:17",
+          "dayOffset": 0
+        },
+        {
+          "station": "LNL",
+          "time": "23:30",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "UP-22",
+      "label": "22ND LOCAL",
+      "direction": "UP",
+      "origin": "PUNE",
+      "terminus": "TGN",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "PUNE",
+          "time": "23:00",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "23:06",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "23:11",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "23:16",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "23:20",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "23:23",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "23:27",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "23:31",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "23:36",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "23:40",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "23:43",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "23:50",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "DOWN-01",
+      "label": "Local 1",
+      "direction": "DOWN",
+      "origin": "TGN",
+      "terminus": "PUNE",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "TGN",
+          "time": "00:05",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "00:09",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "00:12",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "00:16",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "00:21",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "00:25",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "00:30",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "00:33",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "00:37",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "00:42",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "00:47",
+          "dayOffset": 0
+        },
+        {
+          "station": "PUNE",
+          "time": "01:05",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "DOWN-02",
+      "label": "Local 2",
+      "direction": "DOWN",
+      "origin": "LNL",
+      "terminus": "PUNE",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "LNL",
+          "time": "05:20",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "05:28",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "05:35",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "05:39",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "05:43",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "05:48",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "05:52",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "05:55",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "05:59",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "06:04",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "06:08",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "06:12",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "06:15",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "06:19",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "06:23",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "06:28",
+          "dayOffset": 0
+        },
+        {
+          "station": "PUNE",
+          "time": "06:40",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "DOWN-03",
+      "label": "Local 3",
+      "direction": "DOWN",
+      "origin": "LNL",
+      "terminus": "PUNE",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "LNL",
+          "time": "06:35",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "06:41",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "06:48",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "06:52",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "06:57",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "07:01",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "07:06",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "07:09",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "07:13",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "07:19",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "07:23",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "07:28",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "07:30",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "07:34",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "07:38",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "07:43",
+          "dayOffset": 0
+        },
+        {
+          "station": "PUNE",
+          "time": "07:55",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "DOWN-04",
+      "label": "Local 4",
+      "direction": "DOWN",
+      "origin": "TGN",
+      "terminus": "PUNE",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "TGN",
+          "time": "07:50",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "07:54",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "07:57",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "08:01",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "08:06",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "08:10",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "08:14",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "08:17",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "08:21",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "08:25",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "08:30",
+          "dayOffset": 0
+        },
+        {
+          "station": "PUNE",
+          "time": "08:40",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "DOWN-05",
+      "label": "Local 5",
+      "direction": "DOWN",
+      "origin": "LNL",
+      "terminus": "PUNE",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "LNL",
+          "time": "07:25",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "07:33",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "07:39",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "07:43",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "07:49",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "07:54",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "07:59",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "08:04",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "08:08",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "08:13",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "08:17",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "08:22",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "08:25",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "08:29",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "08:33",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "08:38",
+          "dayOffset": 0
+        },
+        {
+          "station": "PUNE",
+          "time": "08:50",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "DOWN-06",
+      "label": "Local 6",
+      "direction": "DOWN",
+      "origin": "LNL",
+      "terminus": "PUNE",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "LNL",
+          "time": "08:20",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "08:28",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "08:35",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "08:39",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "08:43",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "08:48",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "08:52",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "08:55",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "08:59",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "09:04",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "09:08",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "09:12",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "09:15",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "09:19",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "09:23",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "09:28",
+          "dayOffset": 0
+        },
+        {
+          "station": "PUNE",
+          "time": "09:40",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "DOWN-07",
+      "label": "Local 7",
+      "direction": "DOWN",
+      "origin": "TGN",
+      "terminus": "SVJR",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "TGN",
+          "time": "09:57",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "10:01",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "10:04",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "10:08",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "10:13",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "10:17",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "10:21",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "10:24",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "10:28",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "10:32",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "10:40",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "DOWN-08",
+      "label": "Local 8",
+      "direction": "DOWN",
+      "origin": "LNL",
+      "terminus": "PUNE",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "LNL",
+          "time": "10:10",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "10:18",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "10:25",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "10:29",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "10:33",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "10:38",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "10:42",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "10:45",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "10:49",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "10:54",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "10:58",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "11:02",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "11:05",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "11:09",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "11:13",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "11:40",
+          "dayOffset": 0
+        },
+        {
+          "station": "PUNE",
+          "time": "11:55",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "DOWN-09",
+      "label": "Local 9",
+      "direction": "DOWN",
+      "origin": "LNL",
+      "terminus": "PUNE",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "LNL",
+          "time": "11:30",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "11:38",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "11:45",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "11:49",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "11:53",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "11:58",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "12:02",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "12:05",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "12:09",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "12:14",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "12:18",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "12:22",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "12:25",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "12:29",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "12:33",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "12:38",
+          "dayOffset": 0
+        },
+        {
+          "station": "PUNE",
+          "time": "12:50",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "DOWN-10",
+      "label": "Local 10",
+      "direction": "DOWN",
+      "origin": "LNL",
+      "terminus": "PUNE",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "LNL",
+          "time": "14:00",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "14:08",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "14:15",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "14:19",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "14:23",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "14:28",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "14:32",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "14:35",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "14:39",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "14:44",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "14:48",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "14:52",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "14:55",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "14:59",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "15:03",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "15:08",
+          "dayOffset": 0
+        },
+        {
+          "station": "PUNE",
+          "time": "15:20",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "DOWN-11",
+      "label": "Local 11",
+      "direction": "DOWN",
+      "origin": "LNL",
+      "terminus": "PUNE",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "LNL",
+          "time": "14:55",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "15:03",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "15:10",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "15:14",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "15:18",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "15:23",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "15:27",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "15:30",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "15:34",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "15:39",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "15:43",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "15:47",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "15:50",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "15:54",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "15:58",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "16:03",
+          "dayOffset": 0
+        },
+        {
+          "station": "PUNE",
+          "time": "16:15",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "DOWN-12",
+      "label": "Local 12",
+      "direction": "DOWN",
+      "origin": "LNL",
+      "terminus": "PUNE",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "LNL",
+          "time": "15:40",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "15:48",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "15:55",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "15:59",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "16:04",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "16:10",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "16:13",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "16:17",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "16:21",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "16:24",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "16:30",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "16:34",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "16:38",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "16:43",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "16:48",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "16:53",
+          "dayOffset": 0
+        },
+        {
+          "station": "PUNE",
+          "time": "17:05",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "DOWN-13",
+      "label": "Local 13",
+      "direction": "DOWN",
+      "origin": "TGN",
+      "terminus": "PUNE",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "TGN",
+          "time": "16:40",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "16:44",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "16:47",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "16:51",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "16:56",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "17:00",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "17:04",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "17:07",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "17:11",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "17:15",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "17:20",
+          "dayOffset": 0
+        },
+        {
+          "station": "PUNE",
+          "time": "17:30",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "DOWN-14",
+      "label": "Local 14",
+      "direction": "DOWN",
+      "origin": "LNL",
+      "terminus": "PUNE",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "LNL",
+          "time": "17:25",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "17:33",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "17:40",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "17:44",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "17:48",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "17:53",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "17:57",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "18:00",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "18:04",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "18:09",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "18:13",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "18:17",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "18:20",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "18:24",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "18:28",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "18:35",
+          "dayOffset": 0
+        },
+        {
+          "station": "PUNE",
+          "time": "18:45",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "DOWN-15",
+      "label": "Local 15",
+      "direction": "DOWN",
+      "origin": "LNL",
+      "terminus": "PUNE",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "LNL",
+          "time": "18:20",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "18:28",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "18:35",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "18:39",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "18:43",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "18:48",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "18:52",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "18:55",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "18:59",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "19:04",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "19:08",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "19:12",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "19:15",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "19:19",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "19:23",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "19:28",
+          "dayOffset": 0
+        },
+        {
+          "station": "PUNE",
+          "time": "19:40",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "DOWN-16",
+      "label": "Local 16",
+      "direction": "DOWN",
+      "origin": "LNL",
+      "terminus": "SVJR",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "LNL",
+          "time": "19:00",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "19:28",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "19:32",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "19:35",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "19:39",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "19:44",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "19:48",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "19:52",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "19:55",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "19:59",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "20:03",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "20:25",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "DOWN-17",
+      "label": "Local 17",
+      "direction": "DOWN",
+      "origin": "LNL",
+      "terminus": "PUNE",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "LNL",
+          "time": "19:35",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "19:44",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "19:51",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "19:55",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "19:59",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "20:04",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "20:08",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "20:11",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "20:15",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "20:20",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "20:24",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "20:28",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "20:31",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "20:35",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "20:39",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "20:40",
+          "dayOffset": 0
+        },
+        {
+          "station": "PUNE",
+          "time": "20:52",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "DOWN-18",
+      "label": "Local 18",
+      "direction": "DOWN",
+      "origin": "LNL",
+      "terminus": "PUNE",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "LNL",
+          "time": "20:40",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "20:48",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "20:55",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "20:59",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "21:03",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "21:08",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "21:12",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "21:15",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "21:19",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "21:24",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "21:28",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "21:32",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "21:35",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "21:39",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "21:43",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "21:48",
+          "dayOffset": 0
+        },
+        {
+          "station": "PUNE",
+          "time": "22:00",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "DOWN-19",
+      "label": "Local 19",
+      "direction": "DOWN",
+      "origin": "LNL",
+      "terminus": "PUNE",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "LNL",
+          "time": "21:35",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "21:43",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "21:50",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "21:54",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "21:58",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "22:03",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "22:07",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "22:10",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "22:14",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "22:19",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "22:23",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "22:27",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "22:30",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "22:34",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "22:38",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "22:43",
+          "dayOffset": 0
+        },
+        {
+          "station": "PUNE",
+          "time": "22:55",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "DOWN-20",
+      "label": "Local 20",
+      "direction": "DOWN",
+      "origin": "LNL",
+      "terminus": "PUNE",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "LNL",
+          "time": "22:05",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "22:13",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "22:20",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "22:24",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "22:28",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "22:33",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "22:37",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "22:40",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "22:44",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "22:49",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "22:53",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "22:57",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "23:00",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "23:04",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "23:08",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "23:13",
+          "dayOffset": 0
+        },
+        {
+          "station": "PUNE",
+          "time": "23:25",
+          "dayOffset": 0
+        }
+      ]
+    },
+    {
+      "id": "DOWN-21",
+      "label": "Local 21",
+      "direction": "DOWN",
+      "origin": "LNL",
+      "terminus": "PUNE",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "LNL",
+          "time": "22:35",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "22:43",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "22:50",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "22:54",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "22:58",
+          "dayOffset": 0
+        },
+        {
+          "station": "TGN",
+          "time": "23:00",
+          "dayOffset": 0
+        },
+        {
+          "station": "GRWD",
+          "time": "23:07",
+          "dayOffset": 0
+        },
+        {
+          "station": "BGWI",
+          "time": "23:10",
+          "dayOffset": 0
+        },
+        {
+          "station": "DEHR",
+          "time": "23:14",
+          "dayOffset": 0
+        },
+        {
+          "station": "AKRD",
+          "time": "23:19",
+          "dayOffset": 0
+        },
+        {
+          "station": "CCH",
+          "time": "23:24",
+          "dayOffset": 0
+        },
+        {
+          "station": "PMP",
+          "time": "23:28",
+          "dayOffset": 0
+        },
+        {
+          "station": "KSWD",
+          "time": "23:31",
+          "dayOffset": 0
+        },
+        {
+          "station": "DAPD",
+          "time": "23:35",
+          "dayOffset": 0
+        },
+        {
+          "station": "KK",
+          "time": "23:39",
+          "dayOffset": 0
+        },
+        {
+          "station": "SVJR",
+          "time": "23:44",
+          "dayOffset": 0
+        },
+        {
+          "station": "PUNE",
+          "time": "00:20",
+          "dayOffset": 1
+        }
+      ]
+    },
+    {
+      "id": "DOWN-22",
+      "label": "Local 22",
+      "direction": "DOWN",
+      "origin": "LNL",
+      "terminus": "PUNE",
+      "days": "TODO_VERIFY",
+      "trainNo": null,
+      "stops": [
+        {
+          "station": "LNL",
+          "time": "23:40",
+          "dayOffset": 0
+        },
+        {
+          "station": "MVL",
+          "time": "23:47",
+          "dayOffset": 0
+        },
+        {
+          "station": "KMST",
+          "time": "23:54",
+          "dayOffset": 0
+        },
+        {
+          "station": "KNHE",
+          "time": "23:58",
+          "dayOffset": 0
+        },
+        {
+          "station": "VDN",
+          "time": "00:02",
+          "dayOffset": 1
+        },
+        {
+          "station": "TGN",
+          "time": "00:07",
+          "dayOffset": 1
+        },
+        {
+          "station": "GRWD",
+          "time": "00:11",
+          "dayOffset": 1
+        },
+        {
+          "station": "BGWI",
+          "time": "00:14",
+          "dayOffset": 1
+        },
+        {
+          "station": "DEHR",
+          "time": "00:18",
+          "dayOffset": 1
+        },
+        {
+          "station": "AKRD",
+          "time": "00:23",
+          "dayOffset": 1
+        },
+        {
+          "station": "CCH",
+          "time": "00:27",
+          "dayOffset": 1
+        },
+        {
+          "station": "PMP",
+          "time": "00:32",
+          "dayOffset": 1
+        },
+        {
+          "station": "KSWD",
+          "time": "00:37",
+          "dayOffset": 1
+        },
+        {
+          "station": "DAPD",
+          "time": "00:41",
+          "dayOffset": 1
+        },
+        {
+          "station": "KK",
+          "time": "00:46",
+          "dayOffset": 1
+        },
+        {
+          "station": "SVJR",
+          "time": "00:51",
+          "dayOffset": 1
+        },
+        {
+          "station": "PUNE",
+          "time": "01:35",
+          "dayOffset": 1
+        }
+      ]
+    }
+  ],
+  "dataIssues": [
+    "UP 10TH LOCAL: 19 min gap before LNL (13:50) - check",
+    "UP 12TH LOCAL: 22 min gap before LNL (16:32) - check",
+    "UP 17TH LOCAL: KK 19:16 is earlier than previous stop",
+    "DOWN Local 1: 18 min gap before PUNE (01:05) - check",
+    "DOWN Local 8: 27 min gap before SVJR (11:40) - check",
+    "DOWN Local 16: 28 min gap before TGN (19:28) - check",
+    "DOWN Local 16: 22 min gap before SVJR (20:25) - check",
+    "DOWN Local 21: 36 min gap before PUNE (00:20) - check",
+    "DOWN Local 22: 44 min gap before PUNE (01:35) - check"
+  ]
 }

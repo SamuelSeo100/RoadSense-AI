@@ -1,31 +1,25 @@
 /// <reference types="node" />
 /**
- * Fills station coordinates in data/transit/metro.json and suburban_rail.json
- * with Google Places API (New) Text Search, then prints a review table
- * (name → coordinates → formatted address) to catch wrong matches.
+ * Fills station coordinates in data/transit/metro.json (28 stations) and
+ * suburban_rail.json (17 stations) with Google Places API (New) Text Search,
+ * re-estimates metro segment run times from them, and prints a review table
+ * (code → name → lat,lng → formatted address) to catch wrong matches.
  *
  *   node --env-file=.env scripts/geocode-stations.ts            # stations not geocoded yet
  *   node --env-file=.env scripts/geocode-stations.ts --force    # all stations again
  *   node --env-file=.env scripts/geocode-stations.ts --dry-run  # print, don't write
  *
  * Key: GOOGLE_MAPS_API_KEY or EXPO_PUBLIC_GOOGLE_MAPS_API_KEY from the
- * environment (never hard-coded). One request per station.
+ * environment (never hard-coded). One request per station. A station whose
+ * plain name matches the wrong place can carry a `geocodeQuery` override.
  */
 import fs from 'node:fs';
 import path from 'node:path';
 
-interface Station {
-  id: string;
-  name: string;
-  lat: number | null;
-  lng: number | null;
-  geocoded: boolean;
-  verified: boolean;
-  source: string;
-  formattedAddress?: string;
-  /** Overrides the default query when the plain name matches the wrong place. */
-  geocodeQuery?: string;
-}
+import { estimateSegmentMinutes } from '../src/services/transit/buildMetro.ts';
+import type { Geocoded, MetroNetwork } from '../src/services/transit/types.ts';
+
+type Station = Geocoded & { code: string; name: string };
 
 const DATA = path.join(import.meta.dirname, '..', 'data', 'transit');
 const PUNE = { latitude: 18.5204, longitude: 73.8567 };
@@ -52,6 +46,7 @@ interface TextSearchResponse {
     formattedAddress?: string;
     location?: { latitude: number; longitude: number };
   }[];
+  error?: { message?: string };
 }
 
 async function search(query: string) {
@@ -75,95 +70,103 @@ async function search(query: string) {
       locationBias: { circle: { center: PUNE, radius: 50000 } },
     }),
   });
-  const json = (await res.json()) as TextSearchResponse & { error?: { message?: string } };
+  const json = (await res.json()) as TextSearchResponse;
   if (!res.ok) throw new Error(json.error?.message ?? `Places request failed (${res.status})`);
   return json.places?.[0] ?? null;
 }
 
 interface Row {
   file: string;
-  name: string;
-  query: string;
-  coords: string;
-  address: string;
+  station: Station;
+  match: string;
   flag: string;
 }
 
-async function geocodeFile(
-  file: string,
-  stationsOf: (data: any) => Station[],
-  queryOf: (s: Station, data: any) => string,
-): Promise<Row[]> {
-  const fullPath = path.join(DATA, file);
-  const data = JSON.parse(fs.readFileSync(fullPath, 'utf8'));
+/** Geocodes `stations` in place; returns review rows and the number of requests. */
+async function geocode(file: string, stations: Station[], queryOf: (s: Station) => string) {
   const rows: Row[] = [];
-  for (const station of stationsOf(data)) {
-    const query = queryOf(station, data);
-    if (station.geocoded && !force) {
-      rows.push({
-        file,
-        name: station.name,
-        query,
-        coords: `${station.lat}, ${station.lng}`,
-        address: station.formattedAddress ?? '',
-        flag: 'kept',
-      });
+  let requests = 0;
+  for (const s of stations) {
+    if (s.geocoded && !force) {
+      rows.push({ file, station: s, match: s.geocodeSource ?? '', flag: 'kept' });
       continue;
     }
+    const query = s.geocodeQuery ?? queryOf(s);
+    requests++;
     const place = await search(query);
     if (!place?.location) {
-      rows.push({ file, name: station.name, query, coords: '—', address: '', flag: 'NO MATCH' });
+      Object.assign(s, { lat: null, lng: null, geocoded: false });
+      rows.push({ file, station: s, match: `"${query}" → no match`, flag: 'NO MATCH' });
       continue;
     }
     const km = haversineKm(PUNE, place.location);
-    station.lat = Math.round(place.location.latitude * 1e6) / 1e6;
-    station.lng = Math.round(place.location.longitude * 1e6) / 1e6;
-    station.geocoded = true;
-    station.verified = false;
-    station.formattedAddress = place.formattedAddress ?? '';
-    station.source = `Google Places Text Search "${query}" → "${place.displayName?.text ?? ''}" (TODO_VERIFY: review match)`;
+    Object.assign(s, {
+      lat: Math.round(place.location.latitude * 1e6) / 1e6,
+      lng: Math.round(place.location.longitude * 1e6) / 1e6,
+      geocoded: true,
+      formattedAddress: place.formattedAddress ?? '',
+      geocodeSource: `Places Text Search "${query}" → "${place.displayName?.text ?? ''}" (TODO_VERIFY: review)`,
+    });
     rows.push({
       file,
-      name: station.name,
-      query,
-      coords: `${station.lat}, ${station.lng}`,
-      address: `${place.displayName?.text ?? ''} | ${place.formattedAddress ?? ''}`,
+      station: s,
+      match: place.displayName?.text ?? '',
       flag: km > MAX_KM ? `FAR (${Math.round(km)} km)` : '',
     });
   }
-  if (!dryRun) fs.writeFileSync(fullPath, JSON.stringify(data, null, 2) + '\n');
-  return rows;
+  return { rows, requests };
+}
+
+/** Same coordinates for two different stations: at least one is wrong. */
+function flagDuplicates(rows: Row[]) {
+  const seen = new Map<string, Row>();
+  for (const r of rows) {
+    const s = r.station;
+    if (s.lat == null) continue;
+    const k = `${r.file}|${s.lat.toFixed(4)},${s.lng?.toFixed(4)}`;
+    const other = seen.get(k);
+    if (other) {
+      r.flag ||= `SAME AS ${other.station.code}`;
+      other.flag ||= `SAME AS ${s.code}`;
+    } else seen.set(k, r);
+  }
 }
 
 async function main() {
   if (!key) {
-    console.error(
-      'Set GOOGLE_MAPS_API_KEY or EXPO_PUBLIC_GOOGLE_MAPS_API_KEY (e.g. --env-file=.env).',
-    );
+    console.error('Set GOOGLE_MAPS_API_KEY or EXPO_PUBLIC_GOOGLE_MAPS_API_KEY (e.g. --env-file=.env).');
     process.exit(1);
   }
-  const rows = [
-    ...(await geocodeFile(
-      'metro.json',
-      (d) => d.lines.flatMap((l: { stations: Station[] }) => l.stations),
-      (s) => s.geocodeQuery ?? `${s.name} metro station, Pune`,
-    )),
-    ...(await geocodeFile(
-      'suburban_rail.json',
-      (d) => d.stations,
-      (s) => `${s.name.replace(/ Jn$/, ' Junction')} railway station, Maharashtra`,
-    )),
-  ];
-  console.log('| file | station | coordinates | matched place | address | flag |');
-  console.log('|---|---|---|---|---|---|');
-  for (const r of rows) {
-    const [name, address] = r.address.split(' | ');
-    console.log(
-      `| ${r.file} | ${r.name} | ${r.coords} | ${name ?? ''} | ${address ?? ''} | ${r.flag} |`,
+  const metroPath = path.join(DATA, 'metro.json');
+  const subPath = path.join(DATA, 'suburban_rail.json');
+  const metro = JSON.parse(fs.readFileSync(metroPath, 'utf8')) as MetroNetwork;
+  const sub = JSON.parse(fs.readFileSync(subPath, 'utf8')) as { stations: Station[] };
+
+  const m = await geocode('metro', metro.stations, (s) => `${s.name} metro station Pune`);
+  const r = await geocode('rail', sub.stations, (s) => `${s.name} railway station`);
+  const rows = [...m.rows, ...r.rows];
+  flagDuplicates(rows);
+
+  // Segment run times follow the coordinates (verified values are kept).
+  for (const line of metro.lines) {
+    const estimates = estimateSegmentMinutes(line, metro.stations);
+    line.segmentMinutes = estimates.map((e, i) =>
+      line.segmentMinutes[i]?.verified ? line.segmentMinutes[i]! : e,
     );
   }
-  const requests = rows.filter((r) => r.flag !== 'kept').length;
-  console.log(`\n${requests} Places requests${dryRun ? ' (dry run, nothing written)' : ''}.`);
+
+  console.log('| system | code | name | lat, lng | matched place | formatted address | flag |');
+  console.log('|---|---|---|---|---|---|---|');
+  for (const { file, station: s, match, flag } of rows) {
+    const coords = s.lat == null ? '—' : `${s.lat}, ${s.lng}`;
+    const matched = match.match(/→ "(.*)"/)?.[1] ?? match;
+    console.log(`| ${file} | ${s.code} | ${s.name} | ${coords} | ${matched} | ${s.formattedAddress ?? ''} | ${flag} |`);
+  }
+  console.log(`\n${m.requests + r.requests} Places requests${dryRun ? ' (dry run, nothing written)' : ''}.`);
+  if (!dryRun) {
+    fs.writeFileSync(metroPath, JSON.stringify(metro, null, 2) + '\n');
+    fs.writeFileSync(subPath, JSON.stringify(sub, null, 2) + '\n');
+  }
 }
 
 void main();

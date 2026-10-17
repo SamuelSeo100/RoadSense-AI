@@ -1,23 +1,23 @@
 import type { Draft, DraftLeg } from '../google/googleRoutingService';
 import type { LatLng, Route } from '../types';
 
-import { metroJourneyFare, metroRide, type MetroRide } from './metro';
+import { metroRide, type MetroRide } from './metro';
 import {
   activeMetroStations,
-  haversineKm,
-  isOpen,
   matchMetroLine,
   matchMetroStation,
+  metroFare,
   metroNetwork,
+  metroStation,
   nearestStations,
   normaliseStationName,
-  stationPoint,
+  pointOf,
   suburbanNetwork,
   type NearStation,
 } from './network';
 import { nextSuburbanDeparture, type SuburbanDeparture } from './suburban';
 import { formatHHMM, istMinutes, istWeekday } from './time';
-import type { MetroLine, MetroNetwork, SuburbanNetwork, TransitStation } from './types';
+import type { MetroLine, MetroNetwork, SuburbanNetwork } from './types';
 
 /** Tunables for timetable (metro / local train) options. */
 export const injectionConfig = {
@@ -66,72 +66,48 @@ function estimateAccessMin(km: number): number {
 
 const metroLabel = (line: MetroLine) => `Metro ${line.name.replace(/\s*\(.*\)$/, '')}`;
 
-const pathOf = (stations: TransitStation[], from: number, to: number): LatLng[] => {
-  const [lo, hi] = from <= to ? [from, to] : [to, from];
-  const pts = stations
-    .slice(lo, hi + 1)
-    .map(stationPoint)
-    .filter((p): p is LatLng => p !== null);
-  return from <= to ? pts : pts.reverse();
-};
-
-function bestMetroRide(
-  entry: NearStation,
-  exit: NearStation,
-  time: number,
-  network: MetroNetwork,
-): MetroRide | null {
-  let best: MetroRide | null = null;
-  for (const a of entry.ids) {
-    for (const b of exit.ids) {
-      const ride = metroRide(a, b, time, network);
-      if (!ride) continue;
-      if (
-        !best ||
-        ride.arrival < best.arrival ||
-        (ride.arrival === best.arrival && ride.legs.length < best.legs.length)
-      ) {
-        best = ride;
-      }
-    }
-  }
-  return best;
+/** Station coordinates from `from` to `to` along `codes` (either direction). */
+function pathAlong(
+  codes: string[],
+  from: string,
+  to: string,
+  pointFor: (code: string) => LatLng | null,
+): LatLng[] {
+  const a = codes.indexOf(from);
+  const b = codes.indexOf(to);
+  if (a < 0 || b < 0) return [];
+  const slice = a <= b ? codes.slice(a, b + 1) : codes.slice(b, a + 1).reverse();
+  return slice.map(pointFor).filter((p): p is LatLng => p !== null);
 }
 
-function metroLegs(ride: MetroRide): DraftLeg[] {
+function metroLegs(ride: MetroRide, network: MetroNetwork): DraftLeg[] {
   const out: DraftLeg[] = [];
+  const nameOf = (code: string) => metroStation(network, code)?.name ?? code;
+  const pointFor = (code: string) => pointOf(metroStation(network, code));
   ride.legs.forEach((leg, i) => {
-    const from = leg.line.stations[leg.fromIndex];
-    const to = leg.line.stations[leg.toIndex];
-    const prev = ride.legs[i - 1];
-    if (prev) {
-      // Interchange walk: straight line between the two stations (real path loads later).
-      const prevStation = prev.line.stations[prev.toIndex];
-      const a = prevStation && stationPoint(prevStation);
-      const b = from && stationPoint(from);
+    if (i > 0) {
+      // Interchange inside CVC; the wait for the next train is in the route total.
       out.push({
         mode: 'walk',
-        // Walking part only; the wait for the next train is in the route total.
         durationSec: ride.interchangeWalkMin * 60,
-        distanceM: a && b ? haversineKm(a, b) * 1000 : 0,
-        path: a && b ? [a, b] : [],
-        approximate: true,
+        distanceM: 0,
+        path: [],
+        approximate: false,
       });
     }
-    const verified = ride.fare?.verified ?? false;
     out.push({
       mode: 'metro',
       durationSec: (leg.arrival - leg.departure) * 60,
       distanceM: (leg.km ?? 0) * 1000,
-      path: pathOf(leg.line.stations, leg.fromIndex, leg.toIndex),
+      path: pathAlong(leg.line.stations, leg.from, leg.to, pointFor),
       approximate: false,
       label: metroLabel(leg.line),
       stops: leg.stations,
-      fromStop: from?.name,
-      toStop: to?.name,
-      // One fare for the journey, on its first leg. Undefined = fares.ts fallback.
+      fromStop: nameOf(leg.from),
+      toStop: nameOf(leg.to),
+      // One matrix fare for the journey, on its first leg. Undefined = fares.ts fallback.
       fareInr: ride.fare ? (i === 0 ? ride.fare.fare : 0) : undefined,
-      fareEstimated: !verified,
+      fareEstimated: !(ride.fare?.verified ?? false),
       realtime: false,
       lineColor: leg.line.color,
       departure: formatHHMM(leg.departure),
@@ -140,24 +116,25 @@ function metroLegs(ride: MetroRide): DraftLeg[] {
   return out;
 }
 
-function trainLeg(dep: SuburbanDeparture, network: SuburbanNetwork): DraftLeg {
-  const from = network.stations[dep.fromIndex];
-  const to = network.stations[dep.toIndex];
-  const trip = network.trips.find((t) => t.trainNo === dep.trainNo);
-  const [lo, hi] = [Math.min(dep.fromIndex, dep.toIndex), Math.max(dep.fromIndex, dep.toIndex)];
-  const stops = trip
-    ? trip.times.slice(lo, hi + 1).filter((t) => t !== null).length - 1
-    : undefined;
+function trainLeg(
+  dep: SuburbanDeparture,
+  from: string,
+  to: string,
+  network: SuburbanNetwork,
+): DraftLeg {
+  const station = (code: string) => network.stations.find((s) => s.code === code);
+  const codes = network.stations.map((s) => s.code);
   return {
     mode: 'train',
     durationSec: dep.rideMin * 60,
-    distanceM: (dep.km ?? 0) * 1000,
-    path: pathOf(network.stations, dep.fromIndex, dep.toIndex),
+    distanceM: (dep.fare?.km ?? 0) * 1000,
+    path: pathAlong(codes, from, to, (c) => pointOf(station(c))),
     approximate: false,
-    label: `Train ${dep.trainNo}`,
-    stops,
-    fromStop: from?.name,
-    toStop: to?.name,
+    // "Train · to Lonavala": the strip shows "Train", the steps the direction.
+    label: `Train · to ${station(dep.terminus)?.name ?? dep.terminus}`,
+    stops: dep.stops,
+    fromStop: station(from)?.name,
+    toStop: station(to)?.name,
     fareInr: dep.fare?.fare,
     fareEstimated: !(dep.fare?.verified ?? false),
     realtime: false,
@@ -180,7 +157,13 @@ interface Ride {
 
 interface System {
   maxKm: number;
-  stations: TransitStation[];
+  stations: {
+    code: string;
+    name: string;
+    lat?: number | null;
+    lng?: number | null;
+    geocoded: boolean;
+  }[];
   ride: (entry: NearStation, exit: NearStation, time: number) => Ride | null;
 }
 
@@ -215,23 +198,25 @@ export async function timetableDrafts({
       maxKm: injectionConfig.maxStationKm.metro,
       stations: activeMetroStations(metro),
       ride(entry, exit, time) {
-        const r = bestMetroRide(entry, exit, time, metro);
+        const r = metroRide(entry.code, exit.code, time, metro);
         const first = r?.legs[0];
         return r && first
-          ? { departure: first.departure, arrival: r.arrival, legs: metroLegs(r) }
+          ? { departure: first.departure, arrival: r.arrival, legs: metroLegs(r, metro) }
           : null;
       },
     },
     {
-      // No trips imported yet → no stations → no calls.
       maxKm: injectionConfig.maxStationKm.train,
-      stations: suburban.trips.length ? suburban.stations.filter(isOpen) : [],
+      // No trips → no stations → no calls.
+      stations: suburban.trips.length ? suburban.stations : [],
       ride(entry, exit, time) {
-        const a = entry.ids[0];
-        const b = exit.ids[0];
-        const dep = a && b ? nextSuburbanDeparture(a, b, time, weekday, {}, suburban) : null;
+        const dep = nextSuburbanDeparture(entry.code, exit.code, time, { weekday }, suburban);
         return dep
-          ? { departure: dep.departure, arrival: dep.arrival, legs: [trainLeg(dep, suburban)] }
+          ? {
+              departure: dep.departure,
+              arrival: dep.arrival,
+              legs: [trainLeg(dep, entry.code, exit.code, suburban)],
+            }
           : null;
       },
     },
@@ -249,7 +234,7 @@ export async function timetableDrafts({
     });
     return entries.flatMap((entry) =>
       exits.flatMap((exit) => {
-        if (entry.name === exit.name) return [];
+        if (entry.code === exit.code) return [];
         const reach = now + estimateAccessMin(entry.km);
         const ride = system.ride(entry, exit, reach);
         return ride && ride.departure - reach <= maxWaitMin ? [{ system, entry, exit }] : [];
@@ -261,7 +246,7 @@ export async function timetableDrafts({
   // 2. Access / egress legs from Google, one call per distinct (point, station).
   const legCache = new Map<string, Promise<AccessLeg | null>>();
   const access = (point: LatLng, station: NearStation, dir: 'in' | 'out') => {
-    const key = `${dir}|${station.station.id}`;
+    const key = `${dir}|${station.code}`;
     let p = legCache.get(key);
     if (!p) {
       p =
@@ -314,9 +299,9 @@ export async function timetableDrafts({
 }
 
 /**
- * Google metro legs on our lines keep Google's timing but take our fare
- * table (one fare per journey across an interchange) and the line colour.
- * Legs we can't match keep the fares.ts estimate.
+ * Google metro legs on our lines keep Google's timing but take the official
+ * fare matrix (one fare per journey across the CVC interchange) and the line
+ * colour. Legs we can't match keep the fares.ts estimate.
  */
 export function applyMetroTable(draft: Draft, network: MetroNetwork = metroNetwork): Draft {
   const legs = draft.legs.map((l) => ({ ...l }));
@@ -327,50 +312,36 @@ export function applyMetroTable(draft: Draft, network: MetroNetwork = metroNetwo
       continue;
     }
     // One journey: metro legs joined only by walks (an interchange).
-    const run: number[] = [];
+    const run: DraftLeg[] = [];
     let j = i;
     while (j < legs.length && (legs[j]?.mode === 'metro' || legs[j]?.mode === 'walk')) {
-      if (legs[j]?.mode === 'metro') run.push(j);
+      if (legs[j]?.mode === 'metro') run.push(legs[j]!);
       j++;
     }
-    const matched = run.map((k) => {
-      const leg = legs[k] as DraftLeg;
+    const codes = run.map((leg) => {
       const line = matchMetroLine(network, leg.label);
-      const a = line ? matchMetroStation(network, leg.fromStop, line) : null;
-      const b = line ? matchMetroStation(network, leg.toStop, line) : null;
       if (line) leg.lineColor = line.color;
-      return line && a && b ? { line, a: a.index, b: b.index } : null;
+      const a = matchMetroStation(network, leg.fromStop, line);
+      const b = matchMetroStation(network, leg.toStop, line);
+      return a && b ? { a, b } : null;
     });
-    if (matched.every((m) => m !== null) && matched.length) {
-      const fare = metroJourneyFare(
-        matched.map((m) => {
-          const [lo, hi] = m.a < m.b ? [m.a, m.b] : [m.b, m.a];
-          const passed = m.line.stations.slice(lo, hi + 1);
-          const stations = (m.a < m.b ? passed.slice(1) : passed.slice(0, -1)).filter(
-            isOpen,
-          ).length;
-          return { line: m.line, stations, km: null };
-        }),
-        network,
-      );
-      if (fare) {
-        run.forEach((k, n) => {
-          const leg = legs[k] as DraftLeg;
-          leg.fareInr = n === 0 ? fare.fare : 0;
-          leg.fareEstimated = !fare.verified;
-        });
-      }
+    const from = codes[0]?.a;
+    const to = codes[codes.length - 1]?.b;
+    const fare = codes.every((c) => c !== null) && from && to ? metroFare(from, to, network) : null;
+    if (fare) {
+      run.forEach((leg, n) => {
+        leg.fareInr = n === 0 ? fare.fare : 0;
+        leg.fareEstimated = !fare.verified;
+      });
     }
     i = j;
   }
   return { ...draft, legs };
 }
 
-/** Canonical station name: ours when it's a metro station we know. */
+/** Canonical stop: the station code when it's a metro station we know. */
 function canonicalStop(name: string | undefined, network: MetroNetwork): string {
-  const ours = matchMetroStation(network, name);
-  const station = ours?.line.stations[ours.index];
-  return normaliseStationName(station?.name ?? name ?? '');
+  return matchMetroStation(network, name) ?? normaliseStationName(name ?? '');
 }
 
 /** Mode sequence + boarding / alighting stations: equal = near-duplicate options. */

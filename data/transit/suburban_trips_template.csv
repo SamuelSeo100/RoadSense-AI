@@ -1,3 +1,0 @@
-train_no,direction,days,Pune Jn,Shivajinagar,Khadki,Dapodi,Kasarwadi,Pimpri,Chinchwad,Akurdi,Dehu Road,Begdewadi,Ghorawadi,Talegaon,Vadgaon,Kanhe,Kamshet,Malavli,Lonavala
-# One row per train. direction: UP (Pune Jn → Lonavala) or DOWN (Lonavala → Pune Jn). days: Daily | Mon-Sat | Sun | Mon;Wed;Fri. Station cells: HH:MM departure (24 h IST) or - if the train does not stop. Lines starting with # are ignored. Delete the example row below.
-#EXAMPLE_99999,UP,Daily,HH:MM,HH:MM,HH:MM,HH:MM,HH:MM,HH:MM,HH:MM,HH:MM,HH:MM,HH:MM,HH:MM,HH:MM,HH:MM,HH:MM,HH:MM,HH:MM,HH:MM

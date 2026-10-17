@@ -2,7 +2,7 @@ import { describe, expect, it } from '@jest/globals';
 
 import type { Draft, DraftLeg } from '../../google/googleRoutingService';
 import type { LatLng } from '../../types';
-import { metroFixture, suburbanFixture, trip } from '../__fixtures__/networks';
+import { metroFixture } from '../__fixtures__/networks';
 import {
   applyMetroTable,
   dropDominated,
@@ -10,7 +10,8 @@ import {
   timetableDrafts,
   type FetchAccess,
 } from '../injection';
-import { haversineKm } from '../network';
+import { haversineKm, metroFare } from '../network';
+import type { SuburbanNetwork, SuburbanTrip } from '../types';
 
 /** Monday 2026-10-19 at `hhmm` IST. */
 const ist = (hhmm: string) => new Date(`2026-10-19T${hhmm}:00+05:30`);
@@ -24,6 +25,32 @@ function fakeAccess() {
     return { mode, durationSec: min * 60, distanceM: km * 1000, path: [a, b], approximate: false };
   };
   return { calls, fetchAccess };
+}
+
+/** Stations S0…S4 ~5.3 km apart, 6 km chainage each. */
+function suburbanFixture(trips: SuburbanTrip[]): SuburbanNetwork {
+  return {
+    line: { id: 'sub', name: 'Test Local' },
+    source: { name: 'test', author: 'test', credit: 'test' },
+    stations: [0, 1, 2, 3, 4].map((i) => ({
+      code: `S${i}`,
+      name: `Stop ${i}`,
+      kmFromPune: i * 6,
+      lat: 18.6,
+      lng: 73.6 + i * 0.05,
+      geocoded: true,
+    })),
+    fare: {
+      slabs: [
+        { maxKm: 10, fareInr: 5 },
+        { maxKm: 30, fareInr: 10 },
+      ],
+      verified: false,
+      source: 'test',
+    },
+    trips,
+    dataIssues: [],
+  };
 }
 
 const emptySuburban = suburbanFixture([]);
@@ -49,9 +76,19 @@ describe('timetableDrafts', () => {
     expect(best.source).toBe('routly_timetable');
     expect(best.legs.map((l) => l.mode)).toEqual(['walk', 'metro', 'walk', 'metro', 'walk']);
     const [, m1, change, m2] = best.legs as DraftLeg[];
-    expect([m1!.fromStop, m1!.toStop, m2!.fromStop, m2!.toStop]).toEqual(['A1', 'A3', 'B2', 'B4']);
+    expect([m1!.fromStop, m1!.toStop, m2!.fromStop, m2!.toStop]).toEqual([
+      'Station A1',
+      'Station X',
+      'Station X',
+      'Station B4',
+    ]);
     expect(change!.durationSec).toBe(4 * 60); // interchange walk only
-    expect(m1).toMatchObject({ realtime: false, fareInr: 15, lineColor: '#123456' });
+    expect(m1).toMatchObject({
+      realtime: false,
+      fareInr: 25,
+      fareEstimated: false,
+      lineColor: '#123456',
+    });
     expect(m2!.fareInr).toBe(0); // one journey fare
     expect(m1!.departure).toMatch(/^07:\d\d$/);
     // Door to door ≥ access + ride.
@@ -72,9 +109,9 @@ describe('timetableDrafts', () => {
       suburban: emptySuburban,
     });
     expect(calls[0]?.mode).toBe('auto');
-    expect(drafts.some((d) => d.legs[0]?.mode === 'auto' && d.legs[0].label === 'Auto to A1')).toBe(
-      true,
-    );
+    expect(
+      drafts.some((d) => d.legs[0]?.mode === 'auto' && d.legs[0].label === 'Auto to Station A1'),
+    ).toBe(true);
   });
 
   it('makes no calls and no options when no train runs (late night, long wait)', async () => {
@@ -94,10 +131,23 @@ describe('timetableDrafts', () => {
     }
   });
 
-  it('adds local train options from imported trips', async () => {
+  it('adds local train options from the timetable', async () => {
     const { fetchAccess } = fakeAccess();
     const suburban = suburbanFixture([
-      trip('99801', ['07:20', '07:28', '07:35', '07:42', '07:50']),
+      {
+        id: 'UP-01',
+        label: '1ST LOCAL',
+        direction: 'UP',
+        origin: 'S0',
+        terminus: 'S4',
+        days: 'TODO_VERIFY',
+        trainNo: null,
+        stops: ['07:20', '07:28', '07:35', '07:42', '07:50'].map((time, i) => ({
+          station: `S${i}`,
+          time,
+          dayOffset: 0,
+        })),
+      },
     ]);
     const drafts = await timetableDrafts({
       from: { latitude: 18.6, longitude: 73.601 },
@@ -110,10 +160,12 @@ describe('timetableDrafts', () => {
     });
     const train = drafts.find((d) => d.legs.some((l) => l.mode === 'train'));
     expect(train?.legs.find((l) => l.mode === 'train')).toMatchObject({
-      label: 'Train 99801',
-      fromStop: 'S0',
-      toStop: 'S4',
-      fareInr: 15,
+      label: 'Train · to Stop 4',
+      fromStop: 'Stop 0',
+      toStop: 'Stop 4',
+      stops: 4,
+      fareInr: 10, // 24 km
+      fareEstimated: true,
       realtime: false,
       departure: '07:20',
     });
@@ -151,7 +203,7 @@ const googleMetroDraft = (legs: Partial<DraftLeg>[]): Draft => ({
 });
 
 describe('Google metro legs (bundled Pune data)', () => {
-  it('keep Google timing but take our fare and line colour', () => {
+  it('keep Google timing but take the matrix fare and line colour', () => {
     const draft = googleMetroDraft([
       {},
       {
@@ -166,8 +218,8 @@ describe('Google metro legs (bundled Pune data)', () => {
     ]);
     const out = applyMetroTable(draft);
     expect(out.legs[1]).toMatchObject({
-      fareInr: 25,
-      fareEstimated: true,
+      fareInr: metroFare('PIM', 'BPD')!.fare,
+      fareEstimated: false,
       lineColor: '#903373',
       durationSec: 1200,
     });
@@ -187,8 +239,8 @@ describe('Google metro legs (bundled Pune data)', () => {
         },
       ]),
     );
-    // 8 + 9 = 17 stations → top slab.
-    expect(out.legs.map((l) => l.fareInr)).toEqual([35, undefined, 0]);
+    // One matrix fare Vanaz → PCMC, on the first leg.
+    expect(out.legs.map((l) => l.fareInr)).toEqual([metroFare('VNZ', 'PIM')!.fare, undefined, 0]);
   });
 
   it('match Google stop names with other spellings', () => {
@@ -202,8 +254,7 @@ describe('Google metro legs (bundled Pune data)', () => {
         },
       ]),
     );
-    // Shivajinagar → Civil Court → Budhwar Peth → Mandai = 3 stations.
-    expect(out.legs[0]?.fareInr).toBe(10);
+    expect(out.legs[0]?.fareInr).toBe(metroFare('SJO', 'MNA')!.fare);
   });
 
   it('leave unknown lines on the fares.ts estimate', () => {
@@ -229,6 +280,6 @@ describe('Google metro legs (bundled Pune data)', () => {
       source: 'routly_timetable',
     };
     expect(stationSignature(ours)).toBe(stationSignature(google));
-    expect(stationSignature(ours)).toBe('walk|metro:pcmc>budhwarpeth|walk');
+    expect(stationSignature(ours)).toBe('walk|metro:PIM>BPD|walk');
   });
 });

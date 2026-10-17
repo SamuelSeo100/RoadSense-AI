@@ -1,32 +1,39 @@
 /**
- * Shapes of data/transit/*.json. Every number carries where it came from:
- * `verified: false` + a `source` starting with TODO_VERIFY marks a
- * placeholder, not published data. `value: null` = unknown.
+ * Shapes of data/transit/*.json. Station codes (PIM, CVC, PUNE, LNL…) are
+ * the ids everywhere; names are display-only.
+ *
+ * Numbers carry where they came from: `verified: false` = not yet checked
+ * against an official source (the TODO_VERIFY list); `estimated: true` =
+ * computed by us, not published at all. `value: null` = unknown.
  */
 export interface Sourced<T> {
   value: T | null;
   verified: boolean;
   source: string;
+  estimated?: boolean;
 }
 
-export interface TransitStation {
-  /** "line2-vanaz", "sub-akurdi". A physical station on two lines has one id per line. */
-  id: string;
-  name: string;
-  lat: number | null;
-  lng: number | null;
+/** Coordinates written by scripts/geocode-stations.ts. */
+export interface Geocoded {
+  lat?: number | null;
+  lng?: number | null;
   geocoded: boolean;
-  verified: boolean;
-  source: string;
-  /** Other names Google Transit uses ("Kasba Peth"). */
+  formattedAddress?: string;
+  geocodeSource?: string;
+  /** Overrides the default Places query when the plain name matches the wrong place. */
+  geocodeQuery?: string;
+}
+
+export interface MetroStation extends Geocoded {
+  code: string;
+  name: string;
+  /** Other names Google Transit uses ("Civil Court", "Chhatrapati Sambhaji Garden"). */
   aliases?: string[];
-  /** False: trains pass without stopping (under construction). Default true. */
-  open?: boolean;
 }
 
 export interface HeadwayBand {
   band: string;
-  /** "06:00"; `to` is exclusive and may be "24:00". */
+  /** "08:00"; `to` is exclusive. */
   from: string;
   to: string;
   headwayMin: Sourced<number>;
@@ -39,67 +46,81 @@ export interface MetroLine {
   color: string;
   /** Only active lines are routed. */
   active: boolean;
-  stations: TransitStation[];
-  /** Run time between consecutive stations (stations.length − 1 entries). */
+  /** Station codes in line order. */
+  stations: string[];
+  /** Run time between consecutive stations (stations.length − 1 entries), dwell excluded. */
   segmentMinutes: Sourced<number>[];
   dwellSeconds: Sourced<number>;
   /** First / last departure from either terminal, "HH:MM" IST. */
   firstTrain: Sourced<string>;
   lastTrain: Sourced<string>;
+  /** Peak bands; any other time in service uses `offPeakHeadwayMin`. */
   headways: HeadwayBand[];
+  offPeakHeadwayMin: Sourced<number>;
 }
 
 export interface Interchange {
-  /** Station ids on two different lines. */
-  a: string;
-  b: string;
+  /** A station code on every line in `lines`. */
+  station: string;
+  lines: string[];
   walkMinutes: Sourced<number>;
 }
 
-export interface FareSlab {
-  /** Max stations travelled (or km); null = no upper bound. */
-  upTo: number | null;
-  fare: Sourced<number>;
-}
-
-export interface FareTable {
-  basis: 'stations' | 'km';
-  slabs: FareSlab[];
+export interface MetroFares {
+  source: string;
+  checkedOn: string;
+  verified: boolean;
+  /** fare[from][to] in ₹, symmetric. */
+  matrix: Record<string, Record<string, number>>;
+  /** Pairs where the official chart was asymmetric (the higher fare is used both ways). */
+  adjusted: { from: string; to: string; note: string }[];
 }
 
 export interface MetroNetwork {
+  stations: MetroStation[];
   lines: MetroLine[];
   interchanges: Interchange[];
-  fares: FareTable & {
-    /** 'single_journey': one fare across an interchange. */
-    interchange: 'single_journey' | 'per_line';
-    /** Lines run by another operator, with their own table (Line 3). */
-    line3?: { slabs: FareSlab[] };
-  };
+  fares: MetroFares;
 }
 
-export type SuburbanDirection = 'UP' | 'DOWN';
+export interface SuburbanStation extends Geocoded {
+  code: string;
+  name: string;
+  kmFromPune: number;
+}
+
+export interface SuburbanStop {
+  station: string;
+  /** "HH:MM" IST. */
+  time: string;
+  /** Days after the trip's start day (1 = after midnight). */
+  dayOffset: number;
+}
 
 export interface SuburbanTrip {
-  trainNo: string;
-  direction: SuburbanDirection;
-  /** Days the trip starts on (0 = Sunday). */
-  days: number[];
-  /**
-   * Departure per station, in `stations` order; null = doesn't stop. "HH:MM"
-   * with HH ≥ 24 for after midnight of the service day.
-   */
-  times: (string | null)[];
-}
-
-export interface SuburbanStation extends TransitStation {
-  /** Chainage from Pune Jn. */
-  km: Sourced<number>;
+  id: string;
+  /** "1ST LOCAL", "Local 21". */
+  label: string;
+  direction: 'UP' | 'DOWN';
+  origin: string;
+  terminus: string;
+  /** Weekdays (0 = Sunday) or "TODO_VERIFY" (treated as daily). */
+  days: number[] | string;
+  trainNo: string | null;
+  /** Stations served, in order of travel (short workings list fewer). */
+  stops: SuburbanStop[];
 }
 
 export interface SuburbanNetwork {
   line: { id: string; name: string };
+  source: { name: string; author: string; credit: string };
   stations: SuburbanStation[];
-  fares: FareTable;
+  fare: {
+    slabs: { maxKm: number; fareInr: number }[];
+    verified: boolean;
+    source: string;
+  };
   trips: SuburbanTrip[];
+  /** "UP 10TH LOCAL: 19 min gap before LNL (13:50) - check". */
+  dataIssues: string[];
 }
