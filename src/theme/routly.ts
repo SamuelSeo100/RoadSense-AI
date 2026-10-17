@@ -90,7 +90,8 @@ export const modeColors: Record<Mode, { line: string; pillBg: string; pillText: 
   cab: { line: '#EA580C', pillBg: '#FFE6D5', pillText: '#C2410C' },
   bike: { line: '#DC2626', pillBg: '#FBE2E4', pillText: '#B42318' },
   cycle: { line: '#0A7468', pillBg: '#DFF4EF', pillText: '#0A7468' },
-  train: { line: '#0D9488', pillBg: '#CCFBF1', pillText: '#0F766E' },
+  // Maroon, apart from the metro lines' purple / aqua and the teal brand colour.
+  train: { line: '#9D174D', pillBg: '#FCE7F3', pillText: '#9D174D' },
 };
 
 /** Registered by `useFonts` in app/_layout.tsx. Weight comes from the family, never `fontWeight`. */

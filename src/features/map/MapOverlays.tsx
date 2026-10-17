@@ -2,10 +2,34 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { IconButton } from '@/components/routly/IconButton';
 import { RText } from '@/components/routly/RText';
-import { modeNames } from '@/services';
+import { modeNames, type Leg } from '@/services';
 import { colors, fonts, modeColors, radius, type Mode } from '@/theme/routly';
 
 import type { LocationStatus } from './mapStore';
+
+export interface LegendItem {
+  mode: Mode;
+  /** "Metro", "Purple Line". */
+  label: string;
+  color: string;
+}
+
+/** One legend entry per mode, or per line for metro legs with a line colour. */
+export function legendFor(legs: Pick<Leg, 'mode' | 'label' | 'lineColor'>[]): LegendItem[] {
+  const items = new Map<string, LegendItem>();
+  for (const leg of legs) {
+    const line = leg.mode === 'metro' && leg.lineColor ? leg.label.replace(/^Metro /, '') : null;
+    const key = line ? `metro:${line}` : leg.mode;
+    if (!items.has(key)) {
+      items.set(key, {
+        mode: leg.mode,
+        label: line ?? modeNames[leg.mode],
+        color: leg.lineColor ?? modeColors[leg.mode].line,
+      });
+    }
+  }
+  return [...items.values()];
+}
 
 interface MapOverlaysProps {
   /** Bottom edge of the top bar. */
@@ -16,8 +40,8 @@ interface MapOverlaysProps {
   onLayers: () => void;
   satellite: boolean;
   traffic: boolean;
-  /** Modes of the route on the map, in order (legend chip); empty hides it. */
-  legend: Mode[];
+  /** Modes / metro lines of the route on the map, in order (legend chip); empty hides it. */
+  legend: LegendItem[];
 }
 
 /**
@@ -64,10 +88,10 @@ export function MapOverlays({
         <View
           style={[styles.legend, { top: top + 60 }]}
           accessible
-          accessibilityLabel={`Map key: ${legend.map((m) => modeNames[m]).join(', ')}`}
+          accessibilityLabel={`Map key: ${legend.map((item) => item.label).join(', ')}`}
         >
-          {legend.map((mode) => (
-            <View key={mode} style={styles.legendItem}>
+          {legend.map(({ mode, label, color }) => (
+            <View key={label} style={styles.legendItem}>
               {mode === 'walk' ? (
                 <View style={styles.walkSwatch}>
                   {[0, 1, 2].map((d) => (
@@ -75,10 +99,10 @@ export function MapOverlays({
                   ))}
                 </View>
               ) : (
-                <View style={[styles.lineSwatch, { backgroundColor: modeColors[mode].line }]} />
+                <View style={[styles.lineSwatch, { backgroundColor: color }]} />
               )}
               <RText variant="body" size={11} family={fonts.bold}>
-                {modeNames[mode]}
+                {label}
               </RText>
             </View>
           ))}

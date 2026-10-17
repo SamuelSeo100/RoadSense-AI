@@ -12,7 +12,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LiveMap } from '@/features/map/LiveMap';
-import { MapOverlays } from '@/features/map/MapOverlays';
+import { legendFor, MapOverlays } from '@/features/map/MapOverlays';
 import { useMapStore } from '@/features/map/mapStore';
 import { useUserLocation } from '@/features/map/useUserLocation';
 import { useRoutlyPrefs } from '@/store/routlyPrefsStore';
@@ -94,10 +94,10 @@ export function MapShell({ children }: { children: ReactNode }) {
     [sheetIndex, setSheetIndex, tab],
   );
 
-  /** Modes on the map's selected route, in order of travel (legend chip). */
+  /** Modes (metro: lines) on the map's selected route, in order of travel (legend chip). */
   const legend = useMemo(() => {
     const shown = mapContent?.routes.find((r) => r.id === mapContent.selection);
-    return shown ? [...new Set(shown.legs.map((l) => l.mode))] : [];
+    return shown ? legendFor(shown.legs) : [];
   }, [mapContent]);
 
   /**

@@ -214,7 +214,11 @@ export function LiveMap({
               />
             );
           }
-          const color = tint(modeColors[leg.mode].line, highlighted ? 0 : FADED_TINT);
+          // Metro legs on a known line take the line's colour (Purple / Aqua).
+          const color = tint(
+            leg.lineColor ?? modeColors[leg.mode].line,
+            highlighted ? 0 : FADED_TINT,
+          );
           return [
             <Polyline
               key={`${key}-outline`}

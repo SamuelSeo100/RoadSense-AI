@@ -50,8 +50,16 @@ export function shortLegLabel(leg: Leg): string {
   return `${name} ${legMinutes(leg)}`;
 }
 
-/** "₹321–472" when the route's meta carries an estimate range (cabs), else "₹396". */
-export function routeCost(route: Pick<Route, 'costInr' | 'meta'>): string {
+/** "~₹20" when the fare comes from a table not yet checked against the published chart. */
+export const legCost = (leg: Pick<Leg, 'costInr' | 'fareEstimated'>) =>
+  `${leg.fareEstimated ? '~' : ''}${formatInr(leg.costInr ?? 0)}`;
+
+/**
+ * "₹321–472" when the route's meta carries an estimate range (cabs), "~₹45"
+ * when a leg's fare is unverified, else "₹396".
+ */
+export function routeCost(route: Pick<Route, 'costInr' | 'meta' | 'legs'>): string {
   const range = route.meta?.match(/₹[\d,]+–[\d,]+/);
-  return range ? range[0] : formatInr(route.costInr);
+  if (range) return range[0];
+  return `${route.legs.some((l) => l.fareEstimated) ? '~' : ''}${formatInr(route.costInr)}`;
 }

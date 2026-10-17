@@ -4,7 +4,7 @@ import { Icon, modeIcon } from '@/components/routly/Icon';
 import { PressableBox } from '@/components/routly/PressableBox';
 import { PrimaryButton } from '@/components/routly/PrimaryButton';
 import { RText } from '@/components/routly/RText';
-import { formatInr, legMinutes } from '@/components/routly/routeFormat';
+import { legCost, legMinutes } from '@/components/routly/routeFormat';
 import type { Leg, Route, WalkingRoute } from '@/services';
 import type { BookingTrip } from '@/services/bookings';
 import { colors, fonts, modeColors, radius } from '@/theme/routly';
@@ -88,6 +88,16 @@ export function RouteSteps({
               <RText variant="caption" numberOfLines={2}>
                 {from} → {to}
               </RText>
+              {leg.realtime === false && (
+                <View
+                  style={styles.scheduled}
+                  accessibilityLabel={`Scheduled time, not live${leg.departure ? `. Departs ${leg.departure}` : ''}`}
+                >
+                  <RText variant="small" color={colors.textSecondary}>
+                    Scheduled{leg.departure ? ` · dep ${leg.departure}` : ''}
+                  </RText>
+                </View>
+              )}
               {action && (
                 <PressableBox
                   onPress={() => {
@@ -111,7 +121,7 @@ export function RouteSteps({
                 {legMinutes(leg)}
               </RText>
               {leg.costInr !== undefined && leg.costInr > 0 && (
-                <RText variant="caption">{formatInr(leg.costInr)}</RText>
+                <RText variant="caption">{legCost(leg)}</RText>
               )}
             </View>
           </View>
@@ -136,6 +146,14 @@ export function RouteSteps({
 
       {route.legs.some((l) => l.approximate) && (
         <RText variant="small">~ Estimated path: exact directions aren’t available yet.</RText>
+      )}
+      {route.legs.some((l) => l.fareEstimated) && (
+        <RText variant="small">
+          ~₹ Estimated fare: not yet checked against the published fare chart.
+        </RText>
+      )}
+      {route.legs.some((l) => l.realtime === false) && (
+        <RText variant="small">Scheduled: from the timetable, not live train positions.</RText>
       )}
 
       <PrimaryButton
@@ -172,4 +190,12 @@ const styles = StyleSheet.create({
   },
   actionPressed: { backgroundColor: colors.primaryTint },
   notes: { gap: 4 },
+  scheduled: {
+    alignSelf: 'flex-start',
+    marginTop: 2,
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    borderRadius: radius.pill,
+    backgroundColor: colors.divider,
+  },
 });
