@@ -78,10 +78,12 @@ export function createSupabaseTripLogService(supabase: SupabaseClient): TripLogS
     },
   });
 
-  /** Queues the row for the signed-in user; skipped without a session. */
+  /** Queues the row for the signed-in user; skipped (null) without a session. Returns the row id. */
   const write = (table: string, row: Record<string, unknown> & { id?: string }) => {
-    if (!userId) return;
-    queue.submit(table, { id: Crypto.randomUUID(), ...row, user_id: userId });
+    if (!userId) return null;
+    const id = row.id ?? Crypto.randomUUID();
+    queue.submit(table, { ...row, id, user_id: userId });
+    return id;
   };
 
   return {
@@ -133,7 +135,7 @@ export function createSupabaseTripLogService(supabase: SupabaseClient): TripLogS
     },
 
     startTrip(trip) {
-      write('trips', {
+      return write('trips', {
         request_id: trip.requestId,
         started_at: trip.at.toISOString(),
         route: routeSnapshot(trip.route),
@@ -146,6 +148,11 @@ export function createSupabaseTripLogService(supabase: SupabaseClient): TripLogS
         cab_equivalent_inr:
           trip.cabEquivalentInr === null ? null : Math.round(trip.cabEquivalentInr),
       });
+    },
+
+    logTripTrack(track) {
+      // Queued after its trip (the queue keeps order), so the foreign key holds.
+      write('trip_tracks', { ...track });
     },
 
     onTripStored(listener) {
@@ -164,7 +171,8 @@ export function createNoopTripLogService(): TripLogService {
   return {
     logRequest() {},
     logChoice() {},
-    startTrip() {},
+    startTrip: () => null,
+    logTripTrack() {},
     onTripStored: () => () => {},
     clearPending() {},
   };

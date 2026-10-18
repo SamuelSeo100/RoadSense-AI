@@ -42,9 +42,12 @@ export function logChoice(
   tripLogService.logChoice({ requestId, route, priority, action });
 }
 
-/** Stores the trip for History (always, even with learning off). Never blocks. */
+/**
+ * Stores the trip for History (always, even with learning off). Never blocks.
+ * Returns the trip id (null when nothing is stored: signed out / mock auth).
+ */
 export function startTrip(trip: Omit<StartTripLog, 'requestId'> & { requestId: string }) {
-  tripLogService.startTrip({
+  return tripLogService.startTrip({
     ...trip,
     requestId: logged.has(trip.requestId) ? trip.requestId : null,
   });

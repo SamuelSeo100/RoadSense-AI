@@ -14,6 +14,7 @@ import { createLocalPreferencesService } from './mock/mockPreferencesService';
 import { createMockRoutingService } from './mock/mockRoutingService';
 import { createSupabaseAiService } from './supabase/supabaseAiService';
 import { createSupabaseHistoryService } from './supabase/supabaseHistoryService';
+import { createSupabaseResearchConsentService } from './supabase/supabaseResearchConsentService';
 import { createSupabaseSavedPlacesService } from './supabase/supabaseSavedPlacesService';
 import {
   createNoopTripLogService,
@@ -26,6 +27,7 @@ import type {
   LocationService,
   PlacesService,
   PreferencesService,
+  ResearchConsentService,
   RoutingService,
   SafetyService,
   SavedPlacesService,
@@ -57,6 +59,10 @@ export const tripLogService: TripLogService = supabase
 /** Saved places on the server; null in mock-auth mode (they stay on the device). */
 export const savedPlacesService: SavedPlacesService | null = supabase
   ? createSupabaseSavedPlacesService(supabase)
+  : null;
+/** Research GPS consent on the profile; null in mock-auth mode (nothing is uploaded there). */
+export const researchConsentService: ResearchConsentService | null = supabase
+  ? createSupabaseResearchConsentService(supabase)
   : null;
 /** Claude via the parse-trip edge function (keyword fallback); keywords only in mock-auth mode. */
 export const aiService: AiService = supabase

@@ -1,6 +1,34 @@
 import * as Location from 'expo-location';
 
-import { LocationFixError, type LocationService } from './types';
+import { LocationFixError, type FixMode, type LocationService } from './types';
+
+/** Navigation fix rates: best GPS every second on foot / road; coarse every 5 s on a train. */
+const FIX_OPTIONS: Record<FixMode, Location.LocationOptions> = {
+  precise: {
+    accuracy: Location.Accuracy.BestForNavigation,
+    timeInterval: 1000,
+    distanceInterval: 3,
+  },
+  saver: { accuracy: Location.Accuracy.Balanced, timeInterval: 5000, distanceInterval: 30 },
+};
+
+/** Subscribes, and unsubscribes even if `remove` comes before the subscription resolves. */
+function subscribe(start: () => Promise<Location.LocationSubscription>): () => void {
+  let subscription: Location.LocationSubscription | null = null;
+  let cancelled = false;
+  start()
+    .then((sub) => {
+      if (cancelled) sub.remove();
+      else subscription = sub;
+    })
+    .catch(() => {
+      // Location turned off at the OS level; keep the last known position.
+    });
+  return () => {
+    cancelled = true;
+    subscription?.remove();
+  };
+}
 
 /** Device location via expo-location (foreground only). */
 export function createLocationService(): LocationService {
@@ -41,23 +69,28 @@ export function createLocationService(): LocationService {
     },
 
     watch(cb) {
-      let subscription: Location.LocationSubscription | null = null;
-      let cancelled = false;
-      Location.watchPositionAsync(
-        { accuracy: Location.Accuracy.Balanced, distanceInterval: 25 },
-        ({ coords }) => cb({ latitude: coords.latitude, longitude: coords.longitude }),
-      )
-        .then((sub) => {
-          if (cancelled) sub.remove();
-          else subscription = sub;
-        })
-        .catch(() => {
-          // Location turned off at the OS level; keep the last known position.
-        });
-      return () => {
-        cancelled = true;
-        subscription?.remove();
-      };
+      return subscribe(() =>
+        Location.watchPositionAsync(
+          { accuracy: Location.Accuracy.Balanced, distanceInterval: 25 },
+          ({ coords }) => cb({ latitude: coords.latitude, longitude: coords.longitude }),
+        ),
+      );
+    },
+
+    watchFixes(mode, cb) {
+      return subscribe(() =>
+        Location.watchPositionAsync(FIX_OPTIONS[mode], ({ coords, timestamp }) =>
+          cb({
+            lat: coords.latitude,
+            lng: coords.longitude,
+            accuracy: coords.accuracy ?? null,
+            // iOS reports -1 when unknown.
+            speed: coords.speed !== null && coords.speed >= 0 ? coords.speed : null,
+            heading: coords.heading !== null && coords.heading >= 0 ? coords.heading : null,
+            t: timestamp,
+          }),
+        ),
+      );
     },
 
     async areaName(pos) {

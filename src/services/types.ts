@@ -3,6 +3,7 @@
  * Screens depend only on these types and the service interfaces: the mocks in
  * `./mock` implement them now, the Django/Flask API will later.
  */
+import type { TripTrackRow } from '@/navigation/tripTrack';
 import type { Mode } from '@/theme/routly';
 
 export type { Mode };
@@ -284,11 +285,21 @@ export interface TripLogService {
     priority: Priority;
     action: ChoiceAction;
   }): void;
-  startTrip(trip: StartTripLog): void;
+  /** Returns the trip's id (for its trip_tracks row), null when nothing is stored. */
+  startTrip(trip: StartTripLog): string | null;
+  /** Ground truth of a navigated trip, written once when it ends (same queue: survives no signal). */
+  logTripTrack(track: TripTrackRow): void;
   /** Called whenever a trip lands on the server (possibly after a retry). Returns unsubscribe. */
   onTripStored(listener: () => void): () => void;
   /** Drops queued writes not yet sent (before "Clear my trip history"). */
   clearPending(): void;
+}
+
+/** `profiles.research_consent`: share GPS tracks of navigated trips for research. */
+export interface ResearchConsentService {
+  /** Throws when offline or signed out. */
+  get(): Promise<boolean>;
+  set(consent: boolean): Promise<void>;
 }
 
 export interface AiService {
@@ -329,6 +340,20 @@ export interface LocationFix {
   accuracyM: number | null;
 }
 
+/** A GPS fix for navigation (speed m/s, heading degrees; null when unknown). */
+export interface NavigationFix {
+  lat: number;
+  lng: number;
+  accuracy: number | null;
+  speed: number | null;
+  heading: number | null;
+  /** ms since epoch. */
+  t: number;
+}
+
+/** `precise` on foot / on the road, `saver` while riding (less GPS, longer interval). */
+export type FixMode = 'precise' | 'saver';
+
 export interface LocationService {
   requestPermission(): Promise<LocationPermission>;
   /**
@@ -338,6 +363,8 @@ export interface LocationService {
   currentFix(opts: { timeoutMs: number }): Promise<LocationFix>;
   /** Returns an unsubscribe function. */
   watch(cb: (pos: LatLng) => void): () => void;
+  /** Foreground fixes with speed / heading for navigation. Returns an unsubscribe function. */
+  watchFixes(mode: FixMode, cb: (fix: NavigationFix) => void): () => void;
   /** Neighbourhood name for "You · {area}", or null when unknown. */
   areaName(pos: LatLng): Promise<string | null>;
 }
