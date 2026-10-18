@@ -222,6 +222,51 @@ describe('reroute rate limit', () => {
   });
 });
 
+describe('off route: accuracy and reroute cap', () => {
+  const walk = () =>
+    new NavigationEngine([step({ polyline: [at(0), at(5000)], distanceM: 5000 })], at(5000));
+
+  it('ignores fixes less accurate than 50 m', () => {
+    const engine = walk();
+    engine.start(0);
+    for (let t = 0; t <= 60; t += 5) {
+      expect(engine.update(fix(at(100 + t, 80), t, { accuracy: 60 }))).toEqual([]);
+    }
+    // A poor fix neither starts nor clears an episode.
+    engine.update(fix(at(200, 80), 70, { accuracy: 20 }));
+    engine.update(fix(at(200, 10), 78, { accuracy: 80 })); // "back on route", but untrusted
+    expect(types(engine.update(fix(at(210, 80), 85, { accuracy: 50 })))).toEqual([
+      'offRoute',
+      'reroute',
+    ]);
+  });
+
+  it('computes at most 5 reroutes per trip, then only reports off route', () => {
+    const engine = walk();
+    engine.start(0);
+    const reroutes: number[] = [];
+    // Seven off-route episodes, 40 s apart, back on the route in between.
+    for (let n = 0; n < 7; n++) {
+      const t0 = n * 40;
+      engine.update(fix(at(100, 0), t0 - 1));
+      engine.update(fix(at(100, 80), t0));
+      const events = engine.update(fix(at(100, 80), t0 + 15));
+      expect(types(events)[0]).toBe('offRoute');
+      if (types(events).includes('reroute')) {
+        reroutes.push(n);
+        engine.rerouteFailed();
+      }
+    }
+    expect(reroutes).toEqual([0, 1, 2, 3, 4]);
+    expect(engine.rerouteLimitReached).toBe(true);
+    expect(engine.offRouteCount).toBe(7);
+    // Still off for minutes: no more requests.
+    for (let t = 300; t <= 400; t += 10) {
+      expect(types(engine.update(fix(at(100, 80), t)))).not.toContain('reroute');
+    }
+  });
+});
+
 describe('arrival', () => {
   it('arrives within 50 m of the destination, whatever the step', () => {
     const engine = new NavigationEngine(

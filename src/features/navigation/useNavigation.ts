@@ -2,6 +2,7 @@ import * as Crypto from 'expo-crypto';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { NavigationEngine, type Fix, type NavEvent } from '@/navigation/engine';
+import { alightBackupAt } from '@/navigation/alightBackup';
 import { distanceM } from '@/navigation/geo';
 import { modeFamily, pickReroute, routeToSteps, type NavStep } from '@/navigation/steps';
 import {
@@ -79,6 +80,8 @@ export function useNavigation(request: NavigationRequest) {
     let offRoute = false;
     let finished = false;
     let alightBackup: string | null = null;
+    /** Bumped per (re)schedule: a stale schedule resolving late cancels itself. */
+    let backupGen = 0;
     let alertedStep: string | null = null;
     let fixMode: FixMode | null = null;
     let unsubscribe: (() => void) | null = null;
@@ -146,18 +149,25 @@ export function useNavigation(request: NavigationRequest) {
     };
 
     /** Backup "get off" notification at the predicted time (screen off = no GPS). */
-    const scheduleBackup = (step: NavStep, from: number) => {
+    const cancelBackup = () => {
+      backupGen += 1;
       cancelAlert(alightBackup);
       alightBackup = null;
-      const t = step.transit;
-      if (!t) return;
-      const dep = t.scheduledDep ? Date.parse(t.scheduledDep) : NaN;
-      const start = Math.max(from, Number.isFinite(dep) ? dep : from);
-      const perStop = t.stopCount > 0 ? step.predictedDurationS / t.stopCount : 0;
-      const at = start + (step.predictedDurationS - perStop) * 1000;
-      if (at < Date.now() + 60_000) return;
-      void scheduleAlightBackup(t.alightStop, new Date(at)).then((id) => {
-        if (finished || engine.current !== step) cancelAlert(id);
+    };
+    /**
+     * On reaching the board stop: from max(scheduled departure, arrival at
+     * the stop). Rescheduled on boarding, from the detected boarding time.
+     */
+    const scheduleBackup = (
+      step: NavStep,
+      timing: { reachedStopAt: number; boardedAt?: number },
+    ) => {
+      cancelBackup();
+      const at = alightBackupAt(step, { ...timing, now: Date.now() });
+      if (at === null || !step.transit) return;
+      const gen = backupGen;
+      void scheduleAlightBackup(step.transit.alightStop, new Date(at)).then((id) => {
+        if (finished || gen !== backupGen) cancelAlert(id);
         else alightBackup = id;
       });
     };
@@ -210,33 +220,38 @@ export function useNavigation(request: NavigationRequest) {
       }
     };
 
-    const speak = (event: NavEvent) => {
+    const speak = (event: NavEvent, rerouting: boolean) => {
       if (mutedRef.current) return;
-      const text = phraseFor(event, destination.name);
+      const text = phraseFor(event, destination.name, rerouting);
       if (text) say(text);
     };
 
     function handle(events: NavEvent[]) {
+      // After the 5th reroute, off-route is only reported.
+      const willReroute = events.some((e) => e.type === 'reroute') || !engine.rerouteLimitReached;
       for (const event of events) {
-        speak(event);
+        speak(event, willReroute);
         switch (event.type) {
           case 'stepStart':
             offRoute = false;
-            if (event.step.kind === 'transit') scheduleBackup(event.step, event.t);
-            else {
-              cancelAlert(alightBackup);
-              alightBackup = null;
-            }
+            if (event.step.kind === 'transit')
+              scheduleBackup(event.step, { reachedStopAt: event.t });
+            else cancelBackup();
             persist();
             break;
           case 'boarded':
-            if (engine.current) scheduleBackup(engine.current, event.t);
+            if (engine.current) {
+              const reachedStopAt = engine.history[engine.history.length - 1]?.startedAt;
+              scheduleBackup(engine.current, {
+                reachedStopAt: reachedStopAt ?? event.t,
+                boardedAt: event.t,
+              });
+            }
             persist();
             break;
           case 'alightSoon':
             alertedStep = engine.current?.id ?? null;
-            cancelAlert(alightBackup);
-            alightBackup = null;
+            cancelBackup();
             void alightAlertNow(event.stop);
             break;
           case 'offRoute':
@@ -268,7 +283,7 @@ export function useNavigation(request: NavigationRequest) {
       const endedAt = reason === 'arrived' ? (lastFix?.t ?? Date.now()) : Date.now();
       engine.end(endedAt);
       unsubscribe?.();
-      cancelAlert(alightBackup);
+      cancelBackup();
       if (reason !== 'arrived') silence();
       const track = row(reason, endedAt);
       void clearActiveTrip().then(() => {

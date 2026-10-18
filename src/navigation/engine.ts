@@ -10,7 +10,9 @@
  * - Ride boarding: moving > 15 km/h near the line. "Get off at the next
  *   stop" once past the stop before the alighting one, or 600 m out when
  *   the stops aren't known.
- * - Reroute: asked for on off-route, at most once per 30 s.
+ * - Off-route ignores fixes less accurate than 50 m.
+ * - Reroute: asked for on off-route, at most once per 30 s and 5 times per
+ *   trip; after that off-route is only reported (no recompute).
  * - Arrival: within 50 m of the destination.
  */
 import { distanceM, pathLengthM, project, remainingPath } from './geo';
@@ -37,7 +39,7 @@ export const navConfig = {
   offRouteM: { walk: 50, drive: 100, two_wheeler: 100 },
   offRouteForMs: 15_000,
   /** Fixes worse than this neither start nor clear an off-route episode. */
-  offRouteMaxAccuracyM: 100,
+  offRouteMaxAccuracyM: 50,
   /** Near the next ride's boarding point, a walk never goes off route (station forecourts). */
   nearBoardingM: 100,
   boardSpeedKmh: 15,
@@ -51,6 +53,8 @@ export const navConfig = {
   approachMinStepM: 150,
   arriveM: 50,
   rerouteEveryMs: 30_000,
+  /** Route computations per trip (each costs Google calls), failed ones included. */
+  maxReroutesPerTrip: 5,
 } as const;
 
 export type NavEvent =
@@ -95,6 +99,7 @@ export class NavigationEngine {
   private rerouteAsked = false;
   private lastRerouteAt = -Infinity;
   private reroutes = 0;
+  private rerouteRequests = 0;
   private offRoutes = 0;
   private approachDone = new Set<number>();
   private alightDone = new Set<number>();
@@ -121,6 +126,10 @@ export class NavigationEngine {
   /** Reroutes applied (`replaceSteps`). */
   get rerouteCount(): number {
     return this.reroutes;
+  }
+  /** 5 reroutes asked for: off-route is still reported, but no new route is computed. */
+  get rerouteLimitReached(): boolean {
+    return this.rerouteRequests >= navConfig.maxReroutesPerTrip;
   }
   get offRouteCount(): number {
     return this.offRoutes;
@@ -372,8 +381,13 @@ export class NavigationEngine {
       events.push({ type: 'offRoute', index: this.idx, distanceM: offsetM, t: fix.t });
     }
     // Still off route after a rate-limited attempt: ask again once allowed.
-    if (!this.rerouteAsked && fix.t - this.lastRerouteAt >= navConfig.rerouteEveryMs) {
+    if (
+      !this.rerouteAsked &&
+      !this.rerouteLimitReached &&
+      fix.t - this.lastRerouteAt >= navConfig.rerouteEveryMs
+    ) {
       this.rerouteAsked = true;
+      this.rerouteRequests += 1;
       this.lastRerouteAt = fix.t;
       events.push({ type: 'reroute', from: at, t: fix.t });
     }

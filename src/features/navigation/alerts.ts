@@ -16,7 +16,11 @@ Notifications.setNotificationHandler({
 
 let prepared: Promise<void> | null = null;
 
-/** Channel + permission, once per app session (asked when navigation starts). */
+/**
+ * Channel + permission, once per app session: asked on "Start", before
+ * navigation opens. The channel comes first: Android 13+ shows the
+ * POST_NOTIFICATIONS prompt only once the app has a channel.
+ */
 export function prepareAlerts(): Promise<void> {
   prepared ??= (async () => {
     if (Platform.OS === 'android') {
@@ -39,6 +43,8 @@ const content = (stop: string): Notifications.NotificationContentInput => ({
   title: 'Get off at the next stop',
   body: stop,
   sound: true,
+  // Heads-up on Android < 8 (8+ takes it from the HIGH channel).
+  priority: Notifications.AndroidNotificationPriority.HIGH,
 });
 
 /** Now, from a GPS-detected approach. */

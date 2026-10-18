@@ -12,6 +12,7 @@ import { useRoutlyPrefs } from '@/store/routlyPrefsStore';
 import { colors, fonts, radius } from '@/theme/routly';
 
 import { useRouteGeometry } from '../map/legGeometry';
+import { prepareAlerts } from '../navigation/alerts';
 import { useNavigationStore } from '../navigation/navigationStore';
 import { useMapStore, type MapContent } from '../map/mapStore';
 import { SheetScrollView } from '../shell/SheetScrollView';
@@ -111,8 +112,11 @@ export function RoutesScreen() {
     if (opening) logChoice(ready.requestId, route, priority, 'expand');
   };
 
-  const onStart = (route: RankedRoute) => {
+  const onStart = async (route: RankedRoute) => {
     if (!ready || !to) return;
+    // Notification permission (POST_NOTIFICATIONS on Android 13+) before navigation
+    // opens, so "Get off at the next stop" can reach a locked phone. Asked once.
+    await prepareAlerts();
     logChoice(ready.requestId, route, priority, 'start');
     // The cab estimate for the same trip, for "saved vs cab" in History.
     const cab = ready.routes.find((r) => r.mapKey === 'cab' && !r.vehicle);
@@ -230,7 +234,7 @@ export function RoutesScreen() {
                             destinationName={to.name}
                             walk={ready.walk}
                             onBook={(action) => logChoice(ready.requestId, route, priority, action)}
-                            onStart={() => onStart(route)}
+                            onStart={() => void onStart(route)}
                           />
                         ) : undefined}
                       </RouteCard>
