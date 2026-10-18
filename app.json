@@ -39,7 +39,15 @@
         }
       ],
       "expo-secure-store",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#0A7468",
+          "defaultChannel": "trip-alerts"
+        }
+      ]
     ],
     "scheme": "routly",
     "backgroundColor": "#f8f9ff",

@@ -40,6 +40,13 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         {
           locationWhenInUsePermission:
             'Routly uses your location to plan routes from where you are and show live traffic around you.',
+          // Background navigation (follow-up, shipped later by OTA): permissions only for now.
+          // Adds ACCESS_BACKGROUND_LOCATION + FOREGROUND_SERVICE(_LOCATION) and iOS
+          // UIBackgroundModes "location". A Play Store release needs the background-location review.
+          locationAlwaysAndWhenInUsePermission:
+            'Routly uses your location during navigation, including with the screen off, to guide you and alert you before your stop.',
+          isAndroidBackgroundLocationEnabled: true,
+          isIosBackgroundLocationEnabled: true,
         },
       ],
       // On-device speech-to-text for AI Mode voice (adds RECORD_AUDIO on Android).
