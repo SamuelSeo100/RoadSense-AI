@@ -10,6 +10,7 @@ import { RText } from './RText';
 import {
   formatTransfers,
   formatWalking,
+  nextDepartureNote,
   routeCost,
   TOP_PICK_LABEL,
   shortLegLabel,
@@ -38,13 +39,14 @@ export function RouteCard({ route, priorityLabel, selected, onPress, children }:
       ? `BEST FOR ${priorityLabel.toUpperCase()}`
       : null;
   const cost = routeCost(route);
+  const nextDeparture = nextDepartureNote(route);
   return (
     <View style={[styles.card, selected ? [styles.selected, shadows.selectedCard] : styles.normal]}>
       <PressableBox
         onPress={onPress}
         accessibilityRole="button"
         accessibilityState={{ selected, expanded: children !== undefined }}
-        accessibilityLabel={`${badge ? `${badge.toLowerCase()}. ` : ''}${route.name}, ${route.durationMin} minutes, ${cost}, ${route.legs.map((l) => l.label).join(', then ')}`}
+        accessibilityLabel={`${badge ? `${badge.toLowerCase()}. ` : ''}${route.name}, ${route.durationMin} minutes, ${cost}, ${route.legs.map((l) => l.label).join(', then ')}${nextDeparture ? `. ${nextDeparture}` : ''}`}
         style={styles.summary}
         pressedStyle={styles.pressed}
       >
@@ -82,6 +84,12 @@ export function RouteCard({ route, priorityLabel, selected, onPress, children }:
             </Fragment>
           ))}
         </View>
+
+        {nextDeparture && (
+          <RText variant="caption" family={fonts.bold}>
+            {nextDeparture}
+          </RText>
+        )}
 
         <View style={styles.footer}>
           <Stat label="Walking" value={formatWalking(route.walkingKm)} />

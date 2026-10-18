@@ -45,7 +45,7 @@ const ODS: [Place, Place, Date][] = [
   [P.kothrud, P.pimpri, at('08:30')],
   [P.akurdi, P.puneJn, at('08:30')],
   [P.kothrud, P.lonavala, at('08:30')],
-  // 08:30 has no local within the 45-min wait at Shivaji Nagar; 07:20 catches UP-06.
+  // 08:30: the next Lonavala local from Shivaji Nagar is 10:01 (~70 min wait, shown); 07:20 catches UP-06.
   [P.kothrud, P.lonavala, at('07:20')],
   [P.pimpri, P.swargate, at('22:30')],
   [P.puneJn, P.lonavala, at('23:55')],

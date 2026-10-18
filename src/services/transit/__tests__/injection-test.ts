@@ -173,6 +173,43 @@ describe('timetableDrafts', () => {
   });
 });
 
+describe('Kothrud → Lonavala at 08:30 (bundled timetable)', () => {
+  const kothrud = { latitude: 18.5039, longitude: 73.8128 };
+  const lonavala = { latitude: 18.7537, longitude: 73.4086 };
+  const trainDrafts = async (maxTrainWaitMin: number) => {
+    const { fetchAccess } = fakeAccess();
+    const drafts = await timetableDrafts({
+      from: kothrud,
+      to: lonavala,
+      at: ist('08:30'),
+      fetchAccess,
+      maxWaitMin: 45,
+      maxTrainWaitMin,
+    });
+    return drafts.filter((d) => d.legs.some((l) => l.mode === 'train'));
+  };
+
+  it('offers the 10:01 local (UP-07 stops at Talegaon) with the long wait in the total', async () => {
+    const [train] = await trainDrafts(120);
+    expect(train).toBeDefined();
+    const leg = train!.legs.find((l) => l.mode === 'train')!;
+    expect(leg).toMatchObject({
+      fromStop: 'Shivaji Nagar',
+      toStop: 'Lonavala',
+      departure: '10:01',
+    });
+    expect(leg.waitMin).toBeGreaterThan(45);
+    expect(leg.waitMin).toBeLessThanOrEqual(120);
+    // Door to door covers now → 10:01 departure → 11:15 arrival (+ egress).
+    expect(train!.durationSec).toBeGreaterThanOrEqual((11 * 60 + 15 - (8 * 60 + 30)) * 60);
+    expect(train!.durationSec - train!.rideSec).toBeCloseTo(leg.waitMin! * 60, -2);
+  });
+
+  it('had no train under the old 45-min window', async () => {
+    expect(await trainDrafts(45)).toEqual([]);
+  });
+});
+
 describe('dropDominated', () => {
   it('drops options worse on time, cost and walking, keeps trade-offs', () => {
     const fast = { id: 'fast', durationMin: 30, costInr: 40, walkingKm: 0.5 };

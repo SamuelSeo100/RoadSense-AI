@@ -71,3 +71,23 @@ export function routeCost(route: Pick<Route, 'costInr' | 'meta' | 'legs'>): stri
   if (range) return range[0];
   return `${route.legs.some((l) => l.fareEstimated) ? '~' : ''}${formatInr(route.costInr)}`;
 }
+
+/** Below this the wait isn't worth a mention ("Next metro 8:14 AM"). */
+const WAIT_NOTE_MIN = 5;
+
+/**
+ * "Next train 10:01 AM (waits 69 min)" for a timetable route's first ride,
+ * so a long platform wait (already in the total time) is never hidden. Null
+ * for routes without a scheduled departure.
+ */
+export function nextDepartureNote(route: Pick<Route, 'legs'>): string | null {
+  const ride = route.legs.find(
+    (l) => (l.mode === 'metro' || l.mode === 'train' || l.mode === 'bus') && l.departure,
+  );
+  if (!ride?.departure) return null;
+  const wait =
+    ride.waitMin !== undefined && ride.waitMin >= WAIT_NOTE_MIN
+      ? ` (waits ${ride.waitMin} min)`
+      : '';
+  return `Next ${MODE_NAMES[ride.mode].toLowerCase()} ${formatClock12(ride.departure)}${wait}`;
+}

@@ -48,6 +48,11 @@ export const routingConfig = {
    * reach the stop are dropped (late at night Google returns tomorrow's first bus).
    */
   maxTransitWaitMin: 45,
+  /**
+   * Local trains run up to ~1 h apart: the next one is still shown up to this
+   * far ahead, its wait in the total time (the ranker penalises it) and on the card.
+   */
+  maxTrainWaitMin: 120,
   /** A first/last walk longer than this also gets an "Auto to/from <stop>" variant. */
   firstLastMileKm: 1.2,
   /** Straight-line → road distance, for estimated auto legs. */
@@ -156,6 +161,8 @@ export interface DraftLeg {
   lineColor?: string;
   /** "08:14" IST, timetable legs. */
   departure?: string;
+  /** Minutes waited at the platform before this (first) ride, timetable options. */
+  waitMin?: number;
 }
 
 export interface Draft {
@@ -300,7 +307,11 @@ function parseTransit(res: TransitResponse, at: Date): Draft[] {
     let durationSec = seconds(r.duration);
     if (Number.isFinite(firstDep) && Number.isFinite(lastArr)) {
       const waitSec = (firstDep - at.getTime()) / 1000 - walkSec(0, firstTransit);
-      if (waitSec > routingConfig.maxTransitWaitMin * 60) return [];
+      const maxWaitMin =
+        legs[firstTransit]?.mode === 'train'
+          ? routingConfig.maxTrainWaitMin
+          : routingConfig.maxTransitWaitMin;
+      if (waitSec > maxWaitMin * 60) return [];
       durationSec = Math.max(
         durationSec,
         (lastArr - at.getTime()) / 1000 + walkSec(lastTransit + 1, legs.length),
@@ -481,6 +492,7 @@ function transitToRoute(
       to: l.toStop,
       realtime: l.realtime,
       departure: l.departure,
+      waitMin: l.waitMin,
       lineColor: l.lineColor,
       // A timetable leg with no fare from our tables fell back to the fares.ts estimate.
       fareEstimated:
@@ -736,6 +748,7 @@ export function createGoogleRoutingService(deps: {
           at,
           fetchAccess: accessFetcher(at, signal),
           maxWaitMin: routingConfig.maxTransitWaitMin,
+          maxTrainWaitMin: routingConfig.maxTrainWaitMin,
         });
         return { drafts, calls: googleCallCount() - before };
       })(),

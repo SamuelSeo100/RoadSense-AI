@@ -157,6 +157,8 @@ interface Ride {
 
 interface System {
   maxKm: number;
+  /** Longest wait for the first vehicle (local trains run up to ~1 h apart). */
+  maxWaitMin: number;
   stations: {
     code: string;
     name: string;
@@ -171,8 +173,9 @@ interface System {
  * Metro and local-train options from our timetables: k-nearest entry / exit
  * stations, Google Routes walk or auto access and egress (≤ 2 + 2 calls per
  * system, only for pairs with a train), then access + wait + ride (+
- * interchange) + egress. Trains leaving more than `maxWaitMin` after you can
- * reach the station are dropped.
+ * interchange) + egress. Metros leaving more than `maxWaitMin` (local
+ * trains: `maxTrainWaitMin`) after you can reach the station are dropped;
+ * shorter waits stay in the door-to-door time and on the first ride leg.
  */
 export async function timetableDrafts({
   from,
@@ -180,6 +183,7 @@ export async function timetableDrafts({
   at,
   fetchAccess,
   maxWaitMin,
+  maxTrainWaitMin = maxWaitMin,
   metro = metroNetwork,
   suburban = suburbanNetwork,
 }: {
@@ -188,6 +192,7 @@ export async function timetableDrafts({
   at: Date;
   fetchAccess: FetchAccess;
   maxWaitMin: number;
+  maxTrainWaitMin?: number;
   metro?: MetroNetwork;
   suburban?: SuburbanNetwork;
 }): Promise<Draft[]> {
@@ -196,6 +201,7 @@ export async function timetableDrafts({
   const systems: System[] = [
     {
       maxKm: injectionConfig.maxStationKm.metro,
+      maxWaitMin,
       stations: activeMetroStations(metro),
       ride(entry, exit, time) {
         const r = metroRide(entry.code, exit.code, time, metro);
@@ -207,6 +213,7 @@ export async function timetableDrafts({
     },
     {
       maxKm: injectionConfig.maxStationKm.train,
+      maxWaitMin: maxTrainWaitMin,
       // No trips → no stations → no calls.
       stations: suburban.trips.length ? suburban.stations : [],
       ride(entry, exit, time) {
@@ -237,7 +244,7 @@ export async function timetableDrafts({
         if (entry.code === exit.code) return [];
         const reach = now + estimateAccessMin(entry.km);
         const ride = system.ride(entry, exit, reach);
-        return ride && ride.departure - reach <= maxWaitMin ? [{ system, entry, exit }] : [];
+        return ride && ride.departure - reach <= system.maxWaitMin ? [{ system, entry, exit }] : [];
       }),
     );
   });
@@ -279,13 +286,16 @@ export async function timetableDrafts({
     const ride = system.ride(entry, exit, reach);
     if (!ride) continue;
     const waitMin = ride.departure - reach;
-    if (waitMin > maxWaitMin) continue;
+    if (waitMin > system.maxWaitMin) continue;
+    const [firstRide, ...restRide] = ride.legs;
+    if (!firstRide) continue;
     const egressSec = egressLeg?.durationSec ?? 0;
     const durationSec = (ride.arrival - now) * 60 + egressSec;
     drafts.push({
       legs: [
         ...(accessLeg ? [toDraftLeg(accessLeg, entry.name, 'first')] : []),
-        ...ride.legs,
+        { ...firstRide, waitMin: Math.max(0, Math.round(waitMin)) },
+        ...restRide,
         ...(egressLeg ? [toDraftLeg(egressLeg, exit.name, 'last')] : []),
       ],
       durationSec,

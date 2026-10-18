@@ -43,6 +43,8 @@ export interface Leg {
   realtime?: boolean;
   /** Scheduled departure from `from`, "08:14" IST (timetable legs). */
   departure?: string;
+  /** Minutes waited for this (first) ride after reaching the platform (timetable legs). */
+  waitMin?: number;
   /** Line colour on the map (metro lines); `modeColors` otherwise. */
   lineColor?: string;
   /** `costInr` comes from a fare table not yet verified against the published chart ("~₹"). */
