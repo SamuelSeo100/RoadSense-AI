@@ -27,6 +27,14 @@ export const formatTransfers = (n: number) => (n === 0 ? 'Direct' : String(n));
 export const legMinutes = (leg: Pick<Leg, 'durationMin' | 'approximate'>) =>
   `${leg.approximate ? '~' : ''}${leg.durationMin}m`;
 
+/** "16:48" → "4:48 PM", "00:10" → "12:10 AM" (timetable departures are stored 24 h). */
+export function formatClock12(hhmm: string): string {
+  const m = /^(\d{1,2}):(\d{2})$/.exec(hhmm);
+  if (!m) return hhmm;
+  const h = Number(m[1]) % 24;
+  return `${h % 12 || 12}:${m[2]} ${h < 12 ? 'AM' : 'PM'}`;
+}
+
 const MODE_NAMES: Record<Mode, string> = {
   walk: 'Walk',
   metro: 'Metro',

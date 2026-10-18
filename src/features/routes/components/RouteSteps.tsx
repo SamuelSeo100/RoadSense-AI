@@ -4,7 +4,7 @@ import { Icon, modeIcon } from '@/components/routly/Icon';
 import { PressableBox } from '@/components/routly/PressableBox';
 import { PrimaryButton } from '@/components/routly/PrimaryButton';
 import { RText } from '@/components/routly/RText';
-import { legCost, legMinutes } from '@/components/routly/routeFormat';
+import { formatClock12, legCost, legMinutes } from '@/components/routly/routeFormat';
 import type { Leg, Route, WalkingRoute } from '@/services';
 import type { BookingTrip } from '@/services/bookings';
 import { colors, fonts, modeColors, radius } from '@/theme/routly';
@@ -91,10 +91,10 @@ export function RouteSteps({
               {leg.realtime === false && (
                 <View
                   style={styles.scheduled}
-                  accessibilityLabel={`Scheduled time, not live${leg.departure ? `. Departs ${leg.departure}` : ''}`}
+                  accessibilityLabel={`Scheduled time, not live${leg.departure ? `. Departs ${formatClock12(leg.departure)}` : ''}`}
                 >
                   <RText variant="small" color={colors.textSecondary}>
-                    Scheduled{leg.departure ? ` · dep ${leg.departure}` : ''}
+                    Scheduled{leg.departure ? ` · dep ${formatClock12(leg.departure)}` : ''}
                   </RText>
                 </View>
               )}
