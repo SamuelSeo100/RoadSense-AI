@@ -1,5 +1,5 @@
 import { LruCache } from '../lruCache';
-import type { DirectionsService, LatLng, SafetyService, WalkingRoute } from '../types';
+import type { DirectionsService, LatLng, LegStep, SafetyService, WalkingRoute } from '../types';
 import { isNight, pickSafest } from '../walkSafety';
 
 import { googleRequest } from './googleClient';
@@ -28,9 +28,35 @@ interface ComputeRoutesResponse {
     duration?: string;
     description?: string;
     warnings?: string[];
-    legs?: { steps?: { distanceMeters?: number; polyline?: { encodedPolyline?: string } }[] }[];
+    legs?: { steps?: GoogleNavStep[] }[];
     polyline?: { encodedPolyline?: string };
   }[];
+}
+
+/** A Routes API step with the fields navigation needs. */
+export interface GoogleNavStep {
+  distanceMeters?: number;
+  staticDuration?: string;
+  polyline?: { encodedPolyline?: string };
+  navigationInstruction?: { maneuver?: string; instructions?: string };
+}
+
+/** Google's turn-by-turn steps (only those with text and geometry). */
+export function legSteps(steps: GoogleNavStep[] | undefined): LegStep[] {
+  return (steps ?? []).flatMap((st) => {
+    const text = st.navigationInstruction?.instructions?.trim();
+    const encoded = st.polyline?.encodedPolyline;
+    if (!text || !encoded) return [];
+    return [
+      {
+        instruction: text.replace(/\s*\n\s*/g, '. '),
+        maneuver: st.navigationInstruction?.maneuver,
+        distanceM: st.distanceMeters ?? 0,
+        durationSec: Number.parseInt(st.staticDuration ?? '0', 10) || 0,
+        polyline: decodePolyline(encoded),
+      },
+    ];
+  });
 }
 
 /** ~1 m precision: repeated requests for the same trip hit the cache. */
@@ -102,7 +128,7 @@ export function createGoogleDirectionsService(safety: SafetyService): Directions
         {
           signal,
           fieldMask:
-            'routes.distanceMeters,routes.duration,routes.description,routes.warnings,routes.legs.steps.distanceMeters,routes.legs.steps.polyline.encodedPolyline,routes.polyline.encodedPolyline',
+            'routes.distanceMeters,routes.duration,routes.description,routes.warnings,routes.legs.steps.distanceMeters,routes.legs.steps.staticDuration,routes.legs.steps.navigationInstruction,routes.legs.steps.polyline.encodedPolyline,routes.polyline.encodedPolyline',
           body: {
             origin: waypoint(from),
             destination: waypoint(to),
@@ -146,6 +172,7 @@ export function createGoogleDirectionsService(safety: SafetyService): Directions
       path: stepPath(best.route),
       via: best.via,
       warnings: best.warnings,
+      steps: (best.route.legs ?? []).flatMap((l) => legSteps(l.steps)),
       safety: { night, extraSec, notes },
     };
     cache.set(key, route);

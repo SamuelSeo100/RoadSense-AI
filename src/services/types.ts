@@ -24,6 +24,17 @@ export interface Place {
   location: LatLng;
 }
 
+/** One Google step inside a walk / road leg: turn-by-turn text and its geometry. */
+export interface LegStep {
+  /** Google's `navigationInstruction.instructions` ("Turn left onto FC Road"). */
+  instruction: string;
+  /** Google's maneuver ("TURN_LEFT", "DEPART"…), when given. */
+  maneuver?: string;
+  distanceM: number;
+  durationSec: number;
+  polyline: LatLng[];
+}
+
 export interface Leg {
   mode: Mode;
   /** "Walk 5m", "Metro", "Bus 312", "Auto 12m" */
@@ -43,6 +54,12 @@ export interface Leg {
   realtime?: boolean;
   /** Scheduled departure from `from`, "08:14" IST (timetable legs). */
   departure?: string;
+  /** Scheduled (timetable) or Google's departure from `from`, ISO 8601. */
+  departureAt?: string;
+  /** Transit legs: where the vehicle is heading ("Swargate", "Lonavala"). */
+  headsign?: string;
+  /** Walk / road legs: Google's turn-by-turn steps, when the response had them. */
+  steps?: LegStep[];
   /** Minutes waited for this (first) ride after reaching the platform (timetable legs). */
   waitMin?: number;
   /** Line colour on the map (metro lines); `modeColors` otherwise. */
@@ -367,6 +384,8 @@ export interface WalkingRoute {
   via?: string;
   /** Provider warnings, e.g. "This route may be missing sidewalks". */
   warnings: string[];
+  /** Turn-by-turn steps of the chosen route (navigation). */
+  steps?: LegStep[];
   safety: {
     /** Picked with night-time rules (20:00–06:00 local). */
     night: boolean;

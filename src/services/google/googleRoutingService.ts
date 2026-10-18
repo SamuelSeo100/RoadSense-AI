@@ -17,6 +17,7 @@ import {
   type DirectionsService,
   type LatLng,
   type Leg,
+  type LegStep,
   type Place,
   type PreferencesService,
   type Priority,
@@ -34,7 +35,7 @@ import {
 import { isNight } from '../walkSafety';
 
 import { googleCallCount, googleRequest } from './googleClient';
-import { stepPath } from './googleDirectionsService';
+import { legSteps, stepPath, type GoogleNavStep } from './googleDirectionsService';
 import { decodePolyline } from './polyline';
 
 /** Tunables for building route options (fares live in fares.ts, weights in scoring.ts). */
@@ -74,6 +75,7 @@ const TRANSIT_MASK = [
   'routes.legs.steps.travelMode',
   'routes.legs.steps.distanceMeters',
   'routes.legs.steps.staticDuration',
+  'routes.legs.steps.navigationInstruction',
   'routes.legs.steps.polyline.encodedPolyline',
   'routes.legs.steps.startLocation.latLng',
   'routes.legs.steps.endLocation.latLng',
@@ -87,18 +89,15 @@ const TRANSIT_MASK = [
 // The overview polyline is kept only for traffic (speed intervals index into it);
 // the drawn path comes from the step polylines.
 const ROAD_MASK =
-  'routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline,routes.legs.steps.polyline.encodedPolyline,routes.travelAdvisory.speedReadingIntervals';
+  'routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline,routes.legs.steps.distanceMeters,routes.legs.steps.staticDuration,routes.legs.steps.navigationInstruction,routes.legs.steps.polyline.encodedPolyline,routes.travelAdvisory.speedReadingIntervals';
 /** Auto to / from a timetable station: time, distance and street geometry only. */
 const ACCESS_MASK =
   'routes.duration,routes.distanceMeters,routes.legs.steps.polyline.encodedPolyline';
 
 // ---- Routes API response shapes (only the masked fields) ----
 
-interface GStep {
+interface GStep extends GoogleNavStep {
   travelMode?: string;
-  distanceMeters?: number;
-  staticDuration?: string;
-  polyline?: { encodedPolyline?: string };
   startLocation?: { latLng?: LatLng };
   endLocation?: { latLng?: LatLng };
   transitDetails?: {
@@ -127,7 +126,7 @@ interface RoadResponse {
     duration?: string;
     distanceMeters?: number;
     polyline?: { encodedPolyline?: string };
-    legs?: { steps?: { polyline?: { encodedPolyline?: string } }[] }[];
+    legs?: { steps?: GoogleNavStep[] }[];
     travelAdvisory?: {
       speedReadingIntervals?: {
         startPolylinePointIndex?: number;
@@ -163,6 +162,11 @@ export interface DraftLeg {
   departure?: string;
   /** Minutes waited at the platform before this (first) ride, timetable options. */
   waitMin?: number;
+  /** ISO departure (Google's stopDetails, or the timetable time on the trip date). */
+  departureAt?: string;
+  headsign?: string;
+  /** Walk / road legs: Google's turn-by-turn steps. */
+  steps?: LegStep[];
 }
 
 export interface Draft {
@@ -251,6 +255,7 @@ function mergeWalks(legs: DraftLeg[]): DraftLeg[] {
         distanceM: prev.distanceM + leg.distanceM,
         path: [...prev.path, ...leg.path],
         approximate: prev.approximate || leg.approximate,
+        steps: [...(prev.steps ?? []), ...(leg.steps ?? [])],
       };
     } else {
       out.push(leg);
@@ -275,6 +280,7 @@ function parseTransit(res: TransitResponse, at: Date): Draft[] {
           distanceM: step.distanceMeters ?? 0,
           path: decode(step.polyline?.encodedPolyline),
           approximate: false,
+          steps: legSteps([step]),
         };
       }
       const mode = transitModeOf(details.transitLine?.vehicle?.type);
@@ -293,6 +299,8 @@ function parseTransit(res: TransitResponse, at: Date): Draft[] {
         stops: details.stopCount,
         fromStop: details.stopDetails?.departureStop?.name,
         toStop: details.stopDetails?.arrivalStop?.name,
+        headsign: details.headsign,
+        departureAt: Number.isFinite(dep) ? new Date(dep).toISOString() : undefined,
       };
     });
     if (!legs.some(isTransit)) return [];
@@ -492,6 +500,9 @@ function transitToRoute(
       to: l.toStop,
       realtime: l.realtime,
       departure: l.departure,
+      departureAt: l.departureAt,
+      headsign: l.headsign,
+      steps: l.steps?.length ? l.steps : undefined,
       waitMin: l.waitMin,
       lineColor: l.lineColor,
       // A timetable leg with no fare from our tables fell back to the fares.ts estimate.
@@ -531,6 +542,7 @@ interface RoadInfo {
   distanceKm: number;
   path: LatLng[];
   traffic: TrafficLevel;
+  steps: LegStep[];
 }
 
 function parseRoad(res: RoadResponse): RoadInfo | null {
@@ -548,6 +560,7 @@ function parseRoad(res: RoadResponse): RoadInfo | null {
     distanceKm: (r.distanceMeters ?? 0) / 1000,
     path,
     traffic: trafficLevel(intervals, segmentsKm(overview)),
+    steps: (r.legs ?? []).flatMap((l) => legSteps(l.steps)),
   };
 }
 
@@ -579,6 +592,7 @@ function roadRoute(
         costInr,
         polyline: road.path,
         distanceKm: Math.round(road.distanceKm * 10) / 10,
+        steps: road.steps.length ? road.steps : undefined,
       },
     ],
     meta: metaOf(base, extraMeta),
@@ -609,6 +623,7 @@ function walkRoute(walk: WalkingRoute): Omit<Route, 'score'> {
         costInr: 0,
         polyline: walk.path,
         distanceKm: base.walkingKm,
+        steps: walk.steps?.length ? walk.steps : undefined,
       },
     ],
     meta: metaOf(base),
@@ -662,6 +677,7 @@ export function createGoogleRoutingService(deps: {
           distanceM: w.distanceMeters,
           path: w.path,
           approximate: false,
+          steps: w.steps,
         };
       } else {
         const res = await computeRoutes<RoadResponse>(

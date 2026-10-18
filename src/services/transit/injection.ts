@@ -1,5 +1,5 @@
 import type { Draft, DraftLeg } from '../google/googleRoutingService';
-import type { LatLng, Route } from '../types';
+import type { LatLng, LegStep, Route } from '../types';
 
 import { metroRide, type MetroRide } from './metro';
 import {
@@ -44,6 +44,8 @@ export interface AccessLeg {
   distanceM: number;
   path: LatLng[];
   approximate: boolean;
+  /** Walks: Google's turn-by-turn steps. */
+  steps?: LegStep[];
 }
 
 /** Null when Google has no route (that station is then skipped). */
@@ -80,7 +82,18 @@ function pathAlong(
   return slice.map(pointFor).filter((p): p is LatLng => p !== null);
 }
 
-function metroLegs(ride: MetroRide, network: MetroNetwork): DraftLeg[] {
+/** Minutes after the query day's IST midnight → ISO time. */
+type IsoAt = (min: number) => string;
+
+/** The line's end station in the direction from → to (the train's destination board). */
+function headsignOf(line: MetroLine, from: string, to: string, network: MetroNetwork) {
+  const a = line.stations.indexOf(from);
+  const b = line.stations.indexOf(to);
+  const end = b >= a ? line.stations[line.stations.length - 1] : line.stations[0];
+  return end ? (metroStation(network, end)?.name ?? end) : undefined;
+}
+
+function metroLegs(ride: MetroRide, network: MetroNetwork, isoAt: IsoAt): DraftLeg[] {
   const out: DraftLeg[] = [];
   const nameOf = (code: string) => metroStation(network, code)?.name ?? code;
   const pointFor = (code: string) => pointOf(metroStation(network, code));
@@ -111,6 +124,8 @@ function metroLegs(ride: MetroRide, network: MetroNetwork): DraftLeg[] {
       realtime: false,
       lineColor: leg.line.color,
       departure: formatHHMM(leg.departure),
+      departureAt: isoAt(leg.departure),
+      headsign: headsignOf(leg.line, leg.from, leg.to, network),
     });
   });
   return out;
@@ -121,6 +136,7 @@ function trainLeg(
   from: string,
   to: string,
   network: SuburbanNetwork,
+  isoAt: IsoAt,
 ): DraftLeg {
   const station = (code: string) => network.stations.find((s) => s.code === code);
   const codes = network.stations.map((s) => s.code);
@@ -139,6 +155,8 @@ function trainLeg(
     fareEstimated: !(dep.fare?.verified ?? false),
     realtime: false,
     departure: formatHHMM(dep.departure),
+    departureAt: isoAt(dep.departure),
+    headsign: station(dep.terminus)?.name ?? dep.terminus,
   };
 }
 
@@ -198,6 +216,8 @@ export async function timetableDrafts({
 }): Promise<Draft[]> {
   const now = istMinutes(at);
   const weekday = istWeekday(at);
+  const midnight = at.getTime() - now * 60_000;
+  const isoAt: IsoAt = (min) => new Date(midnight + min * 60_000).toISOString();
   const systems: System[] = [
     {
       maxKm: injectionConfig.maxStationKm.metro,
@@ -207,7 +227,7 @@ export async function timetableDrafts({
         const r = metroRide(entry.code, exit.code, time, metro);
         const first = r?.legs[0];
         return r && first
-          ? { departure: first.departure, arrival: r.arrival, legs: metroLegs(r, metro) }
+          ? { departure: first.departure, arrival: r.arrival, legs: metroLegs(r, metro, isoAt) }
           : null;
       },
     },
@@ -222,7 +242,7 @@ export async function timetableDrafts({
           ? {
               departure: dep.departure,
               arrival: dep.arrival,
-              legs: [trainLeg(dep, entry.code, exit.code, suburban)],
+              legs: [trainLeg(dep, entry.code, exit.code, suburban, isoAt)],
             }
           : null;
       },
