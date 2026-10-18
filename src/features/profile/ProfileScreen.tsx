@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Alert, Pressable, StyleSheet, View } from 'react-native';
 
 import { Icon } from '@/components/routly/Icon';
 import { RText } from '@/components/routly/RText';
+import { Switch } from '@/components/routly/Switch';
 import { SectionHeader } from '@/components/routly/SectionHeader';
 import { cityInfo } from '@/constants/cities';
 import { authService } from '@/features/auth/auth.service';
@@ -16,6 +17,7 @@ import { usePreferencesStore } from '@/store/preferencesStore';
 import { useRoutlyPrefs } from '@/store/routlyPrefsStore';
 import { colors, fonts, radius } from '@/theme/routly';
 
+import { useResearchConsent } from '../navigation/researchConsent';
 import { placeIcon } from '../places/placeIcon';
 import { SavedPlacePicker, type PickerTarget } from '../places/SavedPlacePicker';
 import { isFixedLabel, MAX_CUSTOM_PLACES, useSavedPlaces } from '../places/savedPlaces';
@@ -45,6 +47,19 @@ export function ProfileScreen() {
   const savedPlaces = useSavedPlaces();
   const [picker, setPicker] = useState<PickerTarget | null>(null);
   const customCount = savedPlaces.filter((p) => !isFixedLabel(p.label)).length;
+  const researchConsent = useResearchConsent((s) => s.consent);
+  const loadConsent = useResearchConsent((s) => s.load);
+  useEffect(() => {
+    void loadConsent();
+  }, [loadConsent]);
+
+  // TODO(onboarding): the proper consent screen replaces this toggle.
+  const setResearchConsent = (consent: boolean) =>
+    useResearchConsent
+      .getState()
+      .set(consent)
+      .then(() => showToast(consent ? 'Thanks: trip GPS will be shared' : 'Trip GPS sharing off'))
+      .catch(() => showToast('Couldn’t save that. Check your connection.'));
 
   useTopBar('profile', {
     title: 'Profile',
@@ -253,6 +268,19 @@ export function ProfileScreen() {
         <GroupedList>
           <ListRow minHeight={52} onPress={comingSoon('Notification settings')}>
             <RText variant="body">Notifications</RText>
+          </ListRow>
+          <ListRow minHeight={64}>
+            <View style={[styles.flex, styles.version]}>
+              <RText variant="body">Share trip GPS for research</RText>
+              <RText variant="caption" size={12}>
+                Route traces of navigated trips (every 15 s) help improve timings. Off by default.
+              </RText>
+            </View>
+            <Switch
+              value={researchConsent}
+              onValueChange={setResearchConsent}
+              accessibilityLabel="Share trip GPS for research"
+            />
           </ListRow>
           <ListRow
             minHeight={52}

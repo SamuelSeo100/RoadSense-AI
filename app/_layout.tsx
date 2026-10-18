@@ -83,6 +83,8 @@ function RootLayout() {
       >
         <Stack.Protected guard={signedIn}>
           <Stack.Screen name="(app)" />
+          {/* Turn-by-turn, full screen over the map shell; back = "End trip?" */}
+          <Stack.Screen name="navigate" options={{ gestureEnabled: false }} />
         </Stack.Protected>
         <Stack.Protected guard={!signedIn}>
           <Stack.Screen name="(auth)" />

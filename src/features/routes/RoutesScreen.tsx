@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Keyboard, Pressable, StyleSheet, View, type TextInput } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
@@ -11,6 +12,7 @@ import { useRoutlyPrefs } from '@/store/routlyPrefsStore';
 import { colors, fonts, radius } from '@/theme/routly';
 
 import { useRouteGeometry } from '../map/legGeometry';
+import { useNavigationStore } from '../navigation/navigationStore';
 import { useMapStore, type MapContent } from '../map/mapStore';
 import { SheetScrollView } from '../shell/SheetScrollView';
 import { SHEET_FULL, SHEET_PEEK, showToast } from '../shell/shellStore';
@@ -114,17 +116,24 @@ export function RoutesScreen() {
     logChoice(ready.requestId, route, priority, 'start');
     // The cab estimate for the same trip, for "saved vs cab" in History.
     const cab = ready.routes.find((r) => r.mapKey === 'cab' && !r.vehicle);
-    startTrip({
+    const at = new Date();
+    const tripId = startTrip({
       requestId: ready.requestId,
-      at: new Date(),
+      at,
       from: fromLabel === 'Your location' ? (area ?? 'Current location') : fromLabel,
       to: to.name,
       route,
       cabEquivalentInr: cab?.costInr ?? null,
     });
-    // TODO(navigation): turn-by-turn guidance (Phase 2). Until then "I'm
-    // taking this" only records the choice and the trip.
-    showToast('Saved to History. Turn-by-turn navigation is coming soon.');
+    // Navigate the route as drawn (estimated legs replaced by real geometry once loaded).
+    useNavigationStore.getState().begin({
+      route: { ...route, legs: route.id === selected?.id ? selectedLegs : route.legs },
+      destination: to,
+      tripId,
+      priority,
+      startedAt: at.getTime(),
+    });
+    router.push('/navigate');
   };
 
   const priorityLabel = priorityLabels[priority];

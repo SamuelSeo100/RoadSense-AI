@@ -156,12 +156,7 @@ export function RouteSteps({
         <RText variant="small">Scheduled: from the timetable, not live train positions.</RText>
       )}
 
-      <PrimaryButton
-        label="I’m taking this"
-        trailingIcon="arrow-right"
-        height={48}
-        onPress={onStart}
-      />
+      <PrimaryButton label="Start" trailingIcon="arrow-right" height={48} onPress={onStart} />
     </View>
   );
 }
