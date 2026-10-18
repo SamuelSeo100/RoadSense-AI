@@ -62,6 +62,14 @@ export function nameFromGeocode(res: GeocodeResponse): ReverseGeocodeResult {
   return { name, placeId: (base ?? results[0])?.placeId ?? null };
 }
 
+/**
+ * User-made Maps listings that describe a route, not a place ("PCMC to
+ * Swargate Metro route", "Nigdi - Katraj bus line"): their pin is an arbitrary
+ * point along the line, so they're useless as a destination.
+ */
+export const isRouteListing = (name: string) =>
+  /\S\s+(to|→|-|–)\s+\S.*\b(route|line)$/i.test(name.trim());
+
 /** Bias results to ~30 km around the user (city-scale). */
 const BIAS_RADIUS_M = 30000;
 
@@ -96,7 +104,7 @@ export function createGooglePlacesService(): PlacesService {
         },
       );
       const suggestions = (res.suggestions ?? []).flatMap(({ placePrediction: p }) =>
-        p
+        p && !isRouteListing(p.structuredFormat?.mainText?.text ?? p.text?.text ?? '')
           ? [
               {
                 placeId: p.placeId,
