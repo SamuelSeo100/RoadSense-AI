@@ -1,5 +1,8 @@
 {
   "name": "routly-eval",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "tsx": "^4.23.15"
+  }
 }
