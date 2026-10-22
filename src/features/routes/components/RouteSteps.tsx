@@ -4,11 +4,13 @@ import { Icon, modeIcon } from '@/components/routly/Icon';
 import { PressableBox } from '@/components/routly/PressableBox';
 import { PrimaryButton } from '@/components/routly/PrimaryButton';
 import { RText } from '@/components/routly/RText';
+import { Switch } from '@/components/routly/Switch';
 import { formatClock12, legCost, legMinutes } from '@/components/routly/routeFormat';
 import type { Leg, Route, WalkingRoute } from '@/services';
 import type { BookingTrip } from '@/services/bookings';
 import { colors, fonts, modeColors, radius } from '@/theme/routly';
 
+import { simulationAvailable, useSimulateToggle } from '../../navigation/navigationStore';
 import { book, type BookingKind } from '../../trip/booking';
 
 import { BusEtaInfo, BusLegMinutes } from './BusEtaInfo';
@@ -65,6 +67,8 @@ export function RouteSteps({
   onStart,
 }: RouteStepsProps) {
   const isWalkOnly = route.legs.every((l) => l.mode === 'walk');
+  const simulate = useSimulateToggle((s) => s.on);
+  const setSimulate = useSimulateToggle((s) => s.set);
   return (
     <View style={styles.wrap}>
       {route.legs.map((leg, i) => {
@@ -163,7 +167,28 @@ export function RouteSteps({
         <RText variant="small">Scheduled: from the timetable, not live train positions.</RText>
       )}
 
-      <PrimaryButton label="Start" trailingIcon="arrow-right" height={48} onPress={onStart} />
+      {simulationAvailable && (
+        <View style={styles.simulate}>
+          <View style={styles.middle}>
+            <RText variant="body" size={13} family={fonts.extrabold}>
+              Simulate trip
+            </RText>
+            <RText variant="small">Demo: replays the route as fake GPS. Nothing is logged.</RText>
+          </View>
+          <Switch
+            value={simulate}
+            onValueChange={setSimulate}
+            accessibilityLabel="Simulate trip (demo, nothing logged)"
+          />
+        </View>
+      )}
+
+      <PrimaryButton
+        label={simulate ? 'Start simulation' : 'Start'}
+        trailingIcon="arrow-right"
+        height={48}
+        onPress={onStart}
+      />
     </View>
   );
 }
@@ -192,6 +217,7 @@ const styles = StyleSheet.create({
   },
   actionPressed: { backgroundColor: colors.primaryTint },
   notes: { gap: 4 },
+  simulate: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   scheduled: {
     alignSelf: 'flex-start',
     marginTop: 2,

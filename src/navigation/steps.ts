@@ -3,6 +3,7 @@
  * legs split into Google's turn-by-turn steps) and our timetable metro /
  * local-train legs, whose instructions we write ourselves.
  */
+import { busLegOf, type BusLeg } from '@/services/busEta';
 import type { LatLng, Leg, Mode, Route, RouteDataSource } from '@/services/types';
 import { modeColors } from '@/theme/routly';
 
@@ -28,6 +29,8 @@ export interface NavStep {
   legMode: Mode;
   /** Google's maneuver for this step ("TURN_LEFT"), when known. */
   maneuver?: string;
+  /** The user's own car / bike (off-route applies; not to a hired auto or cab). */
+  ownVehicle?: boolean;
   transit?: {
     mode: 'metro' | 'train' | 'bus';
     line: string;
@@ -40,6 +43,8 @@ export interface NavStep {
     stopCount: number;
     /** Board stop … alight stop, when known (timetable legs): "get off at next stop" alerts. */
     stopsLatLng?: LatLng[];
+    /** Google bus legs: what the bus ETA needs (busEta.ts). */
+    bus?: BusLeg;
   };
 }
 
@@ -111,6 +116,7 @@ export function routeToSteps(
       legIndex: i,
       legMode: leg.mode,
       source,
+      ...(route.vehicle && leg.mode !== 'walk' ? { ownVehicle: true } : {}),
     };
     const id = (n: number) => `${route.id}:${i}:${n}`;
 
@@ -143,6 +149,7 @@ export function routeToSteps(
           scheduledDep: leg.departureAt,
           stopCount,
           stopsLatLng,
+          bus: busLegOf(leg) ?? undefined,
         },
       });
       return;

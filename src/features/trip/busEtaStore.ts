@@ -69,6 +69,13 @@ export function useDurationRanges(
   }, [routes, factors]);
 }
 
+/** A navigated bus leg's ETA (schedule-only until its traffic factor is in). */
+export function useBusLegEta(bus: BusLeg | undefined): BusEta | null {
+  const key = bus ? busLegKey(bus) : null;
+  const factor = useBusEtaStore((s) => (key === null ? null : (s.factors[key] ?? null)));
+  return useMemo(() => (bus ? estimateBusLeg(bus, factor) : null), [bus, factor]);
+}
+
 /** The leg's ETA, updating when its traffic call returns; null for non-bus legs. */
 export function useBusEta(leg: Leg): { eta: BusEta; pending: boolean } | null {
   const bus = useMemo(() => busLegOf(leg), [leg]);

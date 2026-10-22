@@ -47,41 +47,87 @@ describe('step advance', () => {
   });
 });
 
+describe('off route near stations', () => {
+  it('not while walking out of the station the ride ended at', () => {
+    const engine = new NavigationEngine(
+      [
+        step({
+          kind: 'transit',
+          legMode: 'train',
+          polyline: [at(-5000), at(0)],
+          transit: { mode: 'train', line: 'local', boardStop: 'A', alightStop: 'B', stopCount: 3 },
+        }),
+        // Google's walk starts 250 m from our station coordinate.
+        step({ legIndex: 1, polyline: [at(250, 0), at(250, 600)], distanceM: 600 }),
+      ],
+      at(250, 600),
+    );
+    engine.start(0);
+    engine.skipLeg(0);
+    for (let t = 1; t <= 60; t += 5)
+      expect(types(engine.update(fix(at(t * 2, 20), t)))).not.toContain('offRoute');
+    expect(engine.offRouteCount).toBe(0);
+  });
+});
+
 describe('off route', () => {
   const walk = () =>
     new NavigationEngine([step({ polyline: [at(0), at(1000)], distanceM: 1000 })], at(1000));
 
-  it('fires after 15 s continuously more than 50 m from a walk', () => {
+  it('fires after 20 s continuously more than 60 m from a walk, without rerouting', () => {
     const engine = walk();
     engine.start(0);
-    expect(engine.update(fix(at(100, 80), 0))).toEqual([]);
-    expect(engine.update(fix(at(120, 80), 10))).toEqual([]);
-    expect(types(engine.update(fix(at(140, 80), 15)))).toEqual(['offRoute', 'reroute']);
+    expect(engine.update(fix(at(100, 55), 0))).toEqual([]); // 55 m: within 60
+    expect(engine.update(fix(at(100, 80), 1))).toEqual([]);
+    expect(engine.update(fix(at(120, 80), 15))).toEqual([]);
+    expect(types(engine.update(fix(at(140, 80), 21)))).toEqual(['offRoute']);
+    expect(engine.offRoute).toBe(true);
     expect(engine.offRouteCount).toBe(1);
-    // Still off: no repeat.
-    expect(engine.update(fix(at(160, 80), 20))).toEqual([]);
+    // Still off: no repeat, and never a reroute on its own.
+    expect(engine.update(fix(at(160, 80), 60))).toEqual([]);
+    expect(engine.rerouteCount).toBe(0);
   });
 
-  it('starts the 15 s again after coming back', () => {
+  it('starts the 20 s again after coming back', () => {
     const engine = walk();
     engine.start(0);
     engine.update(fix(at(100, 80), 0));
     engine.update(fix(at(110, 10), 10)); // back on the path
+    expect(engine.offRoute).toBe(false);
     expect(engine.update(fix(at(120, 80), 14))).toEqual([]);
-    expect(engine.update(fix(at(130, 80), 25))).toEqual([]);
-    expect(types(engine.update(fix(at(140, 80), 29)))).toContain('offRoute');
+    expect(engine.update(fix(at(130, 80), 30))).toEqual([]);
+    expect(types(engine.update(fix(at(140, 80), 34)))).toContain('offRoute');
   });
 
-  it('allows 100 m on road steps', () => {
+  it('allows 100 m on own-vehicle road steps', () => {
     const engine = new NavigationEngine(
-      [step({ kind: 'drive', legMode: 'auto', polyline: [at(0), at(3000)], distanceM: 3000 })],
+      [
+        step({
+          kind: 'drive',
+          legMode: 'cab',
+          ownVehicle: true,
+          polyline: [at(0), at(3000)],
+          distanceM: 3000,
+        }),
+      ],
       at(3000),
     );
     engine.start(0);
     for (let t = 0; t <= 60; t += 5)
       expect(engine.update(fix(at(100 + t * 10, 80), t))).toEqual([]);
     expect(types(engine.update(fix(at(800, 130), 65)))).toEqual([]);
-    expect(types(engine.update(fix(at(850, 130), 80)))).toContain('offRoute');
+    expect(types(engine.update(fix(at(850, 130), 85)))).toContain('offRoute');
+  });
+
+  it('never fires in a hired auto or cab (the driver picks the way)', () => {
+    const engine = new NavigationEngine(
+      [step({ kind: 'drive', legMode: 'auto', polyline: [at(0), at(3000)], distanceM: 3000 })],
+      at(3000),
+    );
+    engine.start(0);
+    for (let t = 0; t <= 120; t += 5)
+      expect(engine.update(fix(at(100 + t * 5, 400), t))).toEqual([]);
+    expect(engine.offRouteCount).toBe(0);
   });
 
   it('never fires during a ride', () => {
@@ -145,31 +191,52 @@ describe('rides', () => {
     expect(engine.history[0]?.boardedAt).toBe(120_000);
   });
 
-  it('says "get off at the next stop" once past the stop before', () => {
+  it('says "get off soon" 900 m out on a metro, not at the station before', () => {
     const engine = ride(true);
     engine.start(0);
     engine.update(fix(at(50), 10, { speed: 8 }));
-    expect(types(engine.update(fix(at(1500), 100, { speed: 10 })))).toEqual([]);
-    expect(engine.update(fix(at(1920), 150, { speed: 10 }))).toMatchObject([
+    expect(types(engine.update(fix(at(2050), 150, { speed: 10 })))).toEqual([]); // past the one before
+    expect(engine.update(fix(at(2150), 160, { speed: 10 }))).toMatchObject([
       { type: 'alightSoon', stop: 'Swargate' },
     ]);
     expect(engine.update(fix(at(2300), 180, { speed: 10 }))).toEqual([]); // once
   });
 
-  it('uses 600 m before the end when the stops are unknown', () => {
-    const engine = ride(false);
+  it('arriving from the vehicle records the alight time', () => {
+    const engine = new NavigationEngine(
+      [
+        step({
+          kind: 'transit',
+          legMode: 'bus',
+          polyline: [at(0), at(3000)],
+          transit: { mode: 'bus', line: 'Bus 94', boardStop: 'A', alightStop: 'B', stopCount: 9 },
+        }),
+        step({ legIndex: 1, polyline: [at(3000), at(2900, 30)], distanceM: 110 }),
+      ],
+      at(2900, 30),
+    );
     engine.start(0);
     engine.update(fix(at(50), 10, { speed: 8 }));
-    expect(engine.update(fix(at(2300), 150, { speed: 10 }))).toEqual([]); // 700 m
-    expect(types(engine.update(fix(at(2420), 160, { speed: 10 })))).toEqual(['alightSoon']);
+    expect(types(engine.update(fix(at(2900), 300, { speed: 6 })))).toContain('arrived');
+    expect(engine.history[0]).toMatchObject({ alightedAt: 300_000, endedAt: 300_000 });
   });
 
-  it('ends the ride near the alighting station and starts the walk', () => {
+  it('ends the ride once near the alighting stop and moving away; alight time = closest', () => {
     const engine = ride(true);
     engine.start(0);
     engine.update(fix(at(50), 10, { speed: 8 }));
-    expect(types(engine.update(fix(at(2900), 300, { speed: 2 })))).toEqual(['stepStart']);
+    expect(types(engine.update(fix(at(2900), 300, { speed: 5 })))).not.toContain('stepStart');
+    engine.update(fix(at(2995), 320, { speed: 0 })); // at the stop (closest)
+    expect(engine.current?.kind).toBe('transit');
+    expect(engine.update(fix(at(3000, 20), 340, { speed: 1 }))).toEqual([]); // 20 m away
+    expect(types(engine.update(fix(at(3000, 45), 360, { speed: 1 })))).toEqual(['stepStart']);
     expect(engine.current?.kind).toBe('walk');
+    expect(engine.history[0]).toMatchObject({
+      boardedAt: 10_000,
+      alightedAt: 320_000,
+      endedAt: 320_000,
+    });
+    expect(engine.history[1]?.startedAt).toBe(360_000);
   });
 
   it('includes the wait for a scheduled departure in the arrival time', () => {
@@ -198,27 +265,28 @@ describe('rides', () => {
   });
 });
 
-describe('reroute rate limit', () => {
-  it('asks at most once per 30 s, and counts the reroutes applied', () => {
+describe('reroute on request', () => {
+  it('only when asked, at most once per 30 s, from the last fix', () => {
     const line = () => [step({ polyline: [at(0), at(2000)], distanceM: 2000 })];
     const engine = new NavigationEngine(line(), at(2000));
     engine.start(0);
+    expect(engine.requestReroute(0)).toBeNull(); // no fix yet
     engine.update(fix(at(100, 80), 0));
-    expect(types(engine.update(fix(at(100, 80), 15)))).toEqual(['offRoute', 'reroute']);
-    // The route call failed: retry allowed, but not before 30 s after the last ask.
-    engine.rerouteFailed();
-    expect(engine.update(fix(at(100, 80), 30))).toEqual([]);
-    expect(types(engine.update(fix(at(100, 80), 45)))).toEqual(['reroute']);
+    expect(types(engine.update(fix(at(100, 80), 20)))).toEqual(['offRoute']);
+    expect(engine.requestReroute(20_000)).toEqual(at(100, 80));
+    // The route call failed: allowed again 30 s after the last ask.
+    expect(engine.canReroute(40_000)).toBe(false);
+    expect(engine.requestReroute(40_000)).toBeNull();
+    expect(engine.requestReroute(50_000)).not.toBeNull();
     expect(engine.rerouteCount).toBe(0);
 
-    // New route still misses us: off-route again after 15 s, reroute only once 30 s have passed.
-    expect(types(engine.replaceSteps(line(), 46_000))).toEqual(['stepStart']);
+    expect(types(engine.replaceSteps(line(), 51_000))).toEqual(['stepStart']);
     expect(engine.rerouteCount).toBe(1);
-    engine.update(fix(at(100, 80), 47));
-    expect(types(engine.update(fix(at(100, 80), 62)))).toEqual(['offRoute']);
-    expect(types(engine.update(fix(at(100, 80), 75)))).toEqual(['reroute']);
+    expect(engine.offRoute).toBe(false);
+    engine.update(fix(at(100, 80), 52));
+    expect(types(engine.update(fix(at(100, 80), 72)))).toEqual(['offRoute']);
     expect(engine.offRouteCount).toBe(2);
-    expect(engine.history[0]).toMatchObject({ version: 0, interrupted: true, endedAt: 46_000 });
+    expect(engine.history[0]).toMatchObject({ version: 0, interrupted: true, endedAt: 51_000 });
   });
 });
 
@@ -235,35 +303,25 @@ describe('off route: accuracy and reroute cap', () => {
     // A poor fix neither starts nor clears an episode.
     engine.update(fix(at(200, 80), 70, { accuracy: 20 }));
     engine.update(fix(at(200, 10), 78, { accuracy: 80 })); // "back on route", but untrusted
-    expect(types(engine.update(fix(at(210, 80), 85, { accuracy: 50 })))).toEqual([
-      'offRoute',
-      'reroute',
-    ]);
+    expect(types(engine.update(fix(at(210, 80), 90, { accuracy: 50 })))).toEqual(['offRoute']);
   });
 
   it('computes at most 5 reroutes per trip, then only reports off route', () => {
     const engine = walk();
     engine.start(0);
     const reroutes: number[] = [];
-    // Seven off-route episodes, 40 s apart, back on the route in between.
+    // Seven off-route episodes, 40 s apart, back on the route in between; asked every time.
     for (let n = 0; n < 7; n++) {
       const t0 = n * 40;
       engine.update(fix(at(100, 0), t0 - 1));
       engine.update(fix(at(100, 80), t0));
-      const events = engine.update(fix(at(100, 80), t0 + 15));
-      expect(types(events)[0]).toBe('offRoute');
-      if (types(events).includes('reroute')) {
-        reroutes.push(n);
-        engine.rerouteFailed();
-      }
+      expect(types(engine.update(fix(at(100, 80), t0 + 20)))).toEqual(['offRoute']);
+      if (engine.requestReroute((t0 + 20) * 1000)) reroutes.push(n);
     }
     expect(reroutes).toEqual([0, 1, 2, 3, 4]);
     expect(engine.rerouteLimitReached).toBe(true);
+    expect(engine.canReroute(1_000_000)).toBe(false);
     expect(engine.offRouteCount).toBe(7);
-    // Still off for minutes: no more requests.
-    for (let t = 300; t <= 400; t += 10) {
-      expect(types(engine.update(fix(at(100, 80), t)))).not.toContain('reroute');
-    }
   });
 });
 
@@ -282,5 +340,118 @@ describe('arrival', () => {
     expect(engine.status).toBe('arrived');
     expect(engine.update(fix(at(1000), 80))).toEqual([]);
     expect(engine.history[engine.history.length - 1]?.endedAt).toBe(70_000);
+  });
+});
+
+describe('leg progression', () => {
+  it('ends a walk leg within 40 m of its end (20 m between its own steps)', () => {
+    const engine = new NavigationEngine(
+      [
+        step({ legIndex: 0, polyline: [at(0), at(300)], distanceM: 300 }),
+        step({ legIndex: 0, polyline: [at(300), at(600)], distanceM: 300 }),
+        step({ legIndex: 1, legMode: 'auto', kind: 'drive', polyline: [at(600), at(3000)] }),
+      ],
+      at(3000),
+    );
+    engine.start(0);
+    engine.update(fix(at(270), 10)); // 30 m before a turn: not yet
+    expect(engine.index).toBe(0);
+    engine.update(fix(at(285), 20));
+    expect(engine.index).toBe(1);
+    engine.update(fix(at(565), 30)); // 35 m before the leg's end
+    expect(engine.index).toBe(2);
+  });
+
+  it('"Next leg" by hand skips the rest of the leg, marked manual', () => {
+    const engine = new NavigationEngine(
+      [
+        step({ legIndex: 0, polyline: [at(0), at(300)] }),
+        step({ legIndex: 0, polyline: [at(300), at(600)] }),
+        step({ legIndex: 1, polyline: [at(600), at(900)] }),
+      ],
+      at(900),
+    );
+    engine.start(0);
+    expect(engine.hasNextLeg).toBe(true);
+    expect(engine.skipLeg(5_000)).toMatchObject([{ type: 'stepStart', index: 2 }]);
+    expect(engine.history[0]).toMatchObject({ manual: true, endedAt: 5_000 });
+    expect(engine.hasNextLeg).toBe(false);
+    expect(engine.skipLeg(6_000)).toEqual([]); // the last leg ends on arrival only
+  });
+
+  it('remaining distance and time on the current leg', () => {
+    const engine = new NavigationEngine(
+      [
+        step({ legIndex: 0, polyline: [at(0), at(400)], distanceM: 400, predictedDurationS: 300 }),
+        step({
+          legIndex: 0,
+          polyline: [at(400), at(600)],
+          distanceM: 200,
+          predictedDurationS: 150,
+        }),
+        step({ legIndex: 1, polyline: [at(600), at(900)], distanceM: 300 }),
+      ],
+      at(900),
+    );
+    engine.start(0);
+    engine.update(fix(at(100), 10));
+    const left = engine.legRemaining();
+    expect(left.distanceM).toBeCloseTo(500, -1);
+    expect(left.durationS).toBeCloseTo(375, -1);
+  });
+});
+
+describe('alert thresholds', () => {
+  const rideOf = (mode: 'bus' | 'metro' | 'train') =>
+    new NavigationEngine(
+      [
+        step({
+          kind: 'transit',
+          legMode: mode,
+          polyline: [at(0), at(5000)],
+          distanceM: 5000,
+          transit: { mode, line: 'L', boardStop: 'A', alightStop: 'Swargate', stopCount: 8 },
+        }),
+        step({ legIndex: 1, polyline: [at(5000), at(5000, 400)], distanceM: 400 }),
+      ],
+      at(5000, 400),
+    );
+
+  const cases: ['bus' | 'metro' | 'train', number, number][] = [
+    ['bus', 4350, 4450],
+    ['metro', 4050, 4150],
+    ['train', 4050, 4150],
+  ];
+  it.each(cases)('%s: "get off soon" once within its threshold', (mode, before, after) => {
+    const engine = rideOf(mode);
+    engine.start(0);
+    engine.update(fix(at(50), 10, { speed: 8 }));
+    expect(types(engine.update(fix(at(before), 100, { speed: 8 })))).toEqual([]);
+    expect(engine.update(fix(at(after), 110, { speed: 8 }))).toMatchObject([
+      { type: 'alightSoon', stop: 'Swargate' },
+    ]);
+    expect(engine.update(fix(at(after + 50), 115, { speed: 8 }))).toEqual([]); // once
+  });
+
+  it('"your stop is next" once within 250 m', () => {
+    const engine = rideOf('bus');
+    engine.start(0);
+    engine.update(fix(at(50), 10, { speed: 8 }));
+    engine.update(fix(at(4500), 100, { speed: 8 })); // get off soon
+    expect(engine.update(fix(at(4700), 120, { speed: 8 }))).toEqual([]); // 300 m
+    expect(engine.update(fix(at(4760), 125, { speed: 8 }))).toMatchObject([
+      { type: 'stopNext', stop: 'Swargate' },
+    ]);
+    expect(engine.update(fix(at(4800), 130, { speed: 8 }))).toEqual([]);
+  });
+
+  it('a long first jump fires both at once', () => {
+    const engine = rideOf('bus');
+    engine.start(0);
+    engine.update(fix(at(50), 10, { speed: 8 }));
+    expect(types(engine.update(fix(at(4800), 100, { speed: 8 })))).toEqual([
+      'alightSoon',
+      'stopNext',
+    ]);
   });
 });

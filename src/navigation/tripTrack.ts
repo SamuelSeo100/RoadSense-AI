@@ -47,6 +47,10 @@ export class TrackRecorder {
 export interface TripTrackLeg {
   /** 0 = the route the trip started on, +1 per reroute. */
   version: number;
+  /**
+   * Position in the route's legs. Version 0 matches bus_eta_predictions.leg_index
+   * (join on trip_id + leg_index).
+   */
   leg_index: number;
   kind: NavStep['kind'];
   mode: string;
@@ -56,9 +60,16 @@ export interface TripTrackLeg {
   /** Null when the leg wasn't finished (rerouted, ended or abandoned on it). */
   actual_s: number | null;
   scheduled_dep: string | null;
+  /** When the leg started / ended (ISO); end null while unfinished. */
+  actual_start: string | null;
+  actual_end: string | null;
   actual_board_time: string | null;
+  /** Rides ended by GPS: closest approach to the alighting stop. */
+  actual_alight_time: string | null;
   /** Platform wait: reaching the boarding stop → boarding detected. */
   wait_s: number | null;
+  /** How the leg ended: GPS, "Next leg" by hand, or not ended (null). */
+  ended_by: 'gps' | 'manual' | null;
 }
 
 export interface TripTrackRow {
@@ -99,7 +110,9 @@ export function legsOf(
       if (version !== last && recs.length === 0) continue;
       const first = legSteps[0]!;
       const lastStep = legSteps[legSteps.length - 1]!;
-      const end = recs.find((r) => r.step.id === lastStep.id);
+      // A leg ended by hand ("Next leg") may stop before its last step.
+      const manual = recs.find((r) => r.manual);
+      const end = manual ?? recs.find((r) => r.step.id === lastStep.id);
       const finished = end?.endedAt !== undefined && !end.interrupted;
       const start = recs[0]?.startedAt;
       const ride = recs.find((r) => r.step.kind === 'transit');
@@ -113,8 +126,12 @@ export function legsOf(
         predicted_s: legSteps.reduce((sum, s) => sum + s.predictedDurationS, 0),
         actual_s: finished && start !== undefined ? secs(end!.endedAt! - start) : null,
         scheduled_dep: first.transit?.scheduledDep ?? null,
+        actual_start: iso(start),
+        actual_end: finished ? iso(end!.endedAt) : null,
         actual_board_time: iso(ride?.boardedAt),
+        actual_alight_time: iso(ride?.alightedAt),
         wait_s: ride?.boardedAt !== undefined ? secs(ride.boardedAt - ride.startedAt) : null,
+        ended_by: finished ? (end!.manual ? 'manual' : 'gps') : null,
       });
     }
   });
