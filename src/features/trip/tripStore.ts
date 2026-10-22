@@ -3,6 +3,7 @@ import { create } from 'zustand';
 
 import {
   directionsService,
+  ownVehicleProfiles,
   placesService,
   rankRoutes,
   routingService,
@@ -19,6 +20,8 @@ import { useRoutlyPrefs } from '@/store/routlyPrefsStore';
 
 import { useMapStore } from '../map/mapStore';
 import { savedPlaceFor } from '../places/savedPlaces';
+
+import { useVehicleStore } from '../vehicles/vehicleStore';
 
 import { matchesModes } from './modeFilter';
 import { markRanked, markSearchStart } from './perfTiming';
@@ -169,6 +172,9 @@ export const useTripStore = create<TripState>()((set, get) => {
     try {
       await useRoutlyPrefs.getState().hydrate();
       const vehicles = useRoutlyPrefs.getState().prefs?.vehicles ?? NO_VEHICLES;
+      if (!useVehicleStore.getState().loaded) await useVehicleStore.getState().load();
+      // Saved car / scooty: own-vehicle routes costed from its mileage ("Your scooty").
+      const ownVehicles = ownVehicleProfiles(useVehicleStore.getState().vehicles);
       // getRoutes throws only when every mode failed; the walk is optional extra detail.
       const [result, walk] = await Promise.all([
         routingService.getRoutes(start, destination, {
@@ -176,6 +182,7 @@ export const useTripStore = create<TripState>()((set, get) => {
           vehicles,
           departAt,
           signal,
+          ownVehicles,
         }),
         directionsService
           .walking(start, destination.location, { signal, at: departAt })
@@ -339,4 +346,11 @@ useRoutlyPrefs.subscribe((state, prev) => {
     before !== undefined &&
     (Object.keys(prefs.vehicles) as Vehicle[]).some((v) => before[v] !== prefs.vehicles[v]);
   if (changed && trip.to) trip.retry();
+});
+
+/** A vehicle added, edited or deleted: re-cost the routes on screen. */
+useVehicleStore.subscribe((state, prev) => {
+  if (state.vehicles === prev.vehicles || !prev.loaded) return;
+  const trip = useTripStore.getState();
+  if (trip.to) trip.retry();
 });

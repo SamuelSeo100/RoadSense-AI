@@ -29,6 +29,8 @@ import { useHistoryVersion } from '../trip/tripLog';
 
 import { closeModeAvailable } from '../../../modules/routly-assist';
 
+import { MyVehicles } from '../vehicles/MyVehicles';
+
 import { GroupedList, ListRow } from './components/GroupedList';
 import { PreferencesCard } from './components/PreferencesCard';
 import { QUICK_LAUNCH_COMBOS, QuickLaunchCard } from './components/QuickLaunchCard';
@@ -240,6 +242,8 @@ export function ProfileScreen() {
           )}
         </GroupedList>
       </View>
+
+      <MyVehicles />
 
       <View style={styles.section}>
         <SectionHeader title="Travel preferences" size={16} />

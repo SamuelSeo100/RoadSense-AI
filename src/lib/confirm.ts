@@ -1,7 +1,12 @@
 import { Alert, Platform } from 'react-native';
 
 /** Yes/no confirmation that also works on web (where Alert buttons are unsupported). */
-export function confirm(title: string, message: string, confirmLabel: string): Promise<boolean> {
+export function confirm(
+  title: string,
+  message: string,
+  confirmLabel: string,
+  cancelLabel = 'Cancel',
+): Promise<boolean> {
   if (Platform.OS === 'web') {
     return Promise.resolve(
       typeof window !== 'undefined' && window.confirm(`${title}\n\n${message}`),
@@ -12,7 +17,7 @@ export function confirm(title: string, message: string, confirmLabel: string): P
       title,
       message,
       [
-        { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+        { text: cancelLabel, style: 'cancel', onPress: () => resolve(false) },
         { text: confirmLabel, style: 'destructive', onPress: () => resolve(true) },
       ],
       { cancelable: true, onDismiss: () => resolve(false) },

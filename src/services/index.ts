@@ -38,6 +38,7 @@ import type {
 
 export * from './types';
 export * from './busEta';
+export * from './vehicles';
 export { rankRoutes } from './ranking';
 export { transitDataCredits } from './transit/network';
 /** Origin used until the user's location is known (TODO(api): city centre from the backend). */

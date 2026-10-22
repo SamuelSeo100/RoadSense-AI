@@ -9,6 +9,7 @@ import { RText } from '@/components/routly/RText';
 import { SkeletonCard } from '@/components/routly/SkeletonCard';
 import { PRIORITIES, priorityLabels, type RankedRoute, type Vehicle } from '@/services';
 import { useRoutlyPrefs } from '@/store/routlyPrefsStore';
+import { confirm } from '@/lib/confirm';
 import { colors, fonts, radius } from '@/theme/routly';
 
 import { useRouteGeometry } from '../map/legGeometry';
@@ -24,6 +25,9 @@ import { markRendered } from '../trip/perfTiming';
 import { requestBusEtas, useDurationRanges } from '../trip/busEtaStore';
 import { logBusEtas, logChoice, startTrip } from '../trip/tripLog';
 import { shownRoutes, useTripStore } from '../trip/tripStore';
+
+import { useVehicleEditorRequest } from '../vehicles/MyVehicles';
+import { useVehicleStore } from '../vehicles/vehicleStore';
 
 import { RouteNotices } from './components/RouteNotices';
 import { RouteSteps } from './components/RouteSteps';
@@ -133,6 +137,7 @@ export function RoutesScreen() {
     const opening = !same || !userPick.open;
     setPicked({ requestId: ready.requestId, id: route.id, open: opening });
     if (opening) logChoice(ready.requestId, route, priority, 'expand');
+    if (opening && route.vehicle && route.vehicle !== 'cycle') void offerVehicle(route.vehicle);
   };
 
   const onStart = async (route: RankedRoute) => {
@@ -287,6 +292,26 @@ export function RoutesScreen() {
       )}
     </SheetScrollView>
   );
+}
+
+/**
+ * Once, the first time an own car / bike route is opened with no vehicle saved:
+ * offer to add one for accurate cost. Never blocks the route.
+ */
+async function offerVehicle(kind: 'car' | 'bike') {
+  const store = useVehicleStore.getState();
+  if (store.prompted || store.vehicles.length > 0) return;
+  store.markPrompted();
+  const add = await confirm(
+    'Have a car or scooty?',
+    'Add it for accurate trip cost.',
+    'Add',
+    'Not now',
+  );
+  if (!add) return;
+  router.push('/profile');
+  // Profile mounts the editor; open it for this vehicle type.
+  setTimeout(() => useVehicleEditorRequest.request(kind === 'car' ? 'car' : 'scooter'), 400);
 }
 
 /** "6:30 PM", or "Sat 8:00 AM" when not today (device time zone). */

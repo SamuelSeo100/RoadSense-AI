@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 
 import { useRecoverAbandonedTrip } from '@/features/navigation/activeTrip';
+import { useLoadVehicles } from '@/features/vehicles/vehicleStore';
 import { useSavedPlacesSync } from '@/features/places/savedPlaces';
 import { MapShell } from '@/features/shell/MapShell';
 import { TABS } from '@/features/shell/tabs';
@@ -14,6 +15,7 @@ import { colors } from '@/theme/routly';
 export default function AppLayout() {
   useSavedPlacesSync();
   useRecoverAbandonedTrip();
+  useLoadVehicles();
   return (
     <MapShell>
       <Tabs

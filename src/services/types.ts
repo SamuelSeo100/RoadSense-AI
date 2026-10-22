@@ -7,6 +7,7 @@ import type { TripTrackRow } from '@/navigation/tripTrack';
 import type { Mode } from '@/theme/routly';
 
 import type { BusEta, BusLeg } from './busEta';
+import type { OwnVehicleProfile } from './vehicles';
 
 export type { Mode };
 export type Priority = 'fastest' | 'cheapest' | 'walking' | 'transfers';
@@ -103,6 +104,8 @@ export interface Route {
   aiPick?: boolean;
   /** Preview line: "0.7 km walk · 0 transfers · Low traffic". */
   meta?: string;
+  /** Own-vehicle routes costed from the user's saved vehicle: "₹40 fuel" / "₹12 charge". */
+  costNote?: 'fuel' | 'charge';
 }
 
 export interface RankedRoute extends Route {
@@ -241,6 +244,8 @@ export interface RoutingService {
       /** Departure time (default: now). */
       departAt?: Date;
       signal?: AbortSignal;
+      /** Saved car / scooty: own-vehicle routes costed and named from them. */
+      ownVehicles?: Partial<Record<'car' | 'bike', OwnVehicleProfile>>;
     },
   ): Promise<RoutesResult>;
   /** The 3 cards on Home: top pick, cheapest, fastest. */

@@ -36,6 +36,8 @@ import { isNight } from '../walkSafety';
 
 import { googleCallCount, googleRequest } from './googleClient';
 import { legSteps, stepPath, type GoogleNavStep } from './googleDirectionsService';
+import { profilesKey, type OwnVehicleProfile } from '../vehicles';
+
 import { decodePolyline } from './polyline';
 
 /** Tunables for building route options (fares live in fares.ts, weights in scoring.ts). */
@@ -193,6 +195,11 @@ interface Candidates {
 }
 
 // ---- Helpers ----
+
+type OwnVehicles = Partial<Record<'car' | 'bike', OwnVehicleProfile>>;
+/** The saved vehicle's cost for the distance (null without one: fares.ts estimate). */
+const ownCost = (p: OwnVehicleProfile | undefined, distanceKm: number) =>
+  p ? Math.round(distanceKm * p.perKmInr) : null;
 
 const seconds = (d?: string) => Number.parseInt(d ?? '0', 10) || 0;
 const minutes = (sec: number) => Math.max(1, Math.round(sec / 60));
@@ -583,9 +590,11 @@ function roadRoute(
   road: RoadInfo,
   costInr: number,
   extraMeta?: string,
+  /** The user's saved car / scooty: its name, and "fuel" / "charge" after the cost. */
+  own?: OwnVehicleProfile,
 ): Omit<Route, 'score'> {
   const mode = kind === 'car' ? 'cab' : kind;
-  const name = capitalise(kind);
+  const name = own?.label ?? capitalise(kind);
   const durationMin = minutes(road.durationSec);
   const base = { walkingKm: 0, transfers: 0, traffic: road.traffic };
   return {
@@ -596,6 +605,7 @@ function roadRoute(
     vehicle: kind === 'car' || kind === 'bike' ? kind : undefined,
     durationMin,
     costInr,
+    costNote: own?.costNote,
     ...base,
     legs: [
       {
@@ -724,13 +734,14 @@ export function createGoogleRoutingService(deps: {
     vehicles: Record<Vehicle, boolean>,
     signal?: AbortSignal,
     departAt?: Date,
+    own: OwnVehicles = {},
   ): Promise<Candidates & { googleAt: number | null }> {
     const from = toLatLng(fromP);
     const to = toP.location;
     // A requested departure ("at 6 pm"); past times mean now.
     const at = departAt && departAt.getTime() > Date.now() ? departAt : new Date();
     const bucket = Math.floor(at.getTime() / (routingConfig.cacheBucketMin * 60_000));
-    const key = `${keyOf(from)}>${keyOf(to)}|${bucket}|b${vehicles.bike ? 1 : 0}c${vehicles.car ? 1 : 0}`;
+    const key = `${keyOf(from)}>${keyOf(to)}|${bucket}|b${vehicles.bike ? 1 : 0}c${vehicles.car ? 1 : 0}|${profilesKey(own)}`;
     const cached = cache.get(key);
     if (cached) return { ...cached, googleAt: null };
 
@@ -851,9 +862,29 @@ export function createGoogleRoutingService(deps: {
       const cab = cabFare(drive.distanceKm, drive.durationSec / 60);
       routes.push(roadRoute('cab', 'cab', drive, cab.mid, `₹${cab.min}–${cab.max} est.`));
       if (vehicles.car)
-        routes.push(roadRoute('car', 'car', drive, fuelCost('car', drive.distanceKm)));
+        routes.push(
+          roadRoute(
+            'car',
+            'car',
+            drive,
+            ownCost(own.car, drive.distanceKm) ?? fuelCost('car', drive.distanceKm),
+            undefined,
+            own.car,
+          ),
+        );
     }
-    if (bike) routes.push(roadRoute('bike', 'bike', bike, fuelCost('bike', bike.distanceKm)));
+    if (bike) {
+      routes.push(
+        roadRoute(
+          'bike',
+          'bike',
+          bike,
+          ownCost(own.bike, bike.distanceKm) ?? fuelCost('bike', bike.distanceKm),
+          undefined,
+          own.bike,
+        ),
+      );
+    }
     if (
       walkRes.status === 'fulfilled' &&
       walkRes.value.durationSec <= routingConfig.maxWalkOnlyMin * 60
@@ -873,9 +904,9 @@ export function createGoogleRoutingService(deps: {
       .catch((): Priority => 'fastest');
 
   return {
-    async getRoutes(from, to, { priority, vehicles, departAt, signal }) {
+    async getRoutes(from, to, { priority, vehicles, departAt, signal, ownVehicles }) {
       const [{ routes, notices, googleAt }, aiPriority] = await Promise.all([
-        candidates(from, to, vehicles, signal, departAt),
+        candidates(from, to, vehicles, signal, departAt, ownVehicles),
         defaultPriority(),
       ]);
       // Keep every route that is in the top N for some priority, so callers can

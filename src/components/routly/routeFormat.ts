@@ -53,8 +53,12 @@ export function shortLegLabel(leg: Leg): string {
     // "Bus · Swargate Depot" (no route number) is too long for the strip.
     return label.includes(' · ') ? MODE_NAMES[leg.mode] : label;
   }
-  // First word of the label keeps own vehicles apart from hired ones ("Car", not "Cab").
-  const name = leg.label.split(' ')[0] || MODE_NAMES[leg.mode];
+  // First word of the label keeps own vehicles apart from hired ones ("Car", not "Cab");
+  // a saved vehicle keeps its name ("Your scooty", a nickname).
+  const own = /^(.+) ~?\d+m$/.exec(leg.label)?.[1];
+  const name =
+    (own && !/^(Auto|Cab|Car|Bike|Walk|Cycle)$/.test(own) ? own : leg.label.split(' ')[0]) ||
+    MODE_NAMES[leg.mode];
   return `${name} ${legMinutes(leg)}`;
 }
 
@@ -66,7 +70,9 @@ export const legCost = (leg: Pick<Leg, 'costInr' | 'fareEstimated'>) =>
  * "₹321–472" when the route's meta carries an estimate range (cabs), "~₹45"
  * when a leg's fare is unverified, else "₹396".
  */
-export function routeCost(route: Pick<Route, 'costInr' | 'meta' | 'legs'>): string {
+export function routeCost(route: Pick<Route, 'costInr' | 'meta' | 'legs' | 'costNote'>): string {
+  // From the user's own vehicle: "₹40 fuel", "₹12 charge".
+  if (route.costNote) return `${formatInr(route.costInr)} ${route.costNote}`;
   const range = route.meta?.match(/₹[\d,]+–[\d,]+/);
   if (range) return range[0];
   return `${route.legs.some((l) => l.fareEstimated) ? '~' : ''}${formatInr(route.costInr)}`;
