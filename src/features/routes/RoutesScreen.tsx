@@ -20,6 +20,7 @@ import { SHEET_FULL, SHEET_PEEK, showToast } from '../shell/shellStore';
 import { useMapContent, useSheet, useTopBar } from '../shell/useScreenChrome';
 import { DirectionsCard } from '../trip/DirectionsCard';
 import { modeFilterLabel } from '../trip/modeFilter';
+import { markRendered } from '../trip/perfTiming';
 import { requestBusEtas, useDurationRanges } from '../trip/busEtaStore';
 import { logBusEtas, logChoice, startTrip } from '../trip/tripLog';
 import { shownRoutes, useTripStore } from '../trip/tripStore';
@@ -102,6 +103,9 @@ export function RoutesScreen() {
     if (requestId === undefined) return;
     Keyboard.dismiss();
     setSheetIndex(SHEET_PEEK);
+    // Committed; the next frame is the first with the list on screen.
+    const frame = requestAnimationFrame(() => markRendered(requestId));
+    return () => cancelAnimationFrame(frame);
   }, [requestId, setSheetIndex]);
 
   // Bus ETAs for the top routes, after the list is up (schedule-only until each returns).

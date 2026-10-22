@@ -724,7 +724,7 @@ export function createGoogleRoutingService(deps: {
     vehicles: Record<Vehicle, boolean>,
     signal?: AbortSignal,
     departAt?: Date,
-  ): Promise<Candidates> {
+  ): Promise<Candidates & { googleAt: number | null }> {
     const from = toLatLng(fromP);
     const to = toP.location;
     // A requested departure ("at 6 pm"); past times mean now.
@@ -732,7 +732,7 @@ export function createGoogleRoutingService(deps: {
     const bucket = Math.floor(at.getTime() / (routingConfig.cacheBucketMin * 60_000));
     const key = `${keyOf(from)}>${keyOf(to)}|${bucket}|b${vehicles.bike ? 1 : 0}c${vehicles.car ? 1 : 0}`;
     const cached = cache.get(key);
-    if (cached) return cached;
+    if (cached) return { ...cached, googleAt: null };
 
     const ends = { origin: waypoint(from), destination: waypoint(to) };
     const road = (travelMode: 'DRIVE' | 'TWO_WHEELER') =>
@@ -782,6 +782,8 @@ export function createGoogleRoutingService(deps: {
         return { drafts, calls: googleCallCount() - before };
       })(),
     ]);
+    // Every Google response (and the timetable access legs) is in: merge + rank from here.
+    const googleAt = Date.now();
     if (signal?.aborted) throw new Error('Route request aborted.');
 
     const attempted = [transitRes, driveRes, walkRes, ...(vehicles.bike ? [bikeRes] : [])];
@@ -861,7 +863,7 @@ export function createGoogleRoutingService(deps: {
 
     const result = { routes: scoreRoutes(routes), notices };
     cache.set(key, result);
-    return result;
+    return { ...result, googleAt };
   }
 
   const defaultPriority = () =>
@@ -872,7 +874,7 @@ export function createGoogleRoutingService(deps: {
 
   return {
     async getRoutes(from, to, { priority, vehicles, departAt, signal }) {
-      const [{ routes, notices }, aiPriority] = await Promise.all([
+      const [{ routes, notices, googleAt }, aiPriority] = await Promise.all([
         candidates(from, to, vehicles, signal, departAt),
         defaultPriority(),
       ]);
@@ -891,6 +893,7 @@ export function createGoogleRoutingService(deps: {
       return {
         routes: ranked.map((r, i): RankedRoute => ({ ...r, rank: i + 1, isBest: i === 0 })),
         notices,
+        googleAt,
       };
     },
 

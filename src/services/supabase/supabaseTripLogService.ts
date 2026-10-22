@@ -186,6 +186,10 @@ export function createSupabaseTripLogService(supabase: SupabaseClient): TripLogS
       write('trip_tracks', { ...track });
     },
 
+    logPerfTiming(timing) {
+      write('perf_timings', { ...timing });
+    },
+
     onTripStored(listener) {
       tripListeners.add(listener);
       return () => tripListeners.delete(listener);
@@ -205,6 +209,7 @@ export function createNoopTripLogService(): TripLogService {
     startTrip: () => null,
     logBusEtaPredictions() {},
     logTripTrack() {},
+    logPerfTiming() {},
     onTripStored: () => () => {},
     clearPending() {},
   };

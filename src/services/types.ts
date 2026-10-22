@@ -225,6 +225,8 @@ export interface RoutesResult {
    */
   routes: RankedRoute[];
   notices: RouteNotice[];
+  /** When every Google response was in (epoch ms); null when served from cache. */
+  googleAt?: number | null;
 }
 
 // ---- Services ----
@@ -267,6 +269,20 @@ export interface RouteRequestLog {
   to: { name: string; location: LatLng };
   priority: Priority;
   routes: RankedRoute[];
+}
+
+/** A perf_timings row (ISO timestamps): tap → Google → merged + ranked → rendered. */
+export interface PerfTimingLog {
+  /** First search since the app started. */
+  cold: boolean;
+  t_tap: string;
+  /** Null when the routes came from the routing cache (no Google calls). */
+  t_google: string | null;
+  t_ranked: string;
+  t_rendered: string;
+  device: string;
+  os: string;
+  app_version: string;
 }
 
 /** A bus_eta_predictions row: what one bus leg's ETA said when its route was started. */
@@ -312,6 +328,8 @@ export interface TripLogService {
   logBusEtaPredictions(predictions: BusEtaPredictionLog[]): void;
   /** Ground truth of a navigated trip, written once when it ends (same queue: survives no signal). */
   logTripTrack(track: TripTrackRow): void;
+  /** One route search's timings (perf_timings). */
+  logPerfTiming(timing: PerfTimingLog): void;
   /** Called whenever a trip lands on the server (possibly after a retry). Returns unsubscribe. */
   onTripStored(listener: () => void): () => void;
   /** Drops queued writes not yet sent (before "Clear my trip history"). */
