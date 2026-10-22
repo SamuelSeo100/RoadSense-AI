@@ -11,6 +11,8 @@ import { colors, fonts, modeColors, radius } from '@/theme/routly';
 
 import { book, type BookingKind } from '../../trip/booking';
 
+import { BusEtaInfo } from './BusEtaInfo';
+
 interface RouteStepsProps {
   route: Route;
   /** "Your location" or the From place. */
@@ -88,6 +90,7 @@ export function RouteSteps({
               <RText variant="caption" numberOfLines={2}>
                 {from} → {to}
               </RText>
+              {leg.mode === 'bus' && <BusEtaInfo leg={leg} />}
               {leg.realtime === false && (
                 <View
                   style={styles.scheduled}

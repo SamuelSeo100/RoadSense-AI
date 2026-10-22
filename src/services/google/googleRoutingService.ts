@@ -102,8 +102,8 @@ interface GStep extends GoogleNavStep {
   endLocation?: { latLng?: LatLng };
   transitDetails?: {
     stopDetails?: {
-      departureStop?: { name?: string };
-      arrivalStop?: { name?: string };
+      departureStop?: { name?: string; location?: { latLng?: LatLng } };
+      arrivalStop?: { name?: string; location?: { latLng?: LatLng } };
       departureTime?: string;
       arrivalTime?: string;
     };
@@ -164,6 +164,11 @@ export interface DraftLeg {
   waitMin?: number;
   /** ISO departure (Google's stopDetails, or the timetable time on the trip date). */
   departureAt?: string;
+  /** Google transit legs: scheduled arrival, stop coordinates and the line's short name (bus ETA). */
+  arrivalAt?: string;
+  fromLocation?: LatLng;
+  toLocation?: LatLng;
+  lineShortName?: string;
   headsign?: string;
   /** Walk / road legs: Google's turn-by-turn steps. */
   steps?: LegStep[];
@@ -301,6 +306,10 @@ function parseTransit(res: TransitResponse, at: Date): Draft[] {
         toStop: details.stopDetails?.arrivalStop?.name,
         headsign: details.headsign,
         departureAt: Number.isFinite(dep) ? new Date(dep).toISOString() : undefined,
+        arrivalAt: Number.isFinite(arr) ? new Date(arr).toISOString() : undefined,
+        fromLocation: details.stopDetails?.departureStop?.location?.latLng,
+        toLocation: details.stopDetails?.arrivalStop?.location?.latLng,
+        lineShortName: details.transitLine?.nameShort,
       };
     });
     if (!legs.some(isTransit)) return [];
@@ -501,6 +510,10 @@ function transitToRoute(
       realtime: l.realtime,
       departure: l.departure,
       departureAt: l.departureAt,
+      arrivalAt: l.arrivalAt,
+      fromLocation: l.fromLocation,
+      toLocation: l.toLocation,
+      lineShortName: l.lineShortName,
       headsign: l.headsign,
       steps: l.steps?.length ? l.steps : undefined,
       waitMin: l.waitMin,

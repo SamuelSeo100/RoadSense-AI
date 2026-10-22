@@ -20,7 +20,8 @@ import { SHEET_FULL, SHEET_PEEK, showToast } from '../shell/shellStore';
 import { useMapContent, useSheet, useTopBar } from '../shell/useScreenChrome';
 import { DirectionsCard } from '../trip/DirectionsCard';
 import { modeFilterLabel } from '../trip/modeFilter';
-import { logChoice, startTrip } from '../trip/tripLog';
+import { requestBusEtas } from '../trip/busEtaStore';
+import { logBusEtas, logChoice, startTrip } from '../trip/tripLog';
 import { shownRoutes, useTripStore } from '../trip/tripStore';
 
 import { RouteNotices } from './components/RouteNotices';
@@ -103,6 +104,9 @@ export function RoutesScreen() {
     setSheetIndex(SHEET_PEEK);
   }, [requestId, setSheetIndex]);
 
+  // Bus ETAs for the top routes, after the list is up (schedule-only until each returns).
+  useEffect(() => requestBusEtas(ranked), [ranked]);
+
   const onCardPress = (route: RankedRoute) => {
     if (!ready) return;
     // Tapping the open card folds it; any other card is selected and opened.
@@ -129,6 +133,7 @@ export function RoutesScreen() {
       route,
       cabEquivalentInr: cab?.costInr ?? null,
     });
+    logBusEtas(ready.requestId, tripId, route);
     // Navigate the route as drawn (estimated legs replaced by real geometry once loaded).
     useNavigationStore.getState().begin({
       route: { ...route, legs: route.id === selected?.id ? selectedLegs : route.legs },

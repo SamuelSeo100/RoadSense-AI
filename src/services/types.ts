@@ -6,6 +6,8 @@
 import type { TripTrackRow } from '@/navigation/tripTrack';
 import type { Mode } from '@/theme/routly';
 
+import type { BusEta, BusLeg } from './busEta';
+
 export type { Mode };
 export type Priority = 'fastest' | 'cheapest' | 'walking' | 'transfers';
 export type Vehicle = 'car' | 'bike' | 'cycle';
@@ -57,6 +59,13 @@ export interface Leg {
   departure?: string;
   /** Scheduled (timetable) or Google's departure from `from`, ISO 8601. */
   departureAt?: string;
+  /** Google transit legs: scheduled arrival at `to`, ISO 8601. */
+  arrivalAt?: string;
+  /** Google transit legs: the boarding / alighting stops' coordinates. */
+  fromLocation?: LatLng;
+  toLocation?: LatLng;
+  /** Google transit legs: the line's short name ("115"), when it has one. */
+  lineShortName?: string;
   /** Transit legs: where the vehicle is heading ("Swargate", "Lonavala"). */
   headsign?: string;
   /** Walk / road legs: Google's turn-by-turn steps, when the response had them. */
@@ -260,6 +269,18 @@ export interface RouteRequestLog {
   routes: RankedRoute[];
 }
 
+/** A bus_eta_predictions row: what one bus leg's ETA said when its route was started. */
+export interface BusEtaPredictionLog {
+  requestId: string;
+  /** Null when the trip wasn't stored (signed out). */
+  tripId: string | null;
+  /** Position of the bus leg in the route's legs. */
+  legIndex: number;
+  at: Date;
+  leg: BusLeg;
+  eta: BusEta;
+}
+
 export interface StartTripLog {
   /** Null when the request wasn't logged ("Learn from my trips" off). */
   requestId: string | null;
@@ -287,6 +308,8 @@ export interface TripLogService {
   }): void;
   /** Returns the trip's id (for its trip_tracks row), null when nothing is stored. */
   startTrip(trip: StartTripLog): string | null;
+  /** The bus ETAs shown for the started route (after its trip: same queue, FK holds). */
+  logBusEtaPredictions(predictions: BusEtaPredictionLog[]): void;
   /** Ground truth of a navigated trip, written once when it ends (same queue: survives no signal). */
   logTripTrack(track: TripTrackRow): void;
   /** Called whenever a trip lands on the server (possibly after a retry). Returns unsubscribe. */
