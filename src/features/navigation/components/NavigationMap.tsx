@@ -81,7 +81,9 @@ export function NavigationMap({
       showsMyLocationButton={false}
       showsPointsOfInterests={false}
       toolbarEnabled={false}
-      mapPadding={{ top: insets.top, bottom: insets.bottom, left: 0, right: 0 }}
+      // Only once the map is ready: react-native-maps (Android) calls GoogleMap.setPadding on a
+      // null map for a padding change before then, and the crash blanks the whole screen.
+      mapPadding={ready ? { top: insets.top, bottom: insets.bottom, left: 0, right: 0 } : undefined}
       onMapReady={() => setReady(true)}
       onPanDrag={onPan}
       initialCamera={{ center: start, heading: 0, pitch: 0, zoom: 16, altitude: 1000 }}
