@@ -8,7 +8,7 @@ import { SectionHeader } from '@/components/routly/SectionHeader';
 import { cityInfo } from '@/constants/cities';
 import { authService } from '@/features/auth/auth.service';
 import { choose, confirm } from '@/lib/confirm';
-import { appVersion, isPreviewBuild, updateLabel } from '@/lib/appInfo';
+import { appVersion, buildInfoLabel, isPreviewBuild } from '@/lib/appInfo';
 import { sendTestError } from '@/lib/sentry';
 import { bookingProviderNames, type BookingProvider } from '@/services/bookings';
 import { historyService, transitDataCredits, tripLogService } from '@/services';
@@ -31,8 +31,8 @@ import { GroupedList, ListRow } from './components/GroupedList';
 import { PreferencesCard } from './components/PreferencesCard';
 import { QUICK_LAUNCH_COMBOS, QuickLaunchCard } from './components/QuickLaunchCard';
 
-/** Under the version: OTA update id + runtime, so testers can say what they run. */
-const UPDATE_LABEL = updateLabel();
+/** Under the version: channel, runtime, OTA vs embedded bundle, so testers can say what they run. */
+const BUILD_INFO = `Build info: ${buildInfoLabel()}`;
 
 const LINKED_APPS: BookingProvider[] = ['uber', 'ola', 'puneMetro'];
 
@@ -324,19 +324,15 @@ export function ProfileScreen() {
             minHeight={52}
             onLongPress={isPreviewBuild ? sentryTest : undefined}
             accessibilityRole="button"
-            accessibilityLabel={[`App version ${appVersion}`, UPDATE_LABEL]
-              .filter(Boolean)
-              .join(', ')}
+            accessibilityLabel={`App version ${appVersion}. ${BUILD_INFO}`}
           >
             <View style={[styles.flex, styles.version]}>
               <RText variant="caption" size={13}>
                 Version {appVersion}
               </RText>
-              {UPDATE_LABEL && (
-                <RText variant="caption" size={12} selectable>
-                  {UPDATE_LABEL}
-                </RText>
-              )}
+              <RText variant="caption" size={12} selectable>
+                {BUILD_INFO}
+              </RText>
             </View>
           </ListRow>
         </GroupedList>

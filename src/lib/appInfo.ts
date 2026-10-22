@@ -10,15 +10,20 @@ export const updateChannel: string | null = Updates.isEnabled ? (Updates.channel
 /** EAS preview builds: the update channel is baked into the build (and survives OTA updates). */
 export const isPreviewBuild = updateChannel === 'preview';
 
-/** "Update 3f2a9c1e · runtime 4b1d…" or "Built-in bundle · runtime …"; null in dev. */
-export function updateLabel(): string | null {
-  if (!Updates.isEnabled) return null;
-  const runtime = Updates.runtimeVersion ? `runtime ${Updates.runtimeVersion.slice(0, 12)}` : null;
-  const update =
-    Updates.isEmbeddedLaunch || !Updates.updateId
-      ? 'Built-in bundle'
-      : `Update ${Updates.updateId.slice(0, 8)}`;
-  return [update, runtime].filter(Boolean).join(' · ');
+/**
+ * Which bundle is running: "1.0.0 · preview · runtime 18177b8f · OTA 01a16404" (an EAS
+ * update) or "… · embedded 3f2a9c1e" (the bundle the build shipped with).
+ * Dev: "1.0.0 · dev (Metro)".
+ */
+export function buildInfoLabel(): string {
+  if (!Updates.isEnabled) return `${appVersion} · dev (Metro)`;
+  const short = (id: string | null | undefined) => (id ? id.slice(0, 8) : 'none');
+  return [
+    appVersion,
+    updateChannel ?? 'no channel',
+    `runtime ${short(Updates.runtimeVersion)}`,
+    `${Updates.isEmbeddedLaunch ? 'embedded' : 'OTA'} ${short(Updates.updateId)}`,
+  ].join(' · ');
 }
 
 export const updateInfo = {
