@@ -6,6 +6,7 @@ import {
   createBusEtaService,
   estimateBusLeg,
   hourBand,
+  routeDurationRange,
   type BusLeg,
   type FetchTrafficRatio,
 } from '../busEta';
@@ -86,6 +87,38 @@ describe('busLegOf', () => {
     expect(busLegOf({ ...base, toLocation: undefined })).toBeNull();
     expect(busLegOf({ ...base, arrivalAt: base.departureAt })).toBeNull();
     expect(busLegOf({ ...base, lineShortName: undefined })?.line).toBeNull();
+  });
+});
+
+describe('routeDurationRange', () => {
+  const busLeg = (dep: Date, rideMin: number): Leg => {
+    const b = leg(dep, rideMin);
+    return {
+      mode: 'bus',
+      label: 'Bus 21',
+      durationMin: rideMin,
+      from: b.fromStop,
+      to: b.toStop,
+      departureAt: b.departureAt,
+      arrivalAt: b.arrivalAt,
+      fromLocation: b.from,
+      toLocation: b.to,
+    };
+  };
+  const walk: Leg = { mode: 'walk', label: 'Walk 5m', durationMin: 5 };
+
+  it('bus legs at predicted low / high, the rest unchanged', () => {
+    // 50 min door to door; 30 min bus at peak × 1.2 → 36–48.6 min ride.
+    const route = { durationMin: 50, legs: [walk, busLeg(ist(9), 30), walk] };
+    expect(routeDurationRange(route, () => 1.2)).toEqual({ lowMin: 56, highMin: 69 });
+    // Schedule only: 30–40.5 min ride.
+    expect(routeDurationRange(route, () => null)).toEqual({ lowMin: 50, highMin: 61 });
+  });
+
+  it('null without a bus ETA (routes stay as they are)', () => {
+    expect(routeDurationRange({ durationMin: 20, legs: [walk] }, () => 1.5)).toBeNull();
+    const mockBus: Leg = { mode: 'bus', label: 'Bus 312', durationMin: 15 };
+    expect(routeDurationRange({ durationMin: 20, legs: [mockBus] }, () => 1.5)).toBeNull();
   });
 });
 

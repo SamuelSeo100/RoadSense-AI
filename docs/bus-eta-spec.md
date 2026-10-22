@@ -67,6 +67,14 @@ Phase 3 data should replace them.
   most, shared legs counted once). The base search makes 3–4 calls, plus timetable
   access legs.
 
+### Display
+
+- Bus row: arrival at your stop (range), ride range, and a source badge (tap for one line
+  on how it's estimated). The minutes on the right show the ride range too.
+- Route card total: when the route has a bus leg with an ETA, a range. Each bus leg's
+  predicted ride low / high replaces its scheduled ride; other legs and the wait are
+  unchanged. Routes without bus ETA are unchanged.
+
 ### Failure behaviour
 
 - Traffic call fails or Google returns no route: "Scheduled", schedule-only range.
@@ -109,5 +117,7 @@ During navigation, log what actually happened on each bus leg of the started tri
     schedule × factor)
   - coverage: % of actual arrivals inside the predicted range (and the range width, so
     a wider range doesn't win by default)
+- **Ranking:** routes are still ranked on the *scheduled* duration (`durationMin`), not
+  the bus ETA range. Rank on the predicted duration once the model beats this baseline.
 - **Ship rule:** lower MAE *and* coverage at least the baseline's, with no wider
   average range. Swap `estimateBusLeg` for the model and log `model` = its version.

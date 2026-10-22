@@ -84,8 +84,14 @@ run('manual bus ETA', () => {
       require('../../google/googleClient') as typeof import('../../google/googleClient');
     const { fetchBusTrafficRatio } =
       require('../../google/googleBusTraffic') as typeof import('../../google/googleBusTraffic');
-    const { busEtaConfig, busLegKey, busLegOf, createBusEtaService, estimateBusLeg } =
-      require('../../busEta') as typeof import('../../busEta');
+    const {
+      busEtaConfig,
+      busLegKey,
+      busLegOf,
+      createBusEtaService,
+      estimateBusLeg,
+      routeDurationRange,
+    } = require('../../busEta') as typeof import('../../busEta');
     /* eslint-enable @typescript-eslint/no-require-imports */
     const routing = createGoogleRoutingService({
       directions: createGoogleDirectionsService(createMockSafetyService()),
@@ -125,7 +131,11 @@ run('manual bus ETA', () => {
         );
         const etaCalls = googleCallCount() - before - searchCalls;
         for (const r of top) {
-          lines.push(`  #${r.rank} ${r.name} ${r.durationMin} min`);
+          const total = routeDurationRange(r, (b) => factors.get(busLegKey(b)) ?? null);
+          const card = total
+            ? `card ${total.lowMin}–${total.highMin} min (scheduled ${r.durationMin})`
+            : `card ${r.durationMin} min`;
+          lines.push(`  #${r.rank} ${r.name}: ${card}`);
           for (const l of r.legs) {
             const b = busLegOf(l);
             if (!b) continue;

@@ -7,6 +7,7 @@ import {
   busLegKey,
   busLegOf,
   estimateBusLeg,
+  routeDurationRange,
   type BusEta,
   type BusLeg,
   type Leg,
@@ -51,6 +52,21 @@ export function requestBusEtas(ranked: Pick<Route, 'legs'>[]) {
 /** The estimate as shown right now (schedule-only until its traffic factor is in). */
 export function currentBusEta(bus: BusLeg): BusEta {
   return estimateBusLeg(bus, useBusEtaStore.getState().factors[busLegKey(bus)] ?? null);
+}
+
+/** Card totals with bus ETAs (route id → range), updating as traffic calls return. */
+export function useDurationRanges(
+  routes: Pick<Route, 'id' | 'durationMin' | 'legs'>[],
+): Map<string, { lowMin: number; highMin: number }> {
+  const factors = useBusEtaStore((s) => s.factors);
+  return useMemo(() => {
+    const ranges = new Map<string, { lowMin: number; highMin: number }>();
+    for (const r of routes) {
+      const range = routeDurationRange(r, (bus) => factors[busLegKey(bus)] ?? null);
+      if (range) ranges.set(r.id, range);
+    }
+    return ranges;
+  }, [routes, factors]);
 }
 
 /** The leg's ETA, updating when its traffic call returns; null for non-bus legs. */

@@ -26,13 +26,22 @@ interface RouteCardProps {
   onPress: () => void;
   /** Expanded detail (step list), rendered under the summary. */
   children?: ReactNode;
+  /** Total with bus ETAs ("52–64 min"); without it, `durationMin`. */
+  durationRange?: { lowMin: number; highMin: number };
 }
 
 /**
  * Ranked route on the Routes tab: leg strip, time, cost, walk/transfers/traffic.
  * One badge at most: "Top pick" (`aiPick`) wins over "Best for <priority>".
  */
-export function RouteCard({ route, priorityLabel, selected, onPress, children }: RouteCardProps) {
+export function RouteCard({
+  route,
+  priorityLabel,
+  selected,
+  onPress,
+  children,
+  durationRange,
+}: RouteCardProps) {
   const badge = route.aiPick
     ? TOP_PICK_LABEL.toUpperCase()
     : route.isBest
@@ -40,13 +49,17 @@ export function RouteCard({ route, priorityLabel, selected, onPress, children }:
       : null;
   const cost = routeCost(route);
   const nextDeparture = nextDepartureNote(route);
+  const ranged = durationRange && durationRange.highMin > durationRange.lowMin;
+  const duration = ranged
+    ? `${durationRange.lowMin}–${durationRange.highMin}`
+    : String(durationRange?.lowMin ?? route.durationMin);
   return (
     <View style={[styles.card, selected ? [styles.selected, shadows.selectedCard] : styles.normal]}>
       <PressableBox
         onPress={onPress}
         accessibilityRole="button"
         accessibilityState={{ selected, expanded: children !== undefined }}
-        accessibilityLabel={`${badge ? `${badge.toLowerCase()}. ` : ''}${route.name}, ${route.durationMin} minutes, ${cost}, ${route.legs.map((l) => l.label).join(', then ')}${nextDeparture ? `. ${nextDeparture}` : ''}`}
+        accessibilityLabel={`${badge ? `${badge.toLowerCase()}. ` : ''}${route.name}, ${duration.replace('–', ' to ')} minutes, ${cost}, ${route.legs.map((l) => l.label).join(', then ')}${nextDeparture ? `. ${nextDeparture}` : ''}`}
         style={styles.summary}
         pressedStyle={styles.pressed}
       >
@@ -61,7 +74,7 @@ export function RouteCard({ route, priorityLabel, selected, onPress, children }:
 
         <View style={styles.row}>
           <RText variant="bigNumber">
-            {route.durationMin}
+            {duration}
             <RText variant="caption" size={13}>
               {' '}
               min

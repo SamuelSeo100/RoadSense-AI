@@ -119,6 +119,31 @@ export function estimateBusLeg(leg: BusLeg, trafficFactor: number | null): BusEt
   };
 }
 
+/**
+ * Door-to-door minutes with every bus leg's predicted ride (low / high) in place
+ * of its scheduled one; other legs unchanged. Null when the route has no bus ETA.
+ * Ranking still uses the scheduled `durationMin`.
+ */
+export function routeDurationRange(
+  route: { durationMin: number; legs: Leg[] },
+  factorOf: (leg: BusLeg) => number | null,
+): { lowMin: number; highMin: number } | null {
+  let low = 0;
+  let high = 0;
+  let any = false;
+  for (const l of route.legs) {
+    const bus = busLegOf(l);
+    if (!bus) continue;
+    const eta = estimateBusLeg(bus, factorOf(bus));
+    low += eta.rideLowMin - eta.scheduledRideMin;
+    high += eta.rideHighMin - eta.scheduledRideMin;
+    any = true;
+  }
+  if (!any) return null;
+  const lowMin = Math.round(route.durationMin + low);
+  return { lowMin, highMin: Math.max(lowMin, Math.round(route.durationMin + high)) };
+}
+
 /** Road duration / static duration from `from` to `to` leaving at `at`; null when unknown. */
 export type FetchTrafficRatio = (from: LatLng, to: LatLng, at: Date) => Promise<number | null>;
 

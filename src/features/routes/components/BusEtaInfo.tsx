@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { PressableBox } from '@/components/routly/PressableBox';
 import { RText } from '@/components/routly/RText';
 import type { BusEta, BusEtaSource, Leg } from '@/services';
-import { colors, radius } from '@/theme/routly';
+import { colors, fonts, radius } from '@/theme/routly';
 
 import { useBusEta } from '../../trip/busEtaStore';
 
@@ -45,6 +45,16 @@ function useNow(everyMs: number): number {
     return () => clearInterval(timer);
   }, [everyMs]);
   return now;
+}
+
+/** A bus row's minutes: the ride range ("14–19m") when it has an ETA, else `fallback`. */
+export function BusLegMinutes({ leg, fallback }: { leg: Leg; fallback: string }) {
+  const result = useBusEta(leg);
+  return (
+    <RText variant="body" size={13} family={fonts.extrabold}>
+      {result ? `${range(result.eta.rideLowMin, result.eta.rideHighMin)}m` : fallback}
+    </RText>
+  );
 }
 
 /** Bus leg row: when it reaches your stop, the ride range and where that comes from. */

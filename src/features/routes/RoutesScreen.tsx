@@ -20,7 +20,7 @@ import { SHEET_FULL, SHEET_PEEK, showToast } from '../shell/shellStore';
 import { useMapContent, useSheet, useTopBar } from '../shell/useScreenChrome';
 import { DirectionsCard } from '../trip/DirectionsCard';
 import { modeFilterLabel } from '../trip/modeFilter';
-import { requestBusEtas } from '../trip/busEtaStore';
+import { requestBusEtas, useDurationRanges } from '../trip/busEtaStore';
 import { logBusEtas, logChoice, startTrip } from '../trip/tripLog';
 import { shownRoutes, useTripStore } from '../trip/tripStore';
 
@@ -106,6 +106,7 @@ export function RoutesScreen() {
 
   // Bus ETAs for the top routes, after the list is up (schedule-only until each returns).
   useEffect(() => requestBusEtas(ranked), [ranked]);
+  const durationRanges = useDurationRanges(ranked);
 
   const onCardPress = (route: RankedRoute) => {
     if (!ready) return;
@@ -230,6 +231,7 @@ export function RoutesScreen() {
                         route={route}
                         priorityLabel={priorityLabel}
                         selected={isSelected}
+                        durationRange={durationRanges.get(route.id)}
                         onPress={() => onCardPress(route)}
                       >
                         {open ? (
