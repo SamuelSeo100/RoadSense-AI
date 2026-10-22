@@ -1,6 +1,16 @@
 import { create } from 'zustand';
 
+import { isPreviewBuild } from '@/lib/appInfo';
 import type { Place, Priority, RankedRoute } from '@/services';
+
+/** "Simulate trip" exists only in dev and preview builds (never production). */
+export const simulationAvailable = __DEV__ || isPreviewBuild;
+
+/** The "Simulate trip" toggle on Routes (session only; off in production). */
+export const useSimulateToggle = create<{ on: boolean; set: (on: boolean) => void }>()((set) => ({
+  on: false,
+  set: (on) => set({ on: on && simulationAvailable }),
+}));
 
 /** The trip being navigated, handed from Routes ("Start") to the navigation screen. */
 export interface NavigationRequest {
@@ -11,6 +21,8 @@ export interface NavigationRequest {
   /** Ranking the route was picked under (reroutes keep it). */
   priority: Priority;
   startedAt: number;
+  /** Demo replay (dev / preview builds): fake GPS, nothing logged. */
+  simulate?: boolean;
 }
 
 interface NavigationState {

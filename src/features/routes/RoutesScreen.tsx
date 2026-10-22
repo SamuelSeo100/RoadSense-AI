@@ -13,7 +13,7 @@ import { colors, fonts, radius } from '@/theme/routly';
 
 import { useRouteGeometry } from '../map/legGeometry';
 import { prepareAlerts } from '../navigation/alerts';
-import { useNavigationStore } from '../navigation/navigationStore';
+import { useNavigationStore, useSimulateToggle } from '../navigation/navigationStore';
 import { useMapStore, type MapContent } from '../map/mapStore';
 import { SheetScrollView } from '../shell/SheetScrollView';
 import { SHEET_FULL, SHEET_PEEK, showToast } from '../shell/shellStore';
@@ -126,10 +126,24 @@ export function RoutesScreen() {
     // Notification permission (POST_NOTIFICATIONS on Android 13+) before navigation
     // opens, so "Get off at the next stop" can reach a locked phone. Asked once.
     await prepareAlerts();
+    const legs = route.id === selected?.id ? selectedLegs : route.legs;
+    const at = new Date();
+    if (useSimulateToggle.getState().on) {
+      // Demo replay: no choice, trip, bus ETA or track is logged.
+      useNavigationStore.getState().begin({
+        route: { ...route, legs },
+        destination: to,
+        tripId: null,
+        priority,
+        startedAt: at.getTime(),
+        simulate: true,
+      });
+      router.push('/navigate');
+      return;
+    }
     logChoice(ready.requestId, route, priority, 'start');
     // The cab estimate for the same trip, for "saved vs cab" in History.
     const cab = ready.routes.find((r) => r.mapKey === 'cab' && !r.vehicle);
-    const at = new Date();
     const tripId = startTrip({
       requestId: ready.requestId,
       at,
@@ -141,7 +155,7 @@ export function RoutesScreen() {
     logBusEtas(ready.requestId, tripId, route);
     // Navigate the route as drawn (estimated legs replaced by real geometry once loaded).
     useNavigationStore.getState().begin({
-      route: { ...route, legs: route.id === selected?.id ? selectedLegs : route.legs },
+      route: { ...route, legs },
       destination: to,
       tripId,
       priority,

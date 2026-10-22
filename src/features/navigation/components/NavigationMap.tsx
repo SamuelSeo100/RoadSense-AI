@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { PixelRatio, Platform, StyleSheet } from 'react-native';
+import { PixelRatio, Platform, StyleSheet, View } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, Polyline } from 'react-native-maps';
 
 import type { NavStep } from '@/navigation/steps';
@@ -13,6 +13,12 @@ import { mapStyle } from '../../map/mapStyle';
 export interface NavigationMapProps {
   position: LatLng | null;
   heading: number | null;
+  /** The whole route (drawn faint underneath what's left). */
+  steps: readonly NavStep[];
+  /** Leg in progress: its remaining path is drawn wider. */
+  currentLeg: number | null;
+  /** Demo replay: the fake position gets its own marker (the real GPS dot is hidden). */
+  simulated: boolean;
   /** Remaining path per step, current step first. */
   paths: { step: NavStep; path: LatLng[] }[];
   destination: { name: string; location: LatLng };
@@ -36,6 +42,9 @@ function lineColor(step: NavStep): string {
 export function NavigationMap({
   position,
   heading,
+  steps,
+  currentLeg,
+  simulated,
   paths,
   destination,
   follow,
@@ -66,7 +75,7 @@ export function NavigationMap({
       style={StyleSheet.absoluteFill}
       provider={googleMaps ? PROVIDER_GOOGLE : undefined}
       customMapStyle={googleMaps ? mapStyle : undefined}
-      showsUserLocation
+      showsUserLocation={!simulated}
       followsUserLocation={false}
       showsCompass={false}
       showsMyLocationButton={false}
@@ -78,15 +87,29 @@ export function NavigationMap({
       initialCamera={{ center: start, heading: 0, pitch: 0, zoom: 16, altitude: 1000 }}
       accessibilityLabel="Navigation map"
     >
+      {steps.map((step) =>
+        step.polyline.length < 2 ? null : (
+          <Polyline
+            key={`${step.id}-full`}
+            coordinates={step.polyline}
+            strokeColor={colors.borderStrong}
+            strokeWidth={4}
+            lineCap="round"
+            lineJoin="round"
+            zIndex={0}
+          />
+        ),
+      )}
       {paths.map(({ step, path }, i) => {
         if (path.length < 2) return null;
+        const current = step.legIndex === currentLeg;
         if (step.kind === 'walk') {
           return (
             <Polyline
               key={`${step.id}-walk`}
               coordinates={path}
               strokeColor={modeColors.walk.line}
-              strokeWidth={5}
+              strokeWidth={current ? 7 : 5}
               lineCap="round"
               lineJoin="round"
               lineDashPattern={WALK_PATTERN}
@@ -99,7 +122,7 @@ export function NavigationMap({
             key={`${step.id}-outline`}
             coordinates={path}
             strokeColor={colors.surface}
-            strokeWidth={10}
+            strokeWidth={current ? 13 : 10}
             lineCap="round"
             lineJoin="round"
             zIndex={i === 0 ? 2 : 1}
@@ -108,13 +131,24 @@ export function NavigationMap({
             key={`${step.id}-solid`}
             coordinates={path}
             strokeColor={lineColor(step)}
-            strokeWidth={6.5}
+            strokeWidth={current ? 9 : 6.5}
             lineCap="round"
             lineJoin="round"
             zIndex={i === 0 ? 2 : 1}
           />,
         ];
       })}
+      {simulated && position && (
+        <Marker
+          coordinate={position}
+          anchor={{ x: 0.5, y: 0.5 }}
+          tracksViewChanges={false}
+          zIndex={5}
+          accessibilityLabel="Simulated position"
+        >
+          <View style={styles.simDot} />
+        </Marker>
+      )}
       <Marker
         coordinate={destination.location}
         anchor={{ x: 0.5, y: 1 }}
@@ -127,3 +161,14 @@ export function NavigationMap({
     </MapView>
   );
 }
+
+const styles = StyleSheet.create({
+  simDot: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 3,
+    borderColor: colors.surface,
+    backgroundColor: colors.primary,
+  },
+});

@@ -6,12 +6,7 @@ import type { NavEvent } from '@/navigation/engine';
 const LANGUAGE = 'en-IN';
 
 /** What to say for an engine event, or null. */
-export function phraseFor(
-  event: NavEvent,
-  destinationName: string,
-  /** A new route is being computed (false once the 5 reroutes per trip are used). */
-  rerouting = true,
-): string | null {
+export function phraseFor(event: NavEvent, destinationName: string): string | null {
   switch (event.type) {
     case 'stepStart': {
       const t = event.step.transit;
@@ -22,9 +17,11 @@ export function phraseFor(
     case 'approachTurn':
       return `In 100 metres, ${event.next.instruction}`;
     case 'alightSoon':
-      return `Get off at next stop: ${event.stop}`;
+      return `Get off soon, at ${event.stop}`;
+    case 'stopNext':
+      return `Your stop is next: ${event.stop}`;
     case 'offRoute':
-      return rerouting ? 'You are off the route. Finding a new one.' : 'You are off the route.';
+      return 'You are off the route.';
     case 'arrived':
       return `You have arrived at ${destinationName}`;
     default:

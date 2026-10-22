@@ -3,16 +3,20 @@
  * fixes, act on the events it returns. Times are the fixes' own clocks (ms),
  * so tests can replay a trip.
  *
- * - Advance when within 20 m of the step's end (35 m when accuracy > 25 m;
- *   150 m for a ride, station coordinates are approximate).
- * - Off route: > 50 m (walk) / 100 m (road) from the step for 15 s in a
- *   row. Never during rides (trains leave the road graph).
- * - Ride boarding: moving > 15 km/h near the line. "Get off at the next
- *   stop" once past the stop before the alighting one, or 600 m out when
- *   the stops aren't known.
- * - Off-route ignores fixes less accurate than 50 m.
- * - Reroute: asked for on off-route, at most once per 30 s and 5 times per
- *   trip; after that off-route is only reported (no recompute).
+ * - Advance when within 20 m of the step's end (35 m when accuracy > 25 m),
+ *   40 m at the end of a walk leg.
+ * - Rides end once the user has been within 150 m of the alighting stop and
+ *   is moving away from it again (alighted, or going on past it); the alight
+ *   time is the closest approach.
+ * - Off route: > 60 m (walk) / 100 m (own car or bike) from the step for 20 s
+ *   in a row. Never during rides (GPS in vehicles is noisy) or hired autos /
+ *   cabs (the driver picks the way). Fixes less accurate than 50 m are ignored.
+ * - Reroute: only when the user asks (`requestReroute`), at most once per 30 s
+ *   and 5 times per trip.
+ * - Ride boarding: moving > 15 km/h near the line. "Get off soon" within
+ *   600 m (bus) / 900 m (metro, train) of the stop; "your stop is next"
+ *   within 250 m.
+ * - "Next leg": the user can skip to the next leg by hand (no GPS, missed fix).
  * - Arrival: within 50 m of the destination.
  */
 import { distanceM, pathLengthM, project, remainingPath } from './geo';
@@ -35,19 +39,30 @@ export const navConfig = {
   advanceM: 20,
   advanceLowAccuracyM: 35,
   lowAccuracyM: 25,
+  /** End of a walk leg (the last of its steps). */
+  legEndM: 40,
+  /** A ride ends after coming this close to the alighting stop… */
   rideAdvanceM: 150,
-  offRouteM: { walk: 50, drive: 100, two_wheeler: 100 },
-  offRouteForMs: 15_000,
+  /** …and then moving this much further away again. */
+  alightAwayM: 30,
+  offRouteM: { walk: 60, drive: 100, two_wheeler: 100 },
+  offRouteForMs: 20_000,
   /** Fixes worse than this neither start nor clear an off-route episode. */
   offRouteMaxAccuracyM: 50,
   /** Near the next ride's boarding point, a walk never goes off route (station forecourts). */
   nearBoardingM: 100,
+  /**
+   * Nor near the ride it follows: timetable station coordinates can be a few hundred
+   * metres from where Google's walk out of the station starts.
+   */
+  nearAlightingM: 300,
   boardSpeedKmh: 15,
   /** Timetable lines are straight station-to-station segments: be generous. */
   boardLineM: 250,
-  alightNoStopsM: 600,
-  /** "Past the stop before": within this of it along the line. */
-  alightStopSlackM: 100,
+  /** "Get off soon", metres before the alighting stop along the line. */
+  alightSoonM: { bus: 600, metro: 900, train: 900 },
+  /** "Your stop is next". */
+  stopNextM: 250,
   approachTurnM: 100,
   /** Steps shorter than this get no "in 100 m" warning (it would come at once). */
   approachMinStepM: 150,
@@ -63,9 +78,9 @@ export type NavEvent =
   | { type: 'approachTurn'; index: number; next: NavStep; t: number }
   | { type: 'boarded'; index: number; t: number }
   | { type: 'alightSoon'; index: number; stop: string; t: number }
+  | { type: 'stopNext'; index: number; stop: string; t: number }
+  /** Ask the user whether to reroute (`canReroute`, then `requestReroute`). */
   | { type: 'offRoute'; index: number; distanceM: number; t: number }
-  /** Compute a new route from `from`, then call `replaceSteps`. */
-  | { type: 'reroute'; from: LatLng; t: number }
   | { type: 'arrived'; t: number };
 
 /** What happened on one step (per route version: a reroute starts a new one). */
@@ -77,8 +92,12 @@ export interface StepRecord {
   endedAt?: number;
   /** Rides: when boarding was detected. */
   boardedAt?: number;
+  /** Rides ended by GPS: the closest approach to the alighting stop. */
+  alightedAt?: number;
   /** Ended by a reroute rather than reaching its end. */
   interrupted?: boolean;
+  /** Ended with "Next leg" (by hand), not by GPS. */
+  manual?: boolean;
 }
 
 export type NavStatus = 'idle' | 'navigating' | 'arrived' | 'ended';
@@ -96,13 +115,15 @@ export class NavigationEngine {
   private alongM = 0;
   private offSince: number | null = null;
   private offEmitted = false;
-  private rerouteAsked = false;
   private lastRerouteAt = -Infinity;
+  /** Current ride: closest approach to its alighting stop (metres, fix time). */
+  private nearest: { m: number; t: number } | null = null;
   private reroutes = 0;
   private rerouteRequests = 0;
   private offRoutes = 0;
   private approachDone = new Set<number>();
   private alightDone = new Set<number>();
+  private stopNextDone = new Set<number>();
 
   constructor(
     steps: NavStep[],
@@ -130,6 +151,15 @@ export class NavigationEngine {
   /** 5 reroutes asked for: off-route is still reported, but no new route is computed. */
   get rerouteLimitReached(): boolean {
     return this.rerouteRequests >= navConfig.maxReroutesPerTrip;
+  }
+  /** Off route right now (until back within the limit, or the step changes). */
+  get offRoute(): boolean {
+    return this.offEmitted;
+  }
+  /** The leg after the current one exists ("Next leg" can be offered). */
+  get hasNextLeg(): boolean {
+    const leg = this.steps[this.idx]?.legIndex;
+    return this.steps.some((s, i) => i > this.idx && s.legIndex !== leg);
   }
   get offRouteCount(): number {
     return this.offRoutes;
@@ -163,6 +193,9 @@ export class NavigationEngine {
     const events: NavEvent[] = [];
 
     if (distanceM(at, this.destination) <= navConfig.arriveM) {
+      // Arrived from the vehicle itself (the destination is by the line): it's the alight time too.
+      const rec = this.records[this.records.length - 1];
+      if (rec && rec.step.kind === 'transit' && rec.endedAt === undefined) rec.alightedAt = fix.t;
       this.closeCurrent(fix.t);
       this.status_ = 'arrived';
       return [{ type: 'arrived', t: fix.t }];
@@ -175,6 +208,12 @@ export class NavigationEngine {
       if (!step) break;
       if (!this.stepDone(step, at, fix, speedKmh)) break;
       if (this.idx >= this.steps.length - 1) break; // the last step ends on arrival only
+      if (step.kind === 'transit' && this.nearest) {
+        // Got off at the closest approach, not when they had walked away.
+        const rec = this.records[this.records.length - 1];
+        if (rec) rec.alightedAt = this.nearest.t;
+        this.closeCurrent(this.nearest.t);
+      }
       events.push(...this.enter(this.idx + 1, fix.t));
     }
 
@@ -218,15 +257,60 @@ export class NavigationEngine {
     this.reroutes += 1;
     this.approachDone = new Set();
     this.alightDone = new Set();
-    this.offSince = null;
-    this.offEmitted = false;
-    this.rerouteAsked = false;
+    this.stopNextDone = new Set();
     return this.enter(0, t, false);
   }
 
-  /** The reroute couldn't be computed: ask again (still at most once per 30 s). */
-  rerouteFailed(): void {
-    this.rerouteAsked = false;
+  /** A reroute may be computed now: under the per-trip cap, 30 s after the last one. */
+  canReroute(t: number): boolean {
+    return (
+      this.status_ === 'navigating' &&
+      !this.rerouteLimitReached &&
+      t - this.lastRerouteAt >= navConfig.rerouteEveryMs
+    );
+  }
+
+  /**
+   * The user asked to reroute: the position to compute the new route from
+   * (then `replaceSteps`), or null when not allowed now / no fix yet.
+   */
+  requestReroute(t: number): LatLng | null {
+    if (!this.lastFix || !this.canReroute(t)) return null;
+    this.rerouteRequests += 1;
+    this.lastRerouteAt = t;
+    return { latitude: this.lastFix.lat, longitude: this.lastFix.lng };
+  }
+
+  /** "Next leg" by hand: the current leg ends now, the next leg's first step starts. */
+  skipLeg(t: number): NavEvent[] {
+    if (this.status_ !== 'navigating') return [];
+    const leg = this.steps[this.idx]?.legIndex;
+    const next = this.steps.findIndex((s, i) => i > this.idx && s.legIndex !== leg);
+    if (next < 0) return [];
+    const rec = this.records[this.records.length - 1];
+    if (rec && rec.endedAt === undefined) rec.manual = true;
+    return this.enter(next, t);
+  }
+
+  /** Metres and seconds to the end of the current leg (its remaining steps). */
+  legRemaining(): { distanceM: number; durationS: number } {
+    const step = this.steps[this.idx];
+    if (!step) return { distanceM: 0, durationS: 0 };
+    const stepLen = step.polyline.length > 1 ? pathLengthM(step.polyline) : step.distanceM;
+    const frac = stepLen > 0 ? Math.max(0, 1 - this.alongM / stepLen) : 1;
+    let distance = step.distanceM * frac;
+    let duration = step.predictedDurationS * frac;
+    for (const s of this.steps.slice(this.idx + 1)) {
+      if (s.legIndex !== step.legIndex) break;
+      distance += s.distanceM;
+      duration += s.predictedDurationS;
+    }
+    return { distanceM: distance, durationS: duration };
+  }
+
+  /** Along-line progress on the current step (metres). */
+  get progressM(): number {
+    return this.alongM;
   }
 
   /** Path still to travel on the current step, then the later steps. */
@@ -270,7 +354,7 @@ export class NavigationEngine {
     this.alongM = 0;
     this.offSince = null;
     this.offEmitted = false;
-    this.rerouteAsked = false;
+    this.nearest = null;
     const step = this.steps[index];
     if (!step) return [];
     this.records.push({ step, version: this.version, startedAt: t });
@@ -287,9 +371,13 @@ export class NavigationEngine {
 
   private advanceRadius(step: NavStep, fix: Fix): number {
     if (step.kind === 'transit') return navConfig.rideAdvanceM;
-    return (fix.accuracy ?? 0) > navConfig.lowAccuracyM
-      ? navConfig.advanceLowAccuracyM
-      : navConfig.advanceM;
+    const radius =
+      (fix.accuracy ?? 0) > navConfig.lowAccuracyM
+        ? navConfig.advanceLowAccuracyM
+        : navConfig.advanceM;
+    const next = this.steps[this.idx + 1];
+    const legEnd = step.kind === 'walk' && (!next || next.legIndex !== step.legIndex);
+    return legEnd ? Math.max(radius, navConfig.legEndM) : radius;
   }
 
   private stepDone(step: NavStep, at: LatLng, fix: Fix, speedKmh: number): boolean {
@@ -299,10 +387,13 @@ export class NavigationEngine {
       const rec = this.records[this.records.length - 1];
       const start = step.polyline[0];
       const left = start ? distanceM(at, start) > navConfig.rideAdvanceM : true;
-      return (
-        (rec?.boardedAt !== undefined || left) &&
-        distanceM(at, step.endPoint) <= navConfig.rideAdvanceM
-      );
+      if (rec?.boardedAt === undefined && !left) return false;
+      // Near the alighting stop, then moving away from it: got off (or rode past).
+      const toEnd = distanceM(at, step.endPoint);
+      if (toEnd <= navConfig.rideAdvanceM && (!this.nearest || toEnd < this.nearest.m)) {
+        this.nearest = { m: toEnd, t: fix.t };
+      }
+      return !!this.nearest && toEnd >= this.nearest.m + navConfig.alightAwayM;
     }
     if (distanceM(at, step.endPoint) <= this.advanceRadius(step, fix)) return true;
     // Walking to a ride and already moving along its line: they boarded.
@@ -330,35 +421,28 @@ export class NavigationEngine {
       rec.boardedAt = fix.t;
       events.push({ type: 'boarded', index: this.idx, t: fix.t });
     }
-    if (this.alightDone.has(this.idx)) return events;
+    if (this.alightDone.has(this.idx) && this.stopNextDone.has(this.idx)) return events;
     const start = step.polyline[0];
     const moving =
       rec?.boardedAt !== undefined || (start ? distanceM(at, start) > 300 : offsetM !== null);
     if (!moving) return events;
-    const stops = step.transit?.stopsLatLng;
-    let soon: boolean;
-    if (stops && stops.length >= 2) {
-      const before = stops[stops.length - 2]!;
-      const here = project(stops, at);
-      const beforeAt = project(stops, before);
-      soon = !!here && !!beforeAt && here.alongM >= beforeAt.alongM - navConfig.alightStopSlackM;
-    } else {
-      soon = distanceM(at, step.endPoint) <= navConfig.alightNoStopsM;
-    }
-    if (soon) {
+    const stop = step.transit?.alightStop ?? 'your stop';
+    const toStop = rideRemainingM(step, at);
+    const mode = step.transit?.mode ?? 'bus';
+    if (!this.alightDone.has(this.idx) && toStop <= navConfig.alightSoonM[mode]) {
       this.alightDone.add(this.idx);
-      events.push({
-        type: 'alightSoon',
-        index: this.idx,
-        stop: step.transit?.alightStop ?? 'your stop',
-        t: fix.t,
-      });
+      events.push({ type: 'alightSoon', index: this.idx, stop, t: fix.t });
+    }
+    if (!this.stopNextDone.has(this.idx) && toStop <= navConfig.stopNextM) {
+      this.stopNextDone.add(this.idx);
+      events.push({ type: 'stopNext', index: this.idx, stop, t: fix.t });
     }
     return events;
   }
 
   private offRouteEvents(step: NavStep, at: LatLng, fix: Fix, offsetM: number | null): NavEvent[] {
     if (offsetM === null) return []; // no geometry to compare against
+    if (step.kind !== 'walk' && !step.ownVehicle) return []; // a hired auto / cab
     if ((fix.accuracy ?? 0) > navConfig.offRouteMaxAccuracyM) return [];
     const limit = navConfig.offRouteM[step.kind as keyof typeof navConfig.offRouteM];
     const next = this.steps[this.idx + 1];
@@ -366,33 +450,28 @@ export class NavigationEngine {
       next?.kind === 'transit' &&
       !!next.polyline[0] &&
       distanceM(at, next.polyline[0]) <= navConfig.nearBoardingM;
-    if (offsetM <= limit || nearBoarding) {
+    const prev = this.steps[this.idx - 1];
+    const nearAlighting =
+      prev?.kind === 'transit' && distanceM(at, prev.endPoint) <= navConfig.nearAlightingM;
+    if (offsetM <= limit || nearBoarding || nearAlighting) {
       this.offSince = null;
       this.offEmitted = false;
-      this.rerouteAsked = false;
       return [];
     }
     this.offSince ??= fix.t;
-    if (fix.t - this.offSince < navConfig.offRouteForMs) return [];
-    const events: NavEvent[] = [];
-    if (!this.offEmitted) {
-      this.offEmitted = true;
-      this.offRoutes += 1;
-      events.push({ type: 'offRoute', index: this.idx, distanceM: offsetM, t: fix.t });
-    }
-    // Still off route after a rate-limited attempt: ask again once allowed.
-    if (
-      !this.rerouteAsked &&
-      !this.rerouteLimitReached &&
-      fix.t - this.lastRerouteAt >= navConfig.rerouteEveryMs
-    ) {
-      this.rerouteAsked = true;
-      this.rerouteRequests += 1;
-      this.lastRerouteAt = fix.t;
-      events.push({ type: 'reroute', from: at, t: fix.t });
-    }
-    return events;
+    if (fix.t - this.offSince < navConfig.offRouteForMs || this.offEmitted) return [];
+    this.offEmitted = true;
+    this.offRoutes += 1;
+    return [{ type: 'offRoute', index: this.idx, distanceM: offsetM, t: fix.t }];
   }
+}
+
+/** Metres to a ride's alighting stop: along the line when on it, else straight. */
+function rideRemainingM(step: NavStep, at: LatLng): number {
+  const straight = distanceM(at, step.endPoint);
+  const proj = project(step.polyline, at);
+  if (!proj || proj.offsetM > navConfig.boardLineM) return straight;
+  return Math.max(straight, proj.totalM - proj.alongM);
 }
 
 /** Reported speed, else from the previous fix (iOS reports -1 when unknown). */

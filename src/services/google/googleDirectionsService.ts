@@ -41,22 +41,39 @@ export interface GoogleNavStep {
   navigationInstruction?: { maneuver?: string; instructions?: string };
 }
 
-/** Google's turn-by-turn steps (only those with text and geometry). */
+/**
+ * Google's turn-by-turn steps (those with geometry). A step without text
+ * ("continue straight") is folded into the one before it, so the steps cover
+ * the whole path (a hole reads as off route); first in line, it reads "Continue".
+ */
 export function legSteps(steps: GoogleNavStep[] | undefined): LegStep[] {
-  return (steps ?? []).flatMap((st) => {
-    const text = st.navigationInstruction?.instructions?.trim();
+  const out: LegStep[] = [];
+  for (const st of steps ?? []) {
     const encoded = st.polyline?.encodedPolyline;
-    if (!text || !encoded) return [];
-    return [
-      {
-        instruction: text.replace(/\s*\n\s*/g, '. '),
-        maneuver: st.navigationInstruction?.maneuver,
-        distanceM: st.distanceMeters ?? 0,
-        durationSec: Number.parseInt(st.staticDuration ?? '0', 10) || 0,
-        polyline: decodePolyline(encoded),
-      },
-    ];
-  });
+    if (!encoded) continue;
+    const text = st.navigationInstruction?.instructions?.trim();
+    const polyline = decodePolyline(encoded);
+    const distanceM = st.distanceMeters ?? 0;
+    const durationSec = Number.parseInt(st.staticDuration ?? '0', 10) || 0;
+    const prev = out[out.length - 1];
+    if (!text && prev) {
+      out[out.length - 1] = {
+        ...prev,
+        distanceM: prev.distanceM + distanceM,
+        durationSec: prev.durationSec + durationSec,
+        polyline: [...prev.polyline, ...polyline],
+      };
+      continue;
+    }
+    out.push({
+      instruction: text ? text.replace(/\s*\n\s*/g, '. ') : 'Continue',
+      maneuver: st.navigationInstruction?.maneuver,
+      distanceM,
+      durationSec,
+      polyline,
+    });
+  }
+  return out;
 }
 
 /** ~1 m precision: repeated requests for the same trip hit the cache. */
