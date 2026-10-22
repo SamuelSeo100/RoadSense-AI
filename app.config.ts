@@ -72,6 +72,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           project: 'routly-app',
         },
       ],
+      // Close mode: selectable as the default digital assistant (power-button long-press).
+      './plugins/withAssistIntent',
       // react-native-maps 1.27 needs its own plugin entry: it writes the Android
       // manifest key, and on iOS adds the Google Maps pod + GMSServices init.
       [

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, Linking, Platform, Pressable, StyleSheet, View } from 'react-native';
 
 import { Icon } from '@/components/routly/Icon';
 import { RText } from '@/components/routly/RText';
@@ -27,6 +27,8 @@ import { showToast } from '../shell/shellStore';
 import { useMapContent, useTopBar } from '../shell/useScreenChrome';
 import { useHistoryVersion } from '../trip/tripLog';
 
+import { closeModeAvailable } from '../../../modules/routly-assist';
+
 import { GroupedList, ListRow } from './components/GroupedList';
 import { PreferencesCard } from './components/PreferencesCard';
 import { QUICK_LAUNCH_COMBOS, QuickLaunchCard } from './components/QuickLaunchCard';
@@ -35,6 +37,22 @@ import { QUICK_LAUNCH_COMBOS, QuickLaunchCard } from './components/QuickLaunchCa
 const BUILD_INFO = `Build info: ${buildInfoLabel()}`;
 
 const LINKED_APPS: BookingProvider[] = ['uber', 'ola', 'puneMetro'];
+
+/** Settings › Default apps › Digital assistant app (the screen differs across Android skins). */
+async function openAssistantSettings() {
+  for (const action of [
+    'android.settings.VOICE_INPUT_SETTINGS',
+    'android.settings.MANAGE_DEFAULT_APPS_SETTINGS',
+  ]) {
+    try {
+      await Linking.sendIntent(action);
+      return;
+    } catch {
+      // Not on this phone: try the next one.
+    }
+  }
+  showToast('Open Settings › Default apps › Digital assistant app');
+}
 
 /** Profile shows no routes on the map, only the location dot. */
 const NO_ROUTES = { routes: [], selection: 'none', focused: false };
@@ -282,6 +300,20 @@ export function ProfileScreen() {
               accessibilityLabel="Share trip GPS for research"
             />
           </ListRow>
+          {Platform.OS === 'android' && closeModeAvailable && (
+            <ListRow
+              minHeight={60}
+              onPress={() => void openAssistantSettings()}
+              accessibilityLabel="Set Routly as assistant. Hold the power button to plan a trip, even on the lock screen"
+            >
+              <View style={[styles.flex, styles.version]}>
+                <RText variant="body">Set Routly as assistant</RText>
+                <RText variant="caption" size={13}>
+                  Hold the power button to plan a trip, even on the lock screen.
+                </RText>
+              </View>
+            </ListRow>
+          )}
           <ListRow
             minHeight={52}
             onPress={comingSoon('Language settings')}
