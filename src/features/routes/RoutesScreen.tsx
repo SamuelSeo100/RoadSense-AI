@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Keyboard, Pressable, StyleSheet, View, type TextInput } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
@@ -73,10 +73,16 @@ export function RoutesScreen() {
   const [picked, setPicked] = useState<{ requestId: string; id: string; open: boolean } | null>(
     null,
   );
+  // Close mode's pick (Routes opened with ?open=<route id>) until the user taps a card.
+  const { open: openId } = useLocalSearchParams<{ open?: string }>();
+  const fromAssist =
+    ready && openId && ranked.some((r) => r.id === openId)
+      ? { requestId: ready.requestId, id: openId, open: true }
+      : null;
   const userPick =
     ready && picked?.requestId === ready.requestId && ranked.some((r) => r.id === picked.id)
       ? picked
-      : null;
+      : fromAssist;
   const selected = ranked.find((r) => r.id === userPick?.id) ?? ranked[0] ?? null;
   // Estimated legs of the selected route get real geometry once it loads.
   const selectedLegs = useRouteGeometry(selected);
@@ -111,6 +117,14 @@ export function RoutesScreen() {
   // Bus ETAs for the top routes, after the list is up (schedule-only until each returns).
   useEffect(() => requestBusEtas(ranked), [ranked]);
   const durationRanges = useDurationRanges(ranked);
+
+  // Opened from close mode with that route picked: logged as an expand, like a card tap.
+  const assistRoute = ready && openId ? ready.routes.find((r) => r.id === openId) : undefined;
+  useEffect(() => {
+    if (ready && assistRoute) logChoice(ready.requestId, assistRoute, priority, 'expand');
+    // Once per opened route.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready?.requestId, assistRoute?.id]);
 
   const onCardPress = (route: RankedRoute) => {
     if (!ready) return;

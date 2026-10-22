@@ -85,6 +85,9 @@ function RootLayout() {
           <Stack.Screen name="(app)" />
           {/* Turn-by-turn, full screen over the map shell; back = "End trip?" */}
           <Stack.Screen name="navigate" options={{ gestureEnabled: false }} />
+          {/* Close mode (power-button long-press, maybe over the lock screen): no transition,
+              so the screen below never slides into view. */}
+          <Stack.Screen name="assist" options={{ animation: 'none' }} />
         </Stack.Protected>
         <Stack.Protected guard={!signedIn}>
           <Stack.Screen name="(auth)" />
