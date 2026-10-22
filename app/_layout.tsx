@@ -87,7 +87,10 @@ function RootLayout() {
           <Stack.Screen name="navigate" options={{ gestureEnabled: false }} />
           {/* Close mode (power-button long-press, maybe over the lock screen): no transition,
               so the screen below never slides into view. */}
-          <Stack.Screen name="assist" options={{ animation: 'none' }} />
+          <Stack.Screen
+            name="assist"
+            options={{ animation: 'none', contentStyle: { backgroundColor: 'transparent' } }}
+          />
         </Stack.Protected>
         <Stack.Protected guard={!signedIn}>
           <Stack.Screen name="(auth)" />

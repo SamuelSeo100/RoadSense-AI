@@ -21,6 +21,12 @@ class RoutlyAssistModule : Module() {
 
     Function("leaveAssist") { AssistLaunch.leave() }
 
+    /** Close the overlay: back to whatever was behind it. */
+    Function("dismissAssist") { AssistLaunch.dismiss() }
+
+    /** True when /assist is shown as a translucent overlay (else draw an opaque screen). */
+    Function("isOverlay") { AssistLaunch.isOverlay }
+
     /** Resolves true once unlocked (or not locked), false if the user cancelled. */
     AsyncFunction("dismissKeyguard") { promise: Promise ->
       val activity = appContext.currentActivity

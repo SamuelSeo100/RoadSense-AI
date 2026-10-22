@@ -4,6 +4,8 @@ interface RoutlyAssistNative {
   isLocked(): boolean;
   revealAssist(): void;
   leaveAssist(): void;
+  dismissAssist(): void;
+  isOverlay(): boolean;
   dismissKeyguard(): Promise<boolean>;
 }
 
@@ -24,3 +26,9 @@ export const leaveAssist = (): void => native?.leaveAssist();
 /** Unlock before opening the full app; false when the user cancelled. */
 export const dismissKeyguard = (): Promise<boolean> =>
   native ? native.dismissKeyguard() : Promise.resolve(true);
+
+/** Close the overlay and go back to whatever was behind it (home, an app, the lock screen). */
+export const dismissAssist = (): void => native?.dismissAssist();
+
+/** /assist is a translucent overlay (false on older Android or builds without close mode). */
+export const isOverlay = (): boolean => native?.isOverlay() ?? false;

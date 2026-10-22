@@ -6,6 +6,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
@@ -22,7 +24,12 @@ import java.lang.ref.WeakReference
  * Lock-screen mode (showWhenLocked + turnScreenOn) is on only for an ASSIST launch, behind a
  * plain cover until the /assist screen is on top (no other screen ever shows over the lock
  * screen). It goes off when JS leaves /assist, the screen turns off, the user leaves the app,
- * or /assist doesn't appear in time.
+ * or /assist doesn't appear in time. The flags are set synchronously in the launch callback
+ * (onCreate / onNewIntent), before the window manager decides what shows over the keyguard.
+ *
+ * Overlay mode (same lifetime): the activity is translucent (Activity.setTranslucent, API 30+)
+ * with a transparent window, so whatever is behind (home, an app, the lock screen) stays visible
+ * under the /assist panel; opaque again on leaving.
  */
 object AssistLaunch {
   private const val ASSIST_URL = "routly://assist"
@@ -34,6 +41,9 @@ object AssistLaunch {
   private var activityRef: WeakReference<Activity>? = null
   private var cover: View? = null
   private var screenOff: BroadcastReceiver? = null
+  /** The window background before overlay mode (restored on leave). */
+  private var savedBackground: Drawable? = null
+  private var translucent = false
   private val revealTimeout = Runnable { activityRef?.get()?.let { applyLockMode(it, false) } }
 
   fun attach(activity: Activity) {
@@ -48,7 +58,18 @@ object AssistLaunch {
     if (intent?.action != Intent.ACTION_ASSIST) return
     intent.action = Intent.ACTION_VIEW
     intent.data = Uri.parse(ASSIST_URL)
-    main.post { applyLockMode(activity, true) }
+    // Now, not posted: a warm launch over the keyguard is judged before a posted change lands.
+    if (Looper.myLooper() == Looper.getMainLooper()) applyLockMode(activity, true)
+    else main.post { applyLockMode(activity, true) }
+  }
+
+  /** The overlay's dismiss: back to whatever was behind (home, the app, the lock screen). */
+  fun dismiss() {
+    main.post {
+      val a = activity ?: return@post
+      applyLockMode(a, false)
+      a.moveTaskToBack(true)
+    }
   }
 
   /** /assist is on screen: drop the cover. */
@@ -70,6 +91,7 @@ object AssistLaunch {
       activity.setTurnScreenOn(on)
     }
     main.removeCallbacks(revealTimeout)
+    setOverlay(activity, on)
     if (on) {
       addCover(activity)
       watchScreenOff(activity)
@@ -79,6 +101,26 @@ object AssistLaunch {
       stopWatchingScreenOff(activity)
     }
   }
+
+  private fun setOverlay(activity: Activity, on: Boolean) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R || on == translucent) return
+    val window = activity.window
+    if (on) {
+      savedBackground = window.decorView.background
+      window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+      translucent = activity.setTranslucent(true)
+      if (!translucent) window.setBackgroundDrawable(savedBackground)
+    } else {
+      activity.setTranslucent(false)
+      window.setBackgroundDrawable(savedBackground ?: ColorDrawable(Color.parseColor(COVER_COLOR)))
+      savedBackground = null
+      translucent = false
+    }
+  }
+
+  /** Overlay mode is on (JS draws the dimmed backdrop only then). */
+  val isOverlay: Boolean
+    get() = translucent
 
   private fun addCover(activity: Activity) {
     if (cover != null) return
