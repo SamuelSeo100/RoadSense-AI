@@ -44,3 +44,4 @@ scripts/transit-probe.json
 
 # Supabase CLI local state
 supabase/.temp/
+/modules/*/android/build/
