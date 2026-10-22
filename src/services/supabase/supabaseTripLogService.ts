@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import * as Crypto from 'expo-crypto';
 
+import { busEtaConfig } from '../busEta';
 import { encodePolyline } from '../google/polyline';
 import { PRIORITIES, type LatLng, type Mode, type Route, type TripLogService } from '../types';
 import { isNight } from '../walkSafety';
@@ -150,9 +151,43 @@ export function createSupabaseTripLogService(supabase: SupabaseClient): TripLogS
       });
     },
 
+    logBusEtaPredictions(predictions) {
+      for (const { requestId, tripId, legIndex, at, leg, eta } of predictions) {
+        // Weekday of the scheduled departure, like the hour band.
+        const { weekday } = istParts(new Date(leg.departureAt));
+        write('bus_eta_predictions', {
+          route_request_id: requestId,
+          trip_id: tripId,
+          leg_index: legIndex,
+          created_at: at.toISOString(),
+          model: busEtaConfig.model,
+          route_short_name: leg.line,
+          from_stop_name: leg.fromStop,
+          from_lat: round4(leg.from.latitude),
+          from_lng: round4(leg.from.longitude),
+          to_stop_name: leg.toStop,
+          to_lat: round4(leg.to.latitude),
+          to_lng: round4(leg.to.longitude),
+          scheduled_departure: leg.departureAt,
+          scheduled_arrival: leg.arrivalAt,
+          traffic_factor:
+            eta.trafficFactor === null ? null : Math.round(eta.trafficFactor * 1000) / 1000,
+          predicted_low_min: Math.round(eta.rideLowMin * 10) / 10,
+          predicted_high_min: Math.round(eta.rideHighMin * 10) / 10,
+          source: eta.source,
+          hour_band: eta.hourBand,
+          day_of_week: weekday,
+        });
+      }
+    },
+
     logTripTrack(track) {
       // Queued after its trip (the queue keeps order), so the foreign key holds.
       write('trip_tracks', { ...track });
+    },
+
+    logPerfTiming(timing) {
+      write('perf_timings', { ...timing });
     },
 
     onTripStored(listener) {
@@ -172,7 +207,9 @@ export function createNoopTripLogService(): TripLogService {
     logRequest() {},
     logChoice() {},
     startTrip: () => null,
+    logBusEtaPredictions() {},
     logTripTrack() {},
+    logPerfTiming() {},
     onTripStored: () => () => {},
     clearPending() {},
   };

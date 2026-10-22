@@ -130,8 +130,13 @@ export function createSupabaseHistoryService(supabase: SupabaseClient): HistoryS
       const { data } = await supabase.auth.getSession();
       const userId = data.session?.user.id;
       if (!userId) return;
-      // Trips and choices first (they reference requests), then requests.
-      for (const table of ['trips', 'route_choices', 'route_requests'] as const) {
+      // Trips, choices and bus ETAs first (they reference requests), then requests.
+      for (const table of [
+        'bus_eta_predictions',
+        'trips',
+        'route_choices',
+        'route_requests',
+      ] as const) {
         const { error } = await supabase.from(table).delete().eq('user_id', userId);
         if (error) throw new Error(error.message);
       }

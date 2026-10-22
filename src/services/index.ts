@@ -1,6 +1,8 @@
 import { supabase } from '@/lib/supabase';
 
+import { createBusEtaService, type BusEtaService } from './busEta';
 import { hasGoogleMapsKey } from './config';
+import { fetchBusTrafficRatio } from './google/googleBusTraffic';
 import { createGoogleDirectionsService } from './google/googleDirectionsService';
 import { createGooglePlacesService } from './google/googlePlacesService';
 import { createGoogleRoutingService } from './google/googleRoutingService';
@@ -35,6 +37,7 @@ import type {
 } from './types';
 
 export * from './types';
+export * from './busEta';
 export { rankRoutes } from './ranking';
 export { transitDataCredits } from './transit/network';
 /** Origin used until the user's location is known (TODO(api): city centre from the backend). */
@@ -80,6 +83,11 @@ export const placesService: PlacesService = hasGoogleMapsKey
 export const directionsService: DirectionsService = hasGoogleMapsKey
   ? createGoogleDirectionsService(safetyService)
   : createMockDirectionsService();
+
+/** Bus ETAs: schedule × live road traffic with a key, schedule only without one. */
+export const busEtaService: BusEtaService = createBusEtaService(
+  hasGoogleMapsKey ? fetchBusTrafficRatio : null,
+);
 
 const mockRouting = createMockRoutingService();
 /**

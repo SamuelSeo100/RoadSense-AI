@@ -1,14 +1,19 @@
 import { create } from 'zustand';
 
 import {
+  busLegOf,
   tripLogService,
+  type BusEtaPredictionLog,
   type ChoiceAction,
   type Priority,
   type RankedRoute,
+  type Route,
   type RouteRequestLog,
   type StartTripLog,
 } from '@/services';
 import { useRoutlyPrefs } from '@/store/routlyPrefsStore';
+
+import { currentBusEta } from './busEtaStore';
 
 /** Bumped when a trip is stored or history is cleared, so History refetches. */
 export const useHistoryVersion = create<{ version: number; bump: () => void }>()((set) => ({
@@ -51,4 +56,18 @@ export function startTrip(trip: Omit<StartTripLog, 'requestId'> & { requestId: s
     ...trip,
     requestId: logged.has(trip.requestId) ? trip.requestId : null,
   });
+}
+
+/**
+ * The bus ETAs shown for a route the user started (only started routes: future
+ * ground truth is matched against these). Call after `startTrip`.
+ */
+export function logBusEtas(requestId: string, tripId: string | null, route: Pick<Route, 'legs'>) {
+  if (!learning() || !logged.has(requestId)) return;
+  const at = new Date();
+  const predictions = route.legs.flatMap((l, legIndex): BusEtaPredictionLog[] => {
+    const leg = busLegOf(l);
+    return leg ? [{ requestId, tripId, legIndex, at, leg, eta: currentBusEta(leg) }] : [];
+  });
+  if (predictions.length > 0) tripLogService.logBusEtaPredictions(predictions);
 }

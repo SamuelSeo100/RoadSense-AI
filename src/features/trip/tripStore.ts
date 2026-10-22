@@ -21,6 +21,7 @@ import { useMapStore } from '../map/mapStore';
 import { savedPlaceFor } from '../places/savedPlaces';
 
 import { matchesModes } from './modeFilter';
+import { markRanked, markSearchStart } from './perfTiming';
 import { logRequest } from './tripLog';
 
 /** From is either the live GPS position or a searched place. */
@@ -150,6 +151,7 @@ export const useTripStore = create<TripState>()((set, get) => {
     const controller = new AbortController();
     inflight = controller;
     const { signal } = controller;
+    markSearchStart();
     set({ routes: { status: 'loading' } });
     // Right after launch the first GPS fix may not have arrived yet: wait for it.
     const start =
@@ -181,6 +183,7 @@ export const useTripStore = create<TripState>()((set, get) => {
       ]);
       if (signal.aborted) return;
       const requestId = Crypto.randomUUID();
+      markRanked(requestId, result.googleAt);
       const fromName =
         origin.kind === 'place'
           ? origin.place.name
